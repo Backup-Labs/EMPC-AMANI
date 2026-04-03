@@ -268,11 +268,13 @@ export default function Home() {
               { title: "Color Psychology in Workspaces", date: "Mar 10, 2026", image: "/images/project2.png" },
             ].map((b, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.07 }}>
-                <div style={{ position: "relative", borderRadius: "14px", overflow: "hidden", aspectRatio: "16/10", marginBottom: "14px" }}>
-                  <Image src={b.image} alt={b.title} fill sizes="33vw" style={{ objectFit: "cover" }} />
-                </div>
-                <p style={{ fontSize: "11px", color: "#888", margin: "0 0 6px", fontWeight: 500 }}>{b.date}</p>
-                <p style={{ fontWeight: 700, fontSize: "0.95rem", color: "#111", margin: 0, lineHeight: 1.4 }}>{b.title}</p>
+                <Link href={`/blog/${b.title.toLowerCase().replace(/ /g, "-")}`} style={{ textDecoration: "none" }}>
+                  <div style={{ position: "relative", borderRadius: "14px", overflow: "hidden", aspectRatio: "16/10", marginBottom: "14px" }}>
+                    <Image src={b.image} alt={b.title} fill sizes="33vw" style={{ objectFit: "cover" }} />
+                  </div>
+                  <p style={{ fontSize: "11px", color: "#888", margin: "0 0 6px", fontWeight: 500 }}>{b.date}</p>
+                  <p style={{ fontWeight: 700, fontSize: "0.95rem", color: "#111", margin: 0, lineHeight: 1.4 }}>{b.title}</p>
+                </Link>
               </motion.div>
             ))}
           </div>

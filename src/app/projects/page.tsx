@@ -120,21 +120,23 @@ export default function Projects() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px", paddingTop: "40px", paddingBottom: "80px" }}>
             {featuredProjects.map((p, i) => (
               <motion.div key={i} {...fade(i * 0.07)} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                <div style={{ position: "relative", borderRadius: "16px", overflow: "hidden", aspectRatio: "1/1" }}>
+                <Link href={`/projects/${p.title.toLowerCase().replace(/ /g, "-")}`} style={{ position: "relative", borderRadius: "16px", overflow: "hidden", aspectRatio: "1/1", display: "block" }}>
                   <Image src={p.image} alt={p.title} fill sizes="(max-width:768px) 100vw, 33vw" style={{ objectFit: "cover", transition: "transform 0.6s ease" }} />
-                </div>
+                </Link>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                   <div>
-                    <p style={{ fontWeight: 700, fontSize: "0.95rem", margin: "0 0 8px", color: "#111" }}>{p.title}</p>
+                    <Link href={`/projects/${p.title.toLowerCase().replace(/ /g, "-")}`} style={{ textDecoration: "none" }}>
+                      <p style={{ fontWeight: 700, fontSize: "0.95rem", margin: "0 0 8px", color: "#111" }}>{p.title}</p>
+                    </Link>
                     <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
                       {p.tags.map((t) => (
                         <span key={t} style={{ fontSize: "11px", fontWeight: 500, color: "#444", border: "1px solid #c8c8c8", borderRadius: "999px", padding: "3px 10px" }}>{t}</span>
                       ))}
                     </div>
                   </div>
-                  <div style={{ height: "32px", width: "32px", borderRadius: "50%", border: "1px solid #c8c8c8", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <Link href={`/projects/${p.title.toLowerCase().replace(/ /g, "-")}`} style={{ height: "32px", width: "32px", borderRadius: "50%", border: "1px solid #c8c8c8", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, textDecoration: "none" }}>
                     <ArrowUpRight size={14} color="#555" />
-                  </div>
+                  </Link>
                 </div>
               </motion.div>
             ))}

@@ -93,7 +93,7 @@ export default function Blog() {
             {posts.map((post, i) => (
               <motion.article key={i} {...fade(i * 0.06)} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 {/* Image */}
-                <div style={{ position: "relative", borderRadius: "16px", overflow: "hidden", aspectRatio: "16/10" }}>
+                <Link href={`/blog/${post.title.toLowerCase().replace(/ /g, "-")}`} style={{ position: "relative", borderRadius: "16px", overflow: "hidden", aspectRatio: "16/10", display: "block" }}>
                   <Image src={post.image} alt={post.title} fill sizes="(max-width:768px) 100vw, 33vw" style={{ objectFit: "cover", transition: "transform 0.6s ease" }}
                     onMouseEnter={(e) => ((e.currentTarget as HTMLImageElement).style.transform = "scale(1.05)")}
                     onMouseLeave={(e) => ((e.currentTarget as HTMLImageElement).style.transform = "scale(1)")}
@@ -101,7 +101,7 @@ export default function Blog() {
                   <div style={{ position: "absolute", top: "12px", left: "12px", background: "rgba(0,0,0,0.52)", backdropFilter: "blur(8px)", borderRadius: "999px", padding: "4px 12px" }}>
                     <span style={{ color: "#fff", fontSize: "10px", fontWeight: 600, letterSpacing: "0.06em" }}>{post.category}</span>
                   </div>
-                </div>
+                </Link>
                 {/* Meta */}
                 <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
                   <span style={{ color: "#888", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px" }}>
@@ -112,11 +112,13 @@ export default function Blog() {
                   </span>
                 </div>
                 {/* Text */}
-                <h2 style={{ fontWeight: 700, fontSize: "1rem", lineHeight: 1.4, letterSpacing: "-0.01em", color: "#111", margin: 0 }}>
-                  {post.title}
-                </h2>
+                <Link href={`/blog/${post.title.toLowerCase().replace(/ /g, "-")}`} style={{ textDecoration: "none" }}>
+                  <h2 style={{ fontWeight: 700, fontSize: "1rem", lineHeight: 1.4, letterSpacing: "-0.01em", color: "#111", margin: 0 }}>
+                    {post.title}
+                  </h2>
+                </Link>
                 <p style={{ color: "#666", fontSize: "13px", lineHeight: 1.7, margin: 0 }}>{post.excerpt}</p>
-                <Link href="#" style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontWeight: 700, fontSize: "12px", color: "#111", textDecoration: "underline", textUnderlineOffset: "4px" }}>
+                <Link href={`/blog/${post.title.toLowerCase().replace(/ /g, "-")}`} style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontWeight: 700, fontSize: "12px", color: "#111", textDecoration: "underline", textUnderlineOffset: "4px" }}>
                   Read More <ArrowUpRight size={12} />
                 </Link>
               </motion.article>
