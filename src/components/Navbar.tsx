@@ -17,14 +17,11 @@ const navLinks = [
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [isHero, setIsHero] = useState(true);
   const pathname = usePathname();
 
   useEffect(() => {
     const handler = () => {
-      const y = window.scrollY;
-      setScrolled(y > 60);
-      setIsHero(y < 80);
+      setScrolled(window.scrollY > 60);
     };
     window.addEventListener("scroll", handler, { passive: true });
     handler();
@@ -37,60 +34,52 @@ export function Navbar() {
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="fixed top-0 left-0 right-0 z-50"
+        className="fixed top-0 left-0 right-0 z-50 px-4 md:px-0"
       >
         {/* Transparent bar that morphs into a pill on scroll */}
         <div
-          className="transition-all duration-500"
+          className="transition-all duration-500 ease-in-out mx-auto"
           style={{
-            margin: scrolled ? "12px auto" : "0 auto",
-            maxWidth: scrolled ? "780px" : "100%",
-            padding: scrolled ? "0 8px" : "0",
+            marginTop: scrolled ? "16px" : "0",
+            maxWidth: scrolled ? "720px" : "100%",
+            width: "100%",
           }}
         >
           <div
-            className="flex items-center justify-between transition-all duration-500"
-            style={{
-              background: scrolled ? "rgba(255,255,255,0.95)" : "transparent",
-              backdropFilter: scrolled ? "blur(20px)" : "none",
-              WebkitBackdropFilter: scrolled ? "blur(20px)" : "none",
-              borderRadius: scrolled ? "999px" : "0",
-              padding: scrolled ? "10px 20px 10px 16px" : "18px 40px",
-              boxShadow: scrolled ? "0 2px 24px rgba(0,0,0,0.10)" : "none",
-            }}
+            className={`
+              flex items-center justify-between transition-all duration-500 ease-in-out
+              ${scrolled 
+                ? "bg-white/90 backdrop-blur-xl border border-black/5 rounded-full px-6 py-3 md:px-8 shadow-xl" 
+                : "bg-transparent py-6 px-4 md:px-12 lg:px-16"
+              }
+            `}
           >
             {/* Logo */}
             <Link
               href="/"
-              style={{
-                fontFamily: "'Satoshi', sans-serif",
-                fontWeight: 800,
-                fontSize: scrolled ? "15px" : "17px",
-                color: scrolled ? "#111" : "#fff",
-                letterSpacing: "-0.02em",
-                transition: "all 0.3s",
-                textDecoration: "none",
-              }}
+              className={`
+                font-bold tracking-tighter transition-all duration-300 no-underline
+                ${scrolled ? "text-base text-[#111]" : "text-lg md:text-xl text-white"}
+              `}
             >
               EMPC-AMANI
             </Link>
 
             {/* Desktop links */}
-            <nav className="hidden md:flex items-center gap-6">
+            <nav className="hidden md:flex items-center gap-8">
               {navLinks.map((link) => {
                 const active = pathname === link.href;
                 return (
                   <Link
                     key={link.name}
                     href={link.href}
-                    style={{
-                      fontFamily: "'Satoshi', sans-serif",
-                      fontWeight: active ? 700 : 400,
-                      fontSize: "14px",
-                      color: scrolled ? (active ? "#111" : "#444") : "#fff",
-                      textDecoration: "none",
-                      transition: "color 0.3s",
-                    }}
+                    className={`
+                      text-[13px] font-bold no-underline transition-colors tracking-tight
+                      ${scrolled 
+                        ? (active ? "text-[#111]" : "text-[#555] hover:text-[#111]") 
+                        : "text-white/80 hover:text-white"
+                      }
+                    `}
                   >
                     {link.name}
                   </Link>
@@ -100,12 +89,14 @@ export function Navbar() {
 
             {/* Mobile hamburger */}
             <button
-              className="flex md:hidden items-center justify-center"
+              className={`
+                flex md:hidden items-center justify-center transition-colors
+                ${scrolled ? "text-[#111]" : "text-white"}
+              `}
               onClick={() => setMobileOpen(true)}
               aria-label="Open menu"
-              style={{ color: scrolled ? "#111" : "#fff" }}
             >
-              <Menu size={22} />
+              <Menu size={24} />
             </button>
           </div>
         </div>
@@ -118,40 +109,49 @@ export function Navbar() {
             initial={{ opacity: 0, x: "100%" }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
-            transition={{ type: "spring", damping: 28, stiffness: 250 }}
-            className="fixed inset-0 z-[100] flex flex-col bg-white px-8 py-10"
+            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+            className="fixed inset-0 z-[100] flex flex-col bg-white"
           >
-            <div className="flex items-center justify-between mb-14">
-              <span style={{ fontFamily: "'Satoshi', sans-serif", fontWeight: 800, fontSize: "17px" }}>
+            <div className="flex items-center justify-between p-6 md:p-10">
+              <span className="font-bold text-lg tracking-tighter">
                 EMPC-AMANI
               </span>
               <button
                 onClick={() => setMobileOpen(false)}
-                className="h-10 w-10 flex items-center justify-center rounded-full"
-                style={{ background: "#f0f0f0" }}
+                className="h-12 w-12 flex items-center justify-center rounded-3xl bg-[#f0f0f0] transition-transform active:scale-90"
               >
-                <X size={18} />
+                <X size={20} />
               </button>
             </div>
-            <nav className="flex flex-col gap-8">
+            
+            <nav className="flex flex-col gap-6 px-10 pt-10">
               {navLinks.map((link) => (
-                <Link
+                <motion.div 
                   key={link.name}
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  style={{
-                    fontFamily: "'Satoshi', sans-serif",
-                    fontWeight: 700,
-                    fontSize: "2.2rem",
-                    color: "#111",
-                    textDecoration: "none",
-                    letterSpacing: "-0.02em",
-                  }}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 }}
                 >
-                  {link.name}
-                </Link>
+                  <Link
+                    href={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="font-bold text-[2.5rem] text-[#111] no-underline tracking-tighter block hover:translate-x-2 transition-transform"
+                  >
+                    {link.name}
+                  </Link>
+                </motion.div>
               ))}
             </nav>
+            
+            {/* Mobile Footer */}
+            <div className="mt-auto p-10 flex flex-col gap-2">
+              <p className="text-[10px] font-bold text-[#888] tracking-widest uppercase mb-2">Socials</p>
+              <div className="flex gap-4">
+                {["Instagram", "Twitter", "LinkedIn"].map(s => (
+                  <span key={s} className="text-xs font-bold text-[#111]">{s}</span>
+                ))}
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

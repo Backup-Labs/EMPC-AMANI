@@ -12,108 +12,91 @@ const navLinks = [
 ];
 
 const IconInstagram = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
   </svg>
 );
 const IconFacebook = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
   </svg>
 );
 const IconX = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M4 4l11.733 16h4.267l-11.733-16zM4 20l6.768-6.768m2.46-2.46L20 4" />
   </svg>
 );
-const IconWhatsApp = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+const IconLinkedIn = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z" />
+    <circle cx="4" cy="4" r="2" />
   </svg>
 );
 
 export function Footer() {
   return (
-    <footer style={{ background: "#111111", position: "relative", overflow: "hidden" }}>
+    <footer className="bg-[#111111] relative overflow-hidden">
       {/* Subtle radial glow */}
-      <div style={{
-        position: "absolute", bottom: 0, left: "20%",
-        width: "500px", height: "260px", pointerEvents: "none",
-        background: "radial-gradient(ellipse at center, rgba(255,255,255,0.04) 0%, transparent 70%)",
-        filter: "blur(40px)",
-      }} />
+      <div className="absolute bottom-0 left-1/4 w-[600px] h-[300px] pointer-events-none bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,transparent_70%)] blur-[50px] opacity-20" />
 
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "60px 48px 32px", position: "relative", zIndex: 1 }}>
-        {/* Top row */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
-          {/* Nav + Socials (right aligned) */}
-          <div style={{ display: "flex", justifyContent: "flex-end" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px", alignItems: "flex-end" }}>
-              {/* Nav links */}
-              <div style={{ display: "flex", gap: "32px", flexWrap: "wrap", justifyContent: "flex-end" }}>
-                {navLinks.map((l) => (
-                  <Link key={l.name} href={l.href} style={{
-                    fontFamily: "'Satoshi', sans-serif", fontWeight: 400, fontSize: "13px",
-                    color: "rgba(255,255,255,0.55)", textDecoration: "none",
-                  }}>{l.name}</Link>
-                ))}
-              </div>
-              {/* Social icons */}
-              <div style={{ display: "flex", gap: "10px" }}>
-                {[
-                  { Icon: IconInstagram, label: "Instagram" },
-                  { Icon: IconFacebook, label: "Facebook" },
-                  { Icon: IconX, label: "X" },
-                  { Icon: IconWhatsApp, label: "WhatsApp" },
-                ].map(({ Icon, label }) => (
-                  <Link key={label} href="#" aria-label={label} style={{
-                    height: "36px", width: "36px", borderRadius: "50%",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    color: "rgba(255,255,255,0.45)",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                    textDecoration: "none",
-                    transition: "all 0.2s",
-                  }}>
-                    <Icon />
-                  </Link>
-                ))}
-              </div>
-              {/* Terms */}
-              <div style={{ display: "flex", gap: "20px" }}>
-                <Link href="#" style={{ fontFamily: "'Satoshi', sans-serif", fontSize: "11px", color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>Terms &amp; Condition</Link>
-                <Link href="#" style={{ fontFamily: "'Satoshi', sans-serif", fontSize: "11px", color: "rgba(255,255,255,0.3)", textDecoration: "none" }}>Privacy Policy</Link>
-              </div>
+      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pt-20 pb-12 relative z-10">
+        {/* Top Content Row */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-16 md:gap-0">
+          
+          {/* Logo & Info */}
+          <div className="flex flex-col gap-6">
+            <Link href="/" className="font-extrabold text-2xl text-white tracking-tighter no-underline">
+              EMPC-AMANI
+            </Link>
+            <div className="flex flex-col gap-1.5">
+              <p className="text-white/40 text-sm font-medium">Lane London EC1R 0BJ</p>
+              <p className="text-white/40 text-sm font-medium">info@empc-amani.com</p>
+            </div>
+          </div>
+
+          {/* Navigation & Socials */}
+          <div className="flex flex-col gap-10 md:items-end">
+            {/* Links Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-12 gap-y-4 md:flex md:gap-8">
+              {navLinks.map((l) => (
+                <Link key={l.name} href={l.href} className="text-[13px] font-bold text-white/50 no-underline hover:text-white transition-colors">{l.name}</Link>
+              ))}
+            </div>
+
+            {/* Social Icons */}
+            <div className="flex gap-3">
+              {[
+                { Icon: IconInstagram, label: "Instagram" },
+                { Icon: IconFacebook, label: "Facebook" },
+                { Icon: IconX, label: "X" },
+                { Icon: IconLinkedIn, label: "LinkedIn" },
+              ].map(({ Icon, label }) => (
+                <Link key={label} href="#" aria-label={label} className="h-11 w-11 rounded-full flex items-center justify-center text-white/40 border border-white/10 hover:border-white/30 hover:text-white transition-all transform hover:-translate-y-1">
+                  <Icon />
+                </Link>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Huge brand name */}
-        <div style={{ marginTop: "40px", marginBottom: "32px" }}>
-          <span style={{
-            fontFamily: "'Satoshi', sans-serif",
-            fontWeight: 900,
-            fontSize: "clamp(3.5rem, 12vw, 10rem)",
-            lineHeight: 0.9,
-            letterSpacing: "-0.04em",
-            color: "white",
-            display: "block",
-            userSelect: "none",
-          }}>
+        {/* Big Brand Statement */}
+        <div className="mt-20 md:mt-32 mb-10 overflow-hidden">
+          <span className="font-black text-[12vw] lg:text-[11rem] leading-[0.85] tracking-[-0.05em] text-white select-none whitespace-nowrap md:whitespace-normal">
             EMPC-AMANI
           </span>
         </div>
 
-        {/* Bottom bar */}
-        <div style={{
-          display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "8px",
-          paddingTop: "20px", borderTop: "1px solid rgba(255,255,255,0.07)",
-        }}>
-          <p style={{ fontFamily: "'Satoshi', sans-serif", fontSize: "11px", color: "rgba(255,255,255,0.28)" }}>
-            ©2025 All rights reserved.
-          </p>
-          <p style={{ fontFamily: "'Satoshi', sans-serif", fontSize: "11px", color: "rgba(255,255,255,0.28)" }}>
-            Designed by fremix.design
-          </p>
+        {/* Bottom Bar */}
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-6 pt-10 border-t border-white/5">
+          <div className="flex gap-8">
+            <p className="text-[11px] font-bold text-white/20 uppercase tracking-widest no-underline hover:text-white/40 transition-colors cursor-pointer">Terms & Condition</p>
+            <p className="text-[11px] font-bold text-white/20 uppercase tracking-widest no-underline hover:text-white/40 transition-colors cursor-pointer">Privacy Policy</p>
+          </div>
+          <div className="flex gap-4 items-center">
+            <p className="text-[11px] font-bold text-white/20 uppercase tracking-widest">©2026 EMPC-AMANI</p>
+            <span className="h-1 w-1 rounded-full bg-white/10" />
+            <p className="text-[11px] font-bold text-white/20 uppercase tracking-widest">Amani Studio</p>
+          </div>
         </div>
       </div>
     </footer>

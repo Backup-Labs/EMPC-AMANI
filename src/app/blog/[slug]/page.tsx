@@ -43,34 +43,28 @@ export default function BlogDetail() {
   const blog = blogData[slug] || blogData["the-future-of-sustainable-design"];
 
   return (
-    <div style={{ fontFamily: "'Satoshi', sans-serif", background: "#f0f0f0", minHeight: "100vh" }}>
+    <div className="bg-[#f0f0f0] min-h-screen">
       {/* ── HEADER ── */}
-      <section style={{ padding: "120px 0 60px" }}>
-        <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 48px" }}>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <Link href="/blog" style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: 700, fontSize: "14px", color: "#666", marginBottom: "32px", textDecoration: "none" }}>
-              <ArrowLeft size={16} /> Back to Blog
+      <section className="pt-32 md:pt-40 lg:pt-48 pb-12 lg:pb-20 px-6 md:px-12 lg:px-16">
+        <div className="max-w-4xl mx-auto flex flex-col items-center text-center">
+          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <Link href="/blog" className="inline-flex items-center gap-2 font-bold text-xs md:text-sm text-[#888] mb-8 md:mb-12 hover:text-[#111] transition-colors group">
+              <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Back to Blog
             </Link>
             
-            <div style={{ display: "flex", gap: "16px", alignItems: "center", marginBottom: "16px" }}>
-              <span style={{ color: "#888", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}>
-                <Calendar size={11} /> {blog.date}
+            <div className="flex flex-wrap justify-center gap-4 md:gap-8 items-center mb-6 md:mb-8">
+              <span className="text-[#888] text-[10px] md:text-[11px] font-bold flex items-center gap-2 uppercase tracking-widest">
+                <Calendar size={14} /> {blog.date}
               </span>
-              <span style={{ color: "#888", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}>
-                <User size={11} /> {blog.author}
+              <span className="text-[#888] text-[10px] md:text-[11px] font-bold flex items-center gap-2 uppercase tracking-widest">
+                <User size={14} /> {blog.author}
               </span>
-              <span style={{ 
-                background: "#ddd", padding: "3px 10px", borderRadius: "999px", 
-                fontSize: "10px", fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase" 
-              }}>
+              <span className="bg-[#ddd] px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase border border-black/5">
                 {blog.category}
               </span>
             </div>
 
-            <h1 style={{ 
-              fontWeight: 800, fontSize: "clamp(2rem, 5vw, 3.5rem)", 
-              letterSpacing: "-0.04em", lineHeight: 1.1, color: "#111", margin: 0 
-            }}>
+            <h1 className="font-extrabold text-[2.5rem] md:text-[3.5rem] lg:text-[4.5rem] leading-[1.05] tracking-[-0.04em] text-[#111] m-0 max-w-[800px]">
               {blog.title}
             </h1>
           </motion.div>
@@ -78,24 +72,32 @@ export default function BlogDetail() {
       </section>
 
       {/* ── HERO IMAGE ── */}
-      <section>
-        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px" }}>
-          <div style={{ position: "relative", borderRadius: "24px", overflow: "hidden", aspectRatio: "21/9" }}>
-            <Image src={blog.image} alt={blog.title} fill sizes="100vw" style={{ objectFit: "cover" }} />
+      <section className="px-6 md:px-12 lg:px-16">
+        <div className="max-w-7xl mx-auto">
+          <div className="relative rounded-[2rem] md:rounded-[3rem] overflow-hidden aspect-[16/9] lg:aspect-[21/9] shadow-lg">
+            <Image src={blog.image} alt={blog.title} fill sizes="100vw" priority className="object-cover" />
           </div>
         </div>
       </section>
 
       {/* ── CONTENT ── */}
-      <section style={{ padding: "64px 0 100px" }}>
-        <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 48px" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
+      <section className="px-6 md:px-12 lg:px-16 py-16 lg:py-24">
+        <div className="max-w-3xl mx-auto">
+          <div className="flex flex-col gap-8 md:gap-12">
             {blog.content?.map((item: any, i: number) => {
-              if (item.type === "h2") return <h2 key={i} style={{ fontWeight: 800, fontSize: "2rem", letterSpacing: "-0.03em", margin: "20px 0 0" }}>{item.text}</h2>;
-              if (item.type === "p") return <p key={i} style={{ color: "#444", fontSize: "16px", lineHeight: 1.8, margin: 0 }}>{item.text}</p>;
+              if (item.type === "h2") return (
+                <h2 key={i} className="font-bold text-[1.8rem] md:text-[2.2rem] lg:text-[2.5rem] tracking-tight leading-tight m-0 mt-8 md:mt-12 text-[#111]">
+                  {item.text}
+                </h2>
+              );
+              if (item.type === "p") return (
+                <p key={i} className="text-[#444] text-base md:text-lg lg:text-[1.15rem] leading-relaxed m-0 text-balance">
+                  {item.text}
+                </p>
+              );
               if (item.type === "image") return (
-                <div key={i} style={{ position: "relative", borderRadius: "16px", overflow: "hidden", aspectRatio: "16/10", margin: "20px 0" }}>
-                  <Image src={item.src} alt="Article Detail" fill sizes="40vw" style={{ objectFit: "cover" }} />
+                <div key={i} className="relative rounded-3xl overflow-hidden aspect-[16/10] my-8 md:my-12 shadow-md">
+                  <Image src={item.src} alt="Article Detail" fill sizes="(max-width:768px) 100vw, 800px" className="object-cover" />
                 </div>
               );
               return null;
@@ -103,16 +105,25 @@ export default function BlogDetail() {
           </div>
 
           {/* Social Share / Footer */}
-          <div style={{ marginTop: "64px", borderTop: "1px solid #e0e0e0", paddingTop: "40px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <p style={{ fontWeight: 700, fontSize: "14px", margin: 0 }}>Share this article</p>
-            <div style={{ display: "flex", gap: "10px" }}>
+          <div className="mt-20 md:mt-32 pt-10 md:pt-14 border-t border-[#e0e0e0] flex flex-col sm:flex-row justify-between items-center gap-8">
+            <p className="font-bold text-sm md:text-base text-[#111] m-0">Found this helpful? Share the design insight.</p>
+            <div className="flex gap-3">
               {["FB", "X", "LI"].map(s => (
-                <div key={s} style={{ height: "36px", width: "36px", borderRadius: "50%", border: "1px solid #ccc", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 700 }}>{s}</div>
+                <button key={s} className="h-11 w-11 rounded-full border border-[#ccc] flex items-center justify-center text-[11px] font-bold tracking-widest hover:bg-[#111] hover:text-white hover:border-[#111] transition-all transform hover:-translate-y-1">
+                  {s}
+                </button>
               ))}
             </div>
           </div>
         </div>
       </section>
+      
+      {/* ── BACK BUTTON BOTTOM ── */}
+      <div className="px-6 md:px-12 lg:px-16 pb-20 lg:pb-32 flex justify-center">
+        <Link href="/blog" className="inline-flex items-center gap-1.5 font-bold text-sm text-[#111] hover:underline underline-offset-8 decoration-2">
+          <ArrowLeft size={18} /> Back to Blog Feed
+        </Link>
+      </div>
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 
 const fade = (delay = 0) => ({
-  initial: { opacity: 0, y: 20 },
+  initial: { opacity: 0, y: 15 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true },
   transition: { duration: 0.45, ease: "easeOut", delay },
@@ -15,13 +15,13 @@ const fade = (delay = 0) => ({
 
 function SectionHeader({ label, heading, right }: { label: string; heading: React.ReactNode; right?: React.ReactNode }) {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "180px 1fr 1fr", gap: "32px", padding: "56px 0 48px", borderBottom: "1px solid #e0e0e0" }}>
-      <div style={{ display: "flex", alignItems: "flex-start", gap: "8px" }}>
-        <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#111", flexShrink: 0, marginTop: "5px", display: "block" }} />
-        <span style={{ fontFamily: "'Satoshi', sans-serif", fontWeight: 500, fontSize: "13px", color: "#111" }}>{label}</span>
+    <div className="grid grid-cols-1 lg:grid-cols-[180px_1fr_1fr] gap-6 lg:gap-8 py-10 lg:py-14 border-b border-[#e0e0e0]">
+      <div className="flex items-start gap-2 pt-1">
+        <span className="w-2 h-2 rounded-full bg-[#111] shrink-0 mt-1.5 block" />
+        <span className="font-medium text-[13px] text-[#111]">{label}</span>
       </div>
-      <h2 style={{ fontFamily: "'Satoshi', sans-serif", fontWeight: 700, fontSize: "clamp(1.4rem, 2.5vw, 2.1rem)", lineHeight: 1.15, letterSpacing: "-0.025em", color: "#111", margin: 0 }}>{heading}</h2>
-      <div>{right}</div>
+      <h2 className="font-bold text-[1.6rem] md:text-[2.2rem] lg:text-[2.5rem] leading-[1.1] tracking-[-0.03em] text-[#111] m-0">{heading}</h2>
+      <div className="flex flex-col justify-start">{right}</div>
     </div>
   );
 }
@@ -71,62 +71,60 @@ const services = [
 
 export default function Services() {
   return (
-    <div style={{ fontFamily: "'Satoshi', sans-serif", background: "#f0f0f0" }}>
+    <div className="bg-[#f0f0f0] min-h-screen">
 
       {/* ── HERO ── */}
-      <section style={{ position: "relative", height: "52vh", minHeight: "320px", overflow: "hidden" }}>
-        <Image src="/images/project2.png" alt="Our Services" fill sizes="100vw" priority style={{ objectFit: "cover" }} />
-        <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.58)" }} />
-        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "40px 48px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: "32px" }}>
-          <h1 style={{ fontWeight: 800, fontSize: "clamp(2.5rem, 6vw, 5rem)", letterSpacing: "-0.04em", lineHeight: 1, color: "#fff", margin: 0 }}>
+      <section className="relative h-[52vh] min-h-[350px] overflow-hidden">
+        <Image src="/images/project2.png" alt="Our Services" fill sizes="100vw" priority className="object-cover" />
+        <div className="absolute inset-0 bg-black/55" />
+        <div className="absolute inset-x-0 bottom-0 px-6 md:px-12 lg:px-16 pb-12 lg:pb-16 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 md:gap-10 text-white">
+          <h1 className="font-extrabold text-[2.8rem] md:text-[4.5rem] lg:text-[6rem] leading-[0.95] tracking-[-0.04em] m-0">
             Our Services
           </h1>
-          <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "14px", lineHeight: 1.65, maxWidth: "300px", margin: 0 }}>
+          <p className="text-white/70 text-sm md:text-base leading-relaxed max-w-sm m-0">
             Explore our tailored design services crafted to reflect comfort, beauty, and purpose.
           </p>
         </div>
       </section>
 
       {/* ── SECTION INTRO ── */}
-      <section>
-        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px" }}>
+      <section className="px-6 md:px-12 lg:px-16">
+        <div className="max-w-7xl mx-auto">
           <SectionHeader
             label="Services"
             heading={<>Personalized Care.<br />Inspired Spaces.</>}
-            right={<p style={{ fontSize: "14px", color: "#666", lineHeight: 1.65, margin: 0 }}>Discover our range of interior designs that turn ideas into stunning spaces!</p>}
+            right={<p className="text-sm text-[#666] leading-relaxed max-w-sm m-0">Discover our range of interior designs that turn ideas into stunning spaces!</p>}
           />
         </div>
       </section>
 
       {/* ── SERVICE LIST ── */}
-      <section>
-        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px 80px" }}>
+      <section className="px-6 md:px-12 lg:px-16 pb-16 lg:pb-24">
+        <div className="max-w-7xl mx-auto">
           {services.map((s, i) => (
-            <motion.div key={i} {...fade(0)}
-              style={{ borderBottom: "1px solid #e0e0e0", paddingBottom: "48px", marginTop: "40px" }}>
+            <motion.div key={i} {...fade(0)} className="border-b border-[#e0e0e0] pb-12 lg:pb-16 mt-10 md:mt-16">
               {/* Row: number + title/desc/stat */}
-              <div style={{ display: "grid", gridTemplateColumns: "180px 1fr 1fr", gap: "32px", marginBottom: "24px" }}>
-                <span style={{ fontWeight: 600, fontSize: "13px", color: "#888", paddingTop: "4px" }}>{s.num}</span>
-                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                  <h3 style={{ fontWeight: 700, fontSize: "1.4rem", letterSpacing: "-0.02em", margin: 0 }}>{s.title}</h3>
-                  <p style={{ color: "#666", fontSize: "13px", lineHeight: 1.75, margin: 0, maxWidth: "380px" }}>{s.desc}</p>
-                  <div style={{ marginTop: "8px" }}>
-                    <p style={{ fontWeight: 800, fontSize: "1.6rem", letterSpacing: "-0.04em", margin: 0 }}>{s.stat}</p>
-                    <p style={{ color: "#888", fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", margin: "3px 0 0" }}>{s.statLabel}</p>
+              <div className="grid grid-cols-1 lg:grid-cols-[180px_1fr_1fr] gap-6 lg:gap-10 mb-8 md:mb-12">
+                <span className="font-bold text-[13px] text-[#888] lg:pt-1">{s.num}</span>
+                <div className="flex flex-col gap-6 md:gap-8">
+                  <div className="flex flex-col gap-4">
+                    <h3 className="font-bold text-[1.8rem] md:text-[2rem] leading-tight tracking-tight m-0">{s.title}</h3>
+                    <p className="text-[#666] text-[15px] leading-relaxed m-0 max-w-md">{s.desc}</p>
+                  </div>
+                  <div>
+                    <p className="font-extrabold text-[2.2rem] md:text-[2.6rem] tracking-[-0.04em] m-0 leading-none">{s.stat}</p>
+                    <p className="text-[10px] md:text-[11px] font-bold tracking-[0.14em] text-[#888] uppercase mt-2">{s.statLabel}</p>
                   </div>
                 </div>
-                <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "flex-start" }}>
-                  <Link href="/contact" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontWeight: 600, fontSize: "13px", color: "#111", border: "1px solid #ccc", borderRadius: "999px", padding: "8px 18px", textDecoration: "none" }}>
-                    Enquire <ArrowUpRight size={13} />
+                <div className="flex justify-start lg:justify-end items-start pt-2">
+                  <Link href="/contact" className="inline-flex items-center gap-2 font-bold text-xs md:text-sm text-[#111] border border-[#c8c8c8] rounded-full px-6 py-3 hover:bg-[#111] hover:text-white transition-all">
+                    Enquire <ArrowUpRight size={14} />
                   </Link>
                 </div>
               </div>
-              {/* Full-width image */}
-              <div style={{ position: "relative", borderRadius: "18px", overflow: "hidden", aspectRatio: "21/9" }}>
-                <Image src={s.image} alt={s.title} fill sizes="(max-width:1280px) 100vw, 1184px" style={{ objectFit: "cover", transition: "transform 0.7s ease" }}
-                  onMouseEnter={(e) => ((e.currentTarget as HTMLImageElement).style.transform = "scale(1.04)")}
-                  onMouseLeave={(e) => ((e.currentTarget as HTMLImageElement).style.transform = "scale(1)")}
-                />
+              {/* Image with hover */}
+              <div className="relative rounded-3xl overflow-hidden aspect-[16/9] lg:aspect-[21/9] group cursor-pointer shadow-sm">
+                <Image src={s.image} alt={s.title} fill sizes="(max-width:1280px) 100vw, 1280px" className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
               </div>
             </motion.div>
           ))}
@@ -134,26 +132,26 @@ export default function Services() {
       </section>
 
       {/* ── CTA ── */}
-      <section>
-        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px" }}>
+      <section className="px-6 md:px-12 lg:px-16 mb-20 lg:mb-32">
+        <div className="max-w-7xl mx-auto">
           <SectionHeader
             label="Contact"
             heading={<>Together, We Shape<br />the Extraordinary</>}
-            right={<p style={{ fontSize: "14px", color: "#666", lineHeight: 1.65, margin: 0 }}>Interested in working with us? Let&apos;s bring your space to life.</p>}
+            right={<p className="text-sm text-[#666] leading-relaxed max-w-sm m-0">Interested in working with us? Let&apos;s bring your space to life.</p>}
           />
-          <div style={{ paddingTop: "32px", paddingBottom: "80px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
-            <div style={{ position: "relative", borderRadius: "20px", overflow: "hidden", aspectRatio: "16/10" }}>
-              <Image src="/images/project1.png" alt="CTA" fill sizes="50vw" style={{ objectFit: "cover" }} />
-              <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.32)" }} />
-              <p style={{ position: "absolute", bottom: "20px", left: "20px", color: "#fff", fontWeight: 700, fontSize: "1rem", margin: 0 }}>Step Into Your Dream Space</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 py-10 lg:py-14">
+            <div className="relative rounded-3xl overflow-hidden aspect-[16/9] md:aspect-auto group cursor-pointer">
+              <Image src="/images/project1.png" alt="CTA" fill sizes="50vw" className="object-cover group-hover:scale-105 transition-transform duration-700" />
+              <div className="absolute inset-0 bg-black/35" />
+              <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white font-bold text-lg md:text-xl tracking-tight">Step Into Your Dream Space</div>
             </div>
-            <div style={{ background: "white", borderRadius: "20px", padding: "40px", display: "flex", flexDirection: "column", gap: "20px", justifyContent: "center" }}>
-              <p style={{ color: "#888", fontSize: "11px", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", margin: 0 }}>Begin your design journey</p>
-              <p style={{ fontSize: "14px", color: "#555", lineHeight: 1.75, margin: 0 }}>
+            <div className="bg-white rounded-3xl p-10 lg:p-16 flex flex-col gap-6 justify-center shadow-xs">
+              <p className="text-[11px] font-bold tracking-[0.16em] text-[#888] uppercase m-0">Begin your design journey</p>
+              <p className="text-[#555] text-base lg:text-lg leading-relaxed m-0 text-balance">
                 Let&apos;s create something truly incredible together. Your ideal space begins right here with us.
               </p>
-              <Link href="/contact" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontWeight: 700, fontSize: "13px", color: "#111", textDecoration: "underline", textUnderlineOffset: "4px" }}>
-                Contact Us <ArrowUpRight size={14} />
+              <Link href="/contact" className="inline-flex items-center gap-1.5 font-bold text-sm md:text-base text-[#111] hover:underline underline-offset-8 decoration-2 mt-4 transition-all">
+                Contact Us <ArrowUpRight size={18} />
               </Link>
             </div>
           </div>

@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus } from "lucide-react";
 
 const fade = (delay = 0) => ({
-  initial: { opacity: 0, y: 20 },
+  initial: { opacity: 0, y: 15 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true },
   transition: { duration: 0.45, ease: "easeOut", delay },
@@ -36,88 +36,79 @@ export default function Contact() {
     setTimeout(() => setSubmitted(false), 4000);
   };
 
-  const inputStyle: React.CSSProperties = {
-    width: "100%", borderRadius: "8px", border: "1px solid #e0e0e0",
-    padding: "10px 14px", fontSize: "13px", outline: "none",
-    fontFamily: "'Satoshi', sans-serif", background: "white", color: "#111",
-    boxSizing: "border-box",
-  };
-
   return (
-    <div style={{ fontFamily: "'Satoshi', sans-serif", background: "#f0f0f0" }}>
+    <div className="bg-[#f0f0f0] min-h-screen">
 
       {/* ── HERO ── */}
-      <section style={{ position: "relative", height: "52vh", minHeight: "320px", overflow: "hidden" }}>
-        <Image src="/images/hero.png" alt="Contact Us" fill sizes="100vw" priority style={{ objectFit: "cover" }} />
-        <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.55)" }} />
-        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "40px 48px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: "32px" }}>
-          <h1 style={{ fontWeight: 800, fontSize: "clamp(2.5rem, 6vw, 5rem)", letterSpacing: "-0.04em", lineHeight: 1, color: "#fff", margin: 0 }}>
+      <section className="relative h-[52vh] min-h-[350px] overflow-hidden">
+        <Image src="/images/hero.png" alt="Contact Us" fill sizes="100vw" priority className="object-cover" />
+        <div className="absolute inset-0 bg-black/55" />
+        <div className="absolute inset-x-0 bottom-0 px-6 md:px-12 lg:px-16 pb-12 lg:pb-16 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 md:gap-10">
+          <h1 className="font-extrabold text-[2.8rem] md:text-[4.5rem] lg:text-[6rem] leading-[0.95] tracking-[-0.04em] text-white m-0">
             Contact Us
           </h1>
-          <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "14px", lineHeight: 1.65, maxWidth: "300px", margin: 0 }}>
+          <p className="text-white/70 text-sm md:text-base leading-relaxed max-w-sm m-0">
             Have a space in mind? We&apos;re ready to listen, collaborate, and create extraordinary.
           </p>
         </div>
       </section>
 
       {/* ── CONTACT + FORM ── */}
-      <section>
-        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "64px 48px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1.6fr", gap: "40px", alignItems: "flex-start" }}>
+      <section className="px-6 md:px-12 lg:px-16 py-12 lg:py-24">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.6fr] gap-12 lg:gap-20 items-start">
 
             {/* Left: contact info + image */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div className="flex flex-col gap-4 lg:gap-6">
               {contactInfo.map((info, i) => (
                 <motion.div key={i} {...fade(i * 0.06)}
-                  style={{ display: "flex", alignItems: "center", gap: "12px", background: "#e8e8e8", borderRadius: "12px", padding: "12px 16px" }}>
-                  <div style={{ height: "36px", width: "36px", borderRadius: "50%", background: "#d8d8d8", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", flexShrink: 0 }}>
+                  className="flex items-center gap-4 bg-[#e8e8e8] rounded-2xl p-4 md:p-5 hover:bg-[#e0e0e0] transition-colors">
+                  <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-[#d8d8d8] flex items-center justify-center text-xl shrink-0">
                     {info.icon}
                   </div>
-                  <p style={{ fontSize: "13px", fontWeight: 500, color: "#333", margin: 0 }}>{info.label}</p>
+                  <p className="text-sm md:text-base font-bold text-[#333] m-0 break-words">{info.label}</p>
                 </motion.div>
               ))}
-              <motion.div {...fade(0.2)} style={{ position: "relative", borderRadius: "16px", overflow: "hidden", aspectRatio: "4/3", marginTop: "8px" }}>
-                <Image src="/images/project2.png" alt="Our Studio" fill sizes="33vw" style={{ objectFit: "cover" }} />
+              <motion.div {...fade(0.2)} className="relative rounded-3xl overflow-hidden aspect-[4/3] mt-4 lg:mt-6 shadow-sm">
+                <Image src="/images/project2.png" alt="Our Studio" fill sizes="(max-width:1024px) 100vw, 33vw" className="object-cover" />
               </motion.div>
             </div>
 
             {/* Right: form */}
             <motion.div {...fade(0.1)}
-              style={{ background: "#e8e8e8", borderRadius: "20px", padding: "32px" }}>
-              <p style={{ fontWeight: 600, fontSize: "15px", color: "#555", margin: "0 0 24px" }}>Contact Information</p>
-              <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    <label style={{ fontSize: "11px", fontWeight: 600, color: "#777", letterSpacing: "0.04em" }}>First Name</label>
-                    <input required type="text" placeholder="Jane" style={inputStyle} />
+              className="bg-[#e8e8e8] rounded-3xl p-8 lg:p-12 shadow-xs">
+              <p className="font-bold text-lg md:text-xl text-[#333] mb-8">Ready to start? Get in touch.</p>
+              <form onSubmit={handleSubmit} className="flex flex-col gap-6 md:gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex flex-col gap-2.5">
+                    <label className="text-[11px] font-bold text-[#888] tracking-widest uppercase">First Name</label>
+                    <input required type="text" placeholder="Jane" className="w-full bg-white rounded-xl border border-transparent p-4 text-sm font-medium outline-hidden focus:border-[#111] transition-all" />
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    <label style={{ fontSize: "11px", fontWeight: 600, color: "#777", letterSpacing: "0.04em" }}>Last Name</label>
-                    <input required type="text" placeholder="Smith" style={inputStyle} />
-                  </div>
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    <label style={{ fontSize: "11px", fontWeight: 600, color: "#777", letterSpacing: "0.04em" }}>Email</label>
-                    <input required type="email" placeholder="intereo@framer.com" style={inputStyle} />
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    <label style={{ fontSize: "11px", fontWeight: 600, color: "#777", letterSpacing: "0.04em" }}>Contact Number</label>
-                    <input required type="tel" placeholder="+91 8772 62627" style={inputStyle} />
+                  <div className="flex flex-col gap-2.5">
+                    <label className="text-[11px] font-bold text-[#888] tracking-widest uppercase">Last Name</label>
+                    <input required type="text" placeholder="Smith" className="w-full bg-white rounded-xl border border-transparent p-4 text-sm font-medium outline-hidden focus:border-[#111] transition-all" />
                   </div>
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  <label style={{ fontSize: "11px", fontWeight: 600, color: "#777", letterSpacing: "0.04em" }}>Notes</label>
-                  <textarea rows={4} placeholder="Let's work together!" style={{ ...inputStyle, resize: "none" }} />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex flex-col gap-2.5">
+                    <label className="text-[11px] font-bold text-[#888] tracking-widest uppercase">Email</label>
+                    <input required type="email" placeholder="jane.smith@example.com" className="w-full bg-white rounded-xl border border-transparent p-4 text-sm font-medium outline-hidden focus:border-[#111] transition-all" />
+                  </div>
+                  <div className="flex flex-col gap-2.5">
+                    <label className="text-[11px] font-bold text-[#888] tracking-widest uppercase">Contact Number</label>
+                    <input required type="tel" placeholder="+44 20 7946 0958" className="w-full bg-white rounded-xl border border-transparent p-4 text-sm font-medium outline-hidden focus:border-[#111] transition-all" />
+                  </div>
                 </div>
-                <button type="submit" style={{
-                  width: "100%", borderRadius: "8px", padding: "13px",
-                  background: submitted ? "#4caf50" : "#6b5840",
-                  color: "white", fontFamily: "'Satoshi', sans-serif", fontWeight: 700,
-                  fontSize: "14px", border: "none", cursor: submitted ? "default" : "pointer",
-                  transition: "background 0.3s",
-                }}>
-                  {submitted ? "Message Sent ✓" : "Submit"}
+                <div className="flex flex-col gap-2.5">
+                  <label className="text-[11px] font-bold text-[#888] tracking-widest uppercase">Notes</label>
+                  <textarea rows={5} placeholder="Tell us about your project..." className="w-full bg-white rounded-xl border border-transparent p-4 text-sm font-medium outline-hidden focus:border-[#111] transition-all resize-none" />
+                </div>
+                <button type="submit" disabled={submitted} className={`
+                  w-full rounded-xl py-5 px-8 font-bold text-base transition-all active:scale-[0.98]
+                  ${submitted ? "bg-[#4caf50] cursor-default" : "bg-[#111] hover:bg-[#333] cursor-pointer"}
+                  text-white shadow-lg
+                `}>
+                  {submitted ? "Message Sent ✓" : "Send Message"}
                 </button>
               </form>
             </motion.div>
@@ -126,46 +117,40 @@ export default function Contact() {
       </section>
 
       {/* ── FAQ ── */}
-      <section>
-        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px 80px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "64px" }}>
+      <section className="px-6 md:px-12 lg:px-16 pb-20 lg:pb-32">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-12 lg:gap-24">
             {/* Left */}
-            <motion.div {...fade()} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#111", display: "block" }} />
-                <span style={{ fontWeight: 500, fontSize: "13px", color: "#111" }}>FAQ</span>
+            <motion.div {...fade()} className="flex flex-col gap-6">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#111] block" />
+                <span className="font-medium text-[13px] text-[#111]">FAQ</span>
               </div>
-              <h2 style={{ fontWeight: 700, fontSize: "clamp(1.4rem, 2.5vw, 2rem)", lineHeight: 1.2, letterSpacing: "-0.025em", margin: 0 }}>
-                Looking for Clarity?<br />We&apos;re Here to Help
+              <h2 className="font-bold text-[1.8rem] md:text-[2.2rem] lg:text-[2.8rem] leading-[1.1] tracking-[-0.03em] m-0">
+                Looking for Clarity?<br className="hidden md:block" /> We&apos;re Here to Help
               </h2>
-              <p style={{ color: "#666", fontSize: "13px", lineHeight: 1.7, margin: 0 }}>
-                Designing a space comes with many questions we&apos;ve answered.
+              <p className="text-[#666] text-sm md:text-base leading-relaxed m-0 max-w-sm">
+                Designing a space comes with many questions. We&apos;ve answered some of the most common ones here.
               </p>
             </motion.div>
 
             {/* Right: accordion */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <div className="flex flex-col gap-4">
               {faqs.map((faq, i) => (
                 <motion.div key={i} {...fade(i * 0.04)}>
                   <button
                     onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                    style={{
-                      width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
-                      padding: "16px 20px", borderRadius: "12px", background: openFaq === i ? "#e0e0e0" : "#e8e8e8",
-                      border: "none", cursor: "pointer", textAlign: "left", fontFamily: "'Satoshi', sans-serif",
-                      transition: "background 0.2s",
-                    }}
+                    className={`
+                      w-full flex items-center justify-between p-6 md:p-8 rounded-2xl transition-all duration-300 group
+                      ${openFaq === i ? "bg-white shadow-xl" : "bg-[#e8e8e8] hover:bg-[#e0e0e0]"}
+                    `}
                   >
-                    <span style={{ fontWeight: 500, fontSize: "14px", color: "#111" }}>{faq.q}</span>
-                    <div style={{
-                      height: "28px", width: "28px", borderRadius: "50%",
-                      background: openFaq === i ? "#111" : "#d0d0d0",
-                      display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginLeft: "16px",
-                      transition: "background 0.2s",
-                    }}>
-                      {openFaq === i
-                        ? <Minus size={12} color="white" />
-                        : <Plus size={12} color="#555" />}
+                    <span className="font-bold text-sm md:text-base text-[#111] pr-6">{faq.q}</span>
+                    <div className={`
+                      h-8 w-8 md:h-10 md:w-10 rounded-full flex items-center justify-center shrink-0 transition-all duration-300
+                      ${openFaq === i ? "bg-[#111] text-white rotate-180" : "bg-white text-[#111] group-hover:scale-110"}
+                    `}>
+                      {openFaq === i ? <Minus size={14} /> : <Plus size={14} />}
                     </div>
                   </button>
                   <AnimatePresence>
@@ -174,10 +159,10 @@ export default function Contact() {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.22 }}
-                        style={{ overflow: "hidden" }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="overflow-hidden bg-white rounded-b-2xl -mt-4 px-8 pb-8 pt-6 shadow-xl"
                       >
-                        <p style={{ padding: "14px 20px 6px", color: "#555", fontSize: "13px", lineHeight: 1.75, margin: 0 }}>
+                        <p className="text-[#555] text-sm md:text-[15px] leading-relaxed m-0">
                           {faq.a}
                         </p>
                       </motion.div>

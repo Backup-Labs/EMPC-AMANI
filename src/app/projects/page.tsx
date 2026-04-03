@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 
 const fade = (delay = 0) => ({
-  initial: { opacity: 0, y: 20 },
+  initial: { opacity: 0, y: 15 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true },
   transition: { duration: 0.45, ease: "easeOut", delay },
@@ -15,13 +15,13 @@ const fade = (delay = 0) => ({
 
 function SectionHeader({ label, heading, right }: { label: string; heading: React.ReactNode; right?: React.ReactNode }) {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "180px 1fr 1fr", gap: "32px", padding: "56px 0 48px", borderBottom: "1px solid #e0e0e0" }}>
-      <div style={{ display: "flex", alignItems: "flex-start", gap: "8px" }}>
-        <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#111", flexShrink: 0, marginTop: "5px", display: "block" }} />
-        <span style={{ fontFamily: "'Satoshi', sans-serif", fontWeight: 500, fontSize: "13px", color: "#111" }}>{label}</span>
+    <div className="grid grid-cols-1 lg:grid-cols-[180px_1fr_1fr] gap-6 lg:gap-8 py-10 lg:py-14 border-b border-[#e0e0e0]">
+      <div className="flex items-start gap-2 pt-1">
+        <span className="w-2 h-2 rounded-full bg-[#111] shrink-0 mt-1.5 block" />
+        <span className="font-medium text-[13px] text-[#111]">{label}</span>
       </div>
-      <h2 style={{ fontFamily: "'Satoshi', sans-serif", fontWeight: 700, fontSize: "clamp(1.4rem, 2.5vw, 2.1rem)", lineHeight: 1.15, letterSpacing: "-0.025em", color: "#111", margin: 0 }}>{heading}</h2>
-      <div>{right}</div>
+      <h2 className="font-bold text-[1.6rem] md:text-[2.2rem] lg:text-[2.5rem] leading-[1.1] tracking-[-0.03em] text-[#111] m-0">{heading}</h2>
+      <div className="flex flex-col justify-start">{right}</div>
     </div>
   );
 }
@@ -47,62 +47,62 @@ export default function Projects() {
   const slide = exclusiveProjects[idx];
 
   return (
-    <div style={{ fontFamily: "'Satoshi', sans-serif", background: "#f0f0f0" }}>
+    <div className="bg-[#f0f0f0] min-h-screen">
 
       {/* ── HERO ── */}
-      <section style={{ position: "relative", height: "52vh", minHeight: "320px", overflow: "hidden" }}>
-        <Image src="/images/project1.png" alt="Projects" fill sizes="100vw" priority style={{ objectFit: "cover" }} />
-        <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.52)" }} />
-        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "40px 48px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: "32px" }}>
-          <h1 style={{ fontWeight: 800, fontSize: "clamp(2.5rem, 6vw, 5rem)", letterSpacing: "-0.04em", lineHeight: 1, color: "#fff", margin: 0 }}>
+      <section className="relative h-[52vh] min-h-[350px] overflow-hidden">
+        <Image src="/images/project1.png" alt="Projects" fill sizes="100vw" priority className="object-cover" />
+        <div className="absolute inset-0 bg-black/55" />
+        <div className="absolute inset-x-0 bottom-0 px-6 md:px-12 lg:px-16 pb-12 lg:pb-16 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 md:gap-10">
+          <h1 className="font-extrabold text-[2.8rem] md:text-[4.5rem] lg:text-[6rem] leading-[0.95] tracking-[-0.04em] text-white m-0">
             Projects
           </h1>
-          <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "14px", lineHeight: 1.65, maxWidth: "280px", margin: 0 }}>
+          <p className="text-white/70 text-sm md:text-base leading-relaxed max-w-sm m-0">
             From a small beginning to a bold vision, we design spaces that shape lives.
           </p>
         </div>
       </section>
 
       {/* ── EXCLUSIVE PROJECTS ── */}
-      <section>
-        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "180px 1fr 1fr", gap: "32px", padding: "56px 0 48px", borderBottom: "1px solid #e0e0e0" }}>
-            <div style={{ display: "flex", alignItems: "flex-start", gap: "8px" }}>
-              <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#111", flexShrink: 0, marginTop: "5px", display: "block" }} />
-              <span style={{ fontWeight: 500, fontSize: "13px", color: "#111" }}>Exclusive Projects</span>
+      <section className="px-6 md:px-12 lg:px-16">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-[180px_1fr_1fr] gap-6 lg:gap-8 py-10 lg:py-14 border-b border-[#e0e0e0]">
+            <div className="flex items-start gap-2 pt-1">
+              <span className="w-2 h-2 rounded-full bg-[#111] shrink-0 mt-1.5 block" />
+              <span className="font-medium text-[13px] text-[#111]">Exclusive Projects</span>
             </div>
-            <h2 style={{ fontWeight: 700, fontSize: "clamp(1.4rem, 2.5vw, 2.1rem)", lineHeight: 1.15, letterSpacing: "-0.025em", margin: 0 }}>
+            <h2 className="font-bold text-[1.6rem] md:text-[2.2rem] lg:text-[2.5rem] leading-[1.1] tracking-[-0.03em] m-0">
               Boldly Rooted in Vision.<br />Exclusive In Execution.
             </h2>
-            <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-              <p style={{ fontSize: "14px", color: "#666", lineHeight: 1.65, margin: 0 }}>
+            <div className="flex flex-col justify-between gap-6">
+              <p className="text-sm text-[#666] leading-relaxed m-0">
                 A visual library of interiors brought to life from blueprint to beauty.
               </p>
-              <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end", marginTop: "16px" }}>
-                <button onClick={prev} style={{ height: "40px", width: "40px", borderRadius: "50%", background: "#111", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <ChevronLeft size={18} color="white" />
+              <div className="flex gap-2.5 justify-start lg:justify-end">
+                <button onClick={prev} className="h-10 w-10 rounded-full bg-[#111] text-white flex items-center justify-center active:bg-[#333] transition-colors">
+                  <ChevronLeft size={18} />
                 </button>
-                <button onClick={next} style={{ height: "40px", width: "40px", borderRadius: "50%", background: "#111", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <ChevronRight size={18} color="white" />
+                <button onClick={next} className="h-10 w-10 rounded-full bg-[#111] text-white flex items-center justify-center active:bg-[#333] transition-colors">
+                  <ChevronRight size={18} />
                 </button>
               </div>
             </div>
           </div>
 
           {/* Carousel */}
-          <div style={{ paddingTop: "32px", paddingBottom: "64px" }}>
+          <div className="py-8 lg:py-16">
             <motion.div
               key={idx}
-              initial={{ opacity: 0, x: 24 }}
+              initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
-              style={{ position: "relative", borderRadius: "20px", overflow: "hidden", aspectRatio: "16/8" }}
+              className="relative rounded-3xl overflow-hidden aspect-[16/9] lg:aspect-[21/9]"
             >
-              <Image src={slide.image} alt={slide.title} fill sizes="(max-width:1280px) 100vw, 1184px" style={{ objectFit: "cover" }} />
-              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%)" }} />
-              <div style={{ position: "absolute", bottom: "28px", left: "28px" }}>
-                <p style={{ fontWeight: 700, fontSize: "1.3rem", color: "#fff", margin: 0 }}>{slide.title}</p>
-                <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", margin: "4px 0 0" }}>{slide.category} · {slide.year}</p>
+              <Image src={slide.image} alt={slide.title} fill sizes="100vw" className="object-cover" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
+              <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10">
+                <p className="font-bold text-lg md:text-2xl text-white m-0 tracking-tight">{slide.title}</p>
+                <p className="text-white/60 text-xs md:text-sm mt-2 font-medium uppercase tracking-widest">{slide.category} · {slide.year}</p>
               </div>
             </motion.div>
           </div>
@@ -110,32 +110,32 @@ export default function Projects() {
       </section>
 
       {/* ── FEATURED PROJECTS ── */}
-      <section>
-        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px" }}>
+      <section className="px-6 md:px-12 lg:px-16 pb-16 lg:pb-24">
+        <div className="max-w-7xl mx-auto">
           <SectionHeader
             label="Featured Projects"
             heading={<>Spaces That Inspire.<br />Projects That Last.</>}
-            right={<p style={{ fontSize: "14px", color: "#666", lineHeight: 1.65, margin: 0 }}>Discover our range of interior designs that turn ideas into stunning spaces!</p>}
+            right={<p className="text-sm text-[#666] leading-relaxed max-w-sm m-0">Discover our range of interior designs that turn ideas into stunning spaces!</p>}
           />
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px", paddingTop: "40px", paddingBottom: "80px" }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 lg:gap-10 pt-10 lg:pt-16">
             {featuredProjects.map((p, i) => (
-              <motion.div key={i} {...fade(i * 0.07)} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                <Link href={`/projects/${p.title.toLowerCase().replace(/ /g, "-")}`} style={{ position: "relative", borderRadius: "16px", overflow: "hidden", aspectRatio: "1/1", display: "block" }}>
-                  <Image src={p.image} alt={p.title} fill sizes="(max-width:768px) 100vw, 33vw" style={{ objectFit: "cover", transition: "transform 0.6s ease" }} />
+              <motion.div key={i} {...fade(i * 0.07)} className="flex flex-col gap-4 group">
+                <Link href={`/projects/${p.title.toLowerCase().replace(/ /g, "-")}`} className="relative rounded-2xl md:rounded-3xl overflow-hidden aspect-square block">
+                  <Image src={p.image} alt={p.title} fill sizes="(max-width:768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
                 </Link>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <div className="flex justify-between items-start gap-4">
                   <div>
-                    <Link href={`/projects/${p.title.toLowerCase().replace(/ /g, "-")}`} style={{ textDecoration: "none" }}>
-                      <p style={{ fontWeight: 700, fontSize: "0.95rem", margin: "0 0 8px", color: "#111" }}>{p.title}</p>
+                    <Link href={`/projects/${p.title.toLowerCase().replace(/ /g, "-")}`} className="no-underline">
+                      <p className="font-bold text-[16px] lg:text-[18px] text-[#111] mb-2 leading-tight tracking-tight hover:underline underline-offset-4">{p.title}</p>
                     </Link>
-                    <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                    <div className="flex gap-2 flex-wrap">
                       {p.tags.map((t) => (
-                        <span key={t} style={{ fontSize: "11px", fontWeight: 500, color: "#444", border: "1px solid #c8c8c8", borderRadius: "999px", padding: "3px 10px" }}>{t}</span>
+                        <span key={t} className="text-[10px] md:text-[11px] font-semibold text-[#555] border border-[#c8c8c8] rounded-full px-2.5 py-1">{t}</span>
                       ))}
                     </div>
                   </div>
-                  <Link href={`/projects/${p.title.toLowerCase().replace(/ /g, "-")}`} style={{ height: "32px", width: "32px", borderRadius: "50%", border: "1px solid #c8c8c8", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, textDecoration: "none" }}>
-                    <ArrowUpRight size={14} color="#555" />
+                  <Link href={`/projects/${p.title.toLowerCase().replace(/ /g, "-")}`} className="h-9 w-9 rounded-full border border-[#c8c8c8] flex items-center justify-center shrink-0 transition-colors group-hover:bg-[#111] group-hover:border-[#111] group-hover:text-white">
+                    <ArrowUpRight size={14} />
                   </Link>
                 </div>
               </motion.div>
@@ -145,26 +145,26 @@ export default function Projects() {
       </section>
 
       {/* ── CTA ── */}
-      <section>
-        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px" }}>
+      <section className="px-6 md:px-12 lg:px-16 mb-20 lg:mb-32">
+        <div className="max-w-7xl mx-auto">
           <SectionHeader
             label="Contact"
             heading={<>Together, We Shape<br />the Extraordinary</>}
-            right={<p style={{ fontSize: "14px", color: "#666", lineHeight: 1.65, margin: 0 }}>Interested in working with us? Let&apos;s bring your space to life.</p>}
+            right={<p className="text-sm text-[#666] leading-relaxed max-w-sm m-0">Interested in working with us? Let&apos;s bring your space to life.</p>}
           />
-          <div style={{ paddingTop: "32px", paddingBottom: "80px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
-            <div style={{ position: "relative", borderRadius: "20px", overflow: "hidden", aspectRatio: "16/10" }}>
-              <Image src="/images/hero.png" alt="CTA" fill sizes="50vw" style={{ objectFit: "cover" }} />
-              <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.32)" }} />
-              <p style={{ position: "absolute", bottom: "20px", left: "20px", color: "#fff", fontWeight: 700, fontSize: "1rem", margin: 0 }}>Step Into Your Dream Space</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 py-10 lg:py-14">
+            <div className="relative rounded-3xl overflow-hidden aspect-[16/9] md:aspect-auto group cursor-pointer">
+              <Image src="/images/hero.png" alt="CTA" fill sizes="50vw" className="object-cover group-hover:scale-105 transition-transform duration-700" />
+              <div className="absolute inset-0 bg-black/35" />
+              <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white font-bold text-lg md:text-xl tracking-tight">Step Into Your Dream Space</div>
             </div>
-            <div style={{ background: "white", borderRadius: "20px", padding: "40px", display: "flex", flexDirection: "column", gap: "20px", justifyContent: "center" }}>
-              <p style={{ color: "#888", fontSize: "11px", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", margin: 0 }}>Begin your design journey</p>
-              <p style={{ fontSize: "14px", color: "#555", lineHeight: 1.75, margin: 0 }}>
+            <div className="bg-white rounded-3xl p-10 lg:p-16 flex flex-col gap-6 justify-center shadow-xs">
+              <p className="text-[11px] font-bold tracking-[0.16em] text-[#888] uppercase m-0">Begin your design journey</p>
+              <p className="text-[#555] text-base lg:text-lg leading-relaxed m-0 text-balance">
                 Let&apos;s create something truly incredible together. Your ideal space begins right here with us.
               </p>
-              <Link href="/contact" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontWeight: 700, fontSize: "13px", color: "#111", textDecoration: "underline", textUnderlineOffset: "4px" }}>
-                Contact Us <ArrowUpRight size={14} />
+              <Link href="/contact" className="inline-flex items-center gap-1.5 font-bold text-sm md:text-base text-[#111] hover:underline underline-offset-8 decoration-2 mt-4 transition-all">
+                Contact Us <ArrowUpRight size={18} />
               </Link>
             </div>
           </div>

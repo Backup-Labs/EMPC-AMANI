@@ -41,26 +41,18 @@ export default function ProjectDetail() {
   const project = projectData[slug] || projectData["coastal-serenity"]; // Default fallback
 
   return (
-    <div style={{ fontFamily: "'Satoshi', sans-serif", background: "#f0f0f0", minHeight: "100vh" }}>
+    <div className="bg-[#f0f0f0] min-h-screen">
       {/* ── HERO ── */}
-      <section style={{ position: "relative", height: "80vh", minHeight: "500px", overflow: "hidden" }}>
-        <Image src={project.image} alt={project.title} fill sizes="100vw" priority style={{ objectFit: "cover" }} />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%)" }} />
+      <section className="relative h-[80vh] min-h-[500px] overflow-hidden">
+        <Image src={project.image} alt={project.title} fill sizes="100vw" priority className="object-cover" />
+        <div className="absolute inset-0 bg-linear-to-b from-black/30 to-black/70" />
         
-        <div style={{ position: "absolute", bottom: "60px", left: "48px", right: "48px" }}>
+        <div className="absolute inset-x-0 bottom-0 px-6 md:px-12 lg:px-16 pb-12 lg:pb-20">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <span style={{ 
-              display: "inline-block", padding: "6px 14px", borderRadius: "999px", 
-              border: "1px solid rgba(255,255,255,0.4)", color: "#fff", 
-              fontSize: "12px", fontWeight: 600, marginBottom: "16px",
-              backdropFilter: "blur(4px)"
-            }}>
+            <span className="inline-block px-4 py-1.5 rounded-full border border-white/40 text-white text-[11px] font-bold tracking-widest uppercase backdrop-blur-md mb-6">
               {project.category}
             </span>
-            <h1 style={{ 
-              fontWeight: 800, fontSize: "clamp(3rem, 8vw, 6rem)", 
-              letterSpacing: "-0.04em", lineHeight: 1, color: "#fff", margin: 0 
-            }}>
+            <h1 className="font-extrabold text-[3rem] md:text-[5rem] lg:text-[7rem] leading-[0.95] tracking-[-0.04em] text-white m-0">
               {project.title}
             </h1>
           </motion.div>
@@ -68,19 +60,19 @@ export default function ProjectDetail() {
       </section>
 
       {/* ── INFO BAR ── */}
-      <section style={{ background: "white", borderBottom: "1px solid #e0e0e0" }}>
-        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "40px 48px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "24px" }}>
+      <section className="bg-white border-b border-[#e0e0e0] px-6 md:px-12 lg:px-16">
+        <div className="max-w-7xl mx-auto py-10 lg:py-14">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 md:gap-12 lg:gap-16">
             {[
               { label: "Client", value: project.client },
               { label: "Location", value: project.location },
               { label: "Year", value: project.year },
               { label: "Concept", value: project.concept },
-              { label: "Inspiration style", value: project.style },
+              { label: "Style", value: project.style },
             ].map((item, i) => (
               <div key={i}>
-                <p style={{ color: "#888", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 8px" }}>{item.label}</p>
-                <p style={{ color: "#111", fontSize: "14px", fontWeight: 600, margin: 0 }}>{item.value}</p>
+                <p className="text-[10px] md:text-[11px] font-bold tracking-widest text-[#888] uppercase mb-2">{item.label}</p>
+                <p className="text-[#111] text-sm md:text-base font-bold m-0">{item.value}</p>
               </div>
             ))}
           </div>
@@ -88,46 +80,44 @@ export default function ProjectDetail() {
       </section>
 
       {/* ── CONTENT ── */}
-      <section style={{ padding: "80px 0" }}>
-        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "64px" }}>
-            <div>
-              <h2 style={{ fontWeight: 700, fontSize: "2rem", letterSpacing: "-0.025em", margin: "0 0 24px" }}>Concept &amp; Objective</h2>
-              <p style={{ color: "#555", fontSize: "15px", lineHeight: 1.8, margin: 0 }}>
+      <section className="px-6 md:px-12 lg:px-16 py-16 lg:py-24">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+            <div className="flex flex-col gap-6 md:gap-8">
+              <h2 className="font-bold text-[1.8rem] md:text-[2.2rem] lg:text-[2.8rem] leading-tight tracking-tight m-0">Concept &amp; Objective</h2>
+              <p className="text-[#555] text-base md:text-lg leading-relaxed m-0 max-w-lg">
                 {project.description}
               </p>
             </div>
-            <div style={{ position: "relative", borderRadius: "20px", overflow: "hidden", aspectRatio: "4/3" }}>
-              <Image src={project.gallery[0]} alt="Process" fill sizes="40vw" style={{ objectFit: "cover" }} />
+            <div className="relative rounded-3xl overflow-hidden aspect-[4/3] shadow-sm">
+              <Image src={project.gallery[0]} alt="Process" fill sizes="(max-width:1024px) 100vw, 50vw" className="object-cover" />
             </div>
           </div>
 
-          {/* Large image grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", marginTop: "64px" }}>
-            <div style={{ position: "relative", borderRadius: "20px", overflow: "hidden", aspectRatio: "16/10", gridColumn: "span 2" }}>
-              <Image src={project.gallery[1]} alt="Interior 1" fill sizes="90vw" style={{ objectFit: "cover" }} />
+          {/* Gallery grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mt-16 md:mt-24 lg:mt-32">
+            <div className="relative rounded-3xl overflow-hidden aspect-[16/9] md:aspect-auto md:row-span-2 shadow-sm group">
+              <Image src={project.gallery[1]} alt="Interior 1" fill sizes="100vw" className="object-cover group-hover:scale-105 transition-transform duration-700" />
             </div>
-            <div style={{ position: "relative", borderRadius: "20px", overflow: "hidden", aspectRatio: "4/5" }}>
-              <Image src={project.gallery[2]} alt="Interior 2" fill sizes="45vw" style={{ objectFit: "cover" }} />
+            <div className="relative rounded-3xl overflow-hidden aspect-[4/5] shadow-sm group">
+              <Image src={project.gallery[2]} alt="Interior 2" fill sizes="(max-width:768px) 100vw, 50vw" className="object-cover group-hover:scale-105 transition-transform duration-700" />
             </div>
-            <div style={{ position: "relative", borderRadius: "20px", overflow: "hidden", aspectRatio: "4/5" }}>
-              <Image src={project.image} alt="Interior 3" fill sizes="45vw" style={{ objectFit: "cover" }} />
+            <div className="relative rounded-3xl overflow-hidden aspect-[4/5] shadow-sm group">
+              <Image src={project.image} alt="Interior 3" fill sizes="(max-width:768px) 100vw, 50vw" className="object-cover group-hover:scale-105 transition-transform duration-700" />
             </div>
           </div>
         </div>
       </section>
 
       {/* ── NAVIGATION ── */}
-      <section style={{ paddingBottom: "100px" }}>
-        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px" }}>
-          <div style={{ borderTop: "1px solid #e0e0e0", paddingTop: "48px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <Link href="/projects" style={{ display: "flex", alignItems: "center", gap: "8px", color: "#111", fontWeight: 700, fontSize: "14px", textDecoration: "none" }}>
-              <ArrowLeft size={16} /> Back to Projects
-            </Link>
-            <Link href="/contact" style={{ display: "flex", alignItems: "center", gap: "8px", color: "#111", fontWeight: 700, fontSize: "14px", textDecoration: "none" }}>
-              Start a Project <ArrowUpRight size={16} />
-            </Link>
-          </div>
+      <section className="px-6 md:px-12 lg:px-16 pb-20 lg:pb-32">
+        <div className="max-w-7xl mx-auto border-t border-[#e0e0e0] pt-10 flex flex-col sm:flex-row justify-between items-center gap-6">
+          <Link href="/projects" className="inline-flex items-center gap-2 font-bold text-sm md:text-base text-[#111] hover:underline underline-offset-8 decoration-2 order-2 sm:order-1">
+            <ArrowLeft size={18} /> Back to Projects
+          </Link>
+          <Link href="/contact" className="inline-flex items-center gap-2 font-bold text-sm md:text-base text-[#111] hover:underline underline-offset-8 decoration-2 order-1 sm:order-2">
+            Start a Project <ArrowUpRight size={18} />
+          </Link>
         </div>
       </section>
     </div>

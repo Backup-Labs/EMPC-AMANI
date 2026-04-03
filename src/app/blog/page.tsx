@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { ArrowUpRight, Calendar, User } from "lucide-react";
 
 const fade = (delay = 0) => ({
-  initial: { opacity: 0, y: 20 },
+  initial: { opacity: 0, y: 15 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true },
   transition: { duration: 0.45, ease: "easeOut", delay },
@@ -66,20 +66,20 @@ const posts = [
 
 export default function Blog() {
   return (
-    <div style={{ fontFamily: "'Satoshi', sans-serif", background: "#f0f0f0" }}>
+    <div className="bg-[#f0f0f0] min-h-screen">
 
       {/* ── HERO ── */}
-      <section style={{ background: "#111", paddingTop: "120px", paddingBottom: "64px" }}>
-        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px" }}>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
-              <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#777", display: "block" }} />
-              <span style={{ fontWeight: 500, fontSize: "13px", color: "#777" }}>Our Blog</span>
+      <section className="bg-[#111] pt-32 md:pt-40 pb-16 lg:pb-24 px-6 md:px-12 lg:px-16">
+        <div className="max-w-7xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <div className="flex items-center gap-2 mb-6">
+              <span className="w-2 h-2 rounded-full bg-[#555] block" />
+              <span className="font-medium text-[13px] text-[#777]">Our Blog</span>
             </div>
-            <h1 style={{ fontWeight: 800, fontSize: "clamp(2.5rem, 6vw, 5rem)", letterSpacing: "-0.04em", lineHeight: 1, color: "#fff", margin: "0 0 16px" }}>
+            <h1 className="font-extrabold text-[2.8rem] md:text-[4.5rem] lg:text-[6rem] leading-[0.95] tracking-[-0.04em] text-white m-0">
               Insights &amp;<br />Inspiration.
             </h1>
-            <p style={{ color: "rgba(255,255,255,0.45)", fontSize: "14px", lineHeight: 1.7, margin: 0, maxWidth: "380px" }}>
+            <p className="text-white/45 text-sm md:text-base leading-relaxed mt-6 max-w-sm m-0">
               Design insights, trends, and inspiration from the studio of EMPC-AMANI.
             </p>
           </motion.div>
@@ -87,39 +87,38 @@ export default function Blog() {
       </section>
 
       {/* ── BLOG GRID ── */}
-      <section>
-        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "64px 48px 80px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "32px" }}>
+      <section className="px-6 md:px-12 lg:px-16 py-16 lg:py-24">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 lg:gap-12">
             {posts.map((post, i) => (
-              <motion.article key={i} {...fade(i * 0.06)} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+              <motion.article key={i} {...fade(i * 0.06)} className="flex flex-col gap-6 group">
                 {/* Image */}
-                <Link href={`/blog/${post.title.toLowerCase().replace(/ /g, "-")}`} style={{ position: "relative", borderRadius: "16px", overflow: "hidden", aspectRatio: "16/10", display: "block" }}>
-                  <Image src={post.image} alt={post.title} fill sizes="(max-width:768px) 100vw, 33vw" style={{ objectFit: "cover", transition: "transform 0.6s ease" }}
-                    onMouseEnter={(e) => ((e.currentTarget as HTMLImageElement).style.transform = "scale(1.05)")}
-                    onMouseLeave={(e) => ((e.currentTarget as HTMLImageElement).style.transform = "scale(1)")}
-                  />
-                  <div style={{ position: "absolute", top: "12px", left: "12px", background: "rgba(0,0,0,0.52)", backdropFilter: "blur(8px)", borderRadius: "999px", padding: "4px 12px" }}>
-                    <span style={{ color: "#fff", fontSize: "10px", fontWeight: 600, letterSpacing: "0.06em" }}>{post.category}</span>
+                <Link href={`/blog/${post.title.toLowerCase().replace(/ /g, "-")}`} className="relative rounded-2xl md:rounded-3xl overflow-hidden aspect-[16/10] block group shadow-sm">
+                  <Image src={post.image} alt={post.title} fill sizes="(max-width:768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+                  <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-md rounded-full px-4 py-1.5 border border-white/10">
+                    <span className="text-white text-[10px] font-bold tracking-widest uppercase">{post.category}</span>
                   </div>
                 </Link>
                 {/* Meta */}
-                <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-                  <span style={{ color: "#888", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px" }}>
-                    <Calendar size={11} /> {post.date}
+                <div className="flex gap-6 items-center">
+                  <span className="text-[#888] text-[11px] font-bold flex items-center gap-1.5 uppercase tracking-wider">
+                    <Calendar size={12} /> {post.date}
                   </span>
-                  <span style={{ color: "#888", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px" }}>
-                    <User size={11} /> {post.author}
+                  <span className="text-[#888] text-[11px] font-bold flex items-center gap-1.5 uppercase tracking-wider">
+                    <User size={12} /> {post.author}
                   </span>
                 </div>
                 {/* Text */}
-                <Link href={`/blog/${post.title.toLowerCase().replace(/ /g, "-")}`} style={{ textDecoration: "none" }}>
-                  <h2 style={{ fontWeight: 700, fontSize: "1rem", lineHeight: 1.4, letterSpacing: "-0.01em", color: "#111", margin: 0 }}>
-                    {post.title}
-                  </h2>
-                </Link>
-                <p style={{ color: "#666", fontSize: "13px", lineHeight: 1.7, margin: 0 }}>{post.excerpt}</p>
-                <Link href={`/blog/${post.title.toLowerCase().replace(/ /g, "-")}`} style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontWeight: 700, fontSize: "12px", color: "#111", textDecoration: "underline", textUnderlineOffset: "4px" }}>
-                  Read More <ArrowUpRight size={12} />
+                <div className="flex flex-col gap-3">
+                  <Link href={`/blog/${post.title.toLowerCase().replace(/ /g, "-")}`} className="no-underline">
+                    <h2 className="font-bold text-lg lg:text-xl leading-tight tracking-tight text-[#111] hover:underline underline-offset-4 decoration-1">
+                      {post.title}
+                    </h2>
+                  </Link>
+                  <p className="text-[#666] text-sm md:text-[15px] leading-relaxed m-0 line-clamp-3">{post.excerpt}</p>
+                </div>
+                <Link href={`/blog/${post.title.toLowerCase().replace(/ /g, "-")}`} className="inline-flex items-center gap-1.5 font-bold text-xs lg:text-sm text-[#111] border-b border-[#111] pb-1 w-fit mt-1 hover:gap-2.5 transition-all">
+                  Read More <ArrowUpRight size={14} />
                 </Link>
               </motion.article>
             ))}
