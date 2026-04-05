@@ -38,10 +38,10 @@ export function Navbar() {
       >
         {/* Transparent bar that morphs into a pill on scroll */}
         <div
-          className="transition-all duration-500 ease-in-out mx-auto"
+          className="transition-all duration-500 ease-in-out mx-auto px-6 md:px-12 lg:px-16"
           style={{
             marginTop: scrolled ? "16px" : "0",
-            maxWidth: scrolled ? "720px" : "100%",
+            maxWidth: scrolled ? "720px" : "1344px",
             width: "100%",
           }}
         >
@@ -49,8 +49,8 @@ export function Navbar() {
             className={`
               flex items-center justify-between transition-all duration-500 ease-in-out
               ${scrolled 
-                ? "bg-white/90 backdrop-blur-xl border border-black/5 rounded-full px-6 py-3 md:px-8 shadow-xl" 
-                : "bg-transparent py-6 px-4 md:px-12 lg:px-16"
+                ? "glass rounded-full px-6 py-3 md:px-8 shadow-sm" 
+                : "bg-transparent py-8"
               }
             `}
           >
@@ -58,8 +58,8 @@ export function Navbar() {
             <Link
               href="/"
               className={`
-                font-bold tracking-tighter transition-all duration-300 no-underline
-                ${scrolled ? "text-base text-[#111]" : "text-lg md:text-xl text-white"}
+                font-bold text-xl tracking-tighter transition-all duration-300 no-underline
+                ${scrolled ? "text-[#111]" : "text-white"}
               `}
             >
               EMPC-AMANI

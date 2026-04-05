@@ -15,29 +15,36 @@ const exclusiveProjects = [
 ];
 
 const featuredProjects = [
-  { title: "Nordic Light Loft", tags: ["Scandinavian", "Functional Elegance"], image: "/images/hero.png" },
-  { title: "Redwood Horizon", tags: ["Timber Architecture", "Nature Immersion"], image: "/images/project1.png" },
-  { title: "Atelier Noir", tags: ["Monochrome", "Industrial Chic"], image: "/images/project2.png" },
+  { title: "Nordic Light Loft", tags: ["Scandinavian", "Functional"], image: "/images/hero.png" },
+  { title: "Redwood Horizon", tags: ["Timber", "Nature"], image: "/images/project1.png" },
+  { title: "Atelier Noir", tags: ["Monochrome", "Industrial"], image: "/images/project2.png" },
 ];
 
-// Shared section-label row (Responsive 3 columns)
+const fade = (delay = 0) => ({
+  initial: { opacity: 0, y: 15 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true },
+  transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as any, delay },
+});
+
+// Shared section-label row (Responsive)
 function SectionHeader({ label, heading, desc, rightEl }: { label: string; heading: React.ReactNode; desc?: string; rightEl?: React.ReactNode }) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[180px_1fr_1fr] gap-6 lg:gap-8 py-10 lg:py-14 border-b border-[#e0e0e0]">
+    <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr_1fr] gap-10 lg:gap-16 py-20 lg:py-32 border-b border-black/5">
       {/* Label */}
-      <div className="flex items-start gap-2 pt-1">
-        <span className="w-2 h-2 rounded-full bg-[#111] shrink-0 mt-1.5 block" />
-        <span className="font-medium text-[13px] text-[#111]">{label}</span>
+      <div className="flex items-start gap-3 pt-2">
+        <span className="w-2.5 h-2.5 rounded-full bg-primary shrink-0 mt-2 block" />
+        <span className="font-bold text-[14px] uppercase tracking-widest text-[#111]">{label}</span>
       </div>
       {/* Heading */}
       <div>
-        <h2 className="font-bold text-[1.6rem] md:text-[2.2rem] lg:text-[2.5rem] leading-[1.1] tracking-[-0.03em] text-[#111] m-0">
+        <h2 className="font-black text-[2.5rem] md:text-[3.2rem] lg:text-[3.8rem] leading-[0.9] tracking-[-0.05em] text-[#111] m-0">
           {heading}
         </h2>
       </div>
       {/* Description / CTA */}
-      <div className="flex flex-col justify-between gap-4">
-        {desc && <p className="text-sm text-[#666] leading-relaxed m-0 max-w-md lg:max-w-none">{desc}</p>}
+      <div className="flex flex-col justify-between gap-6">
+        {desc && <p className="text-lg text-[#555] leading-relaxed m-0 max-w-md">{desc}</p>}
         {rightEl}
       </div>
     </div>
@@ -53,51 +60,61 @@ export default function Home() {
   const slide = exclusiveProjects[carouselIdx];
 
   return (
-    <div className="bg-white min-h-screen overflow-x-hidden">
+    <div className="bg-white min-h-screen overflow-x-hidden relative">
 
       {/* ── HERO ── */}
-      <section className="relative h-screen min-h-[600px] overflow-hidden">
+      <section className="relative h-screen min-h-[800px] overflow-hidden">
         <Image src="/images/hero.png" alt="EMPC-AMANI Interior" fill priority sizes="100vw" className="object-cover" />
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-linear-to-br from-black/50 via-black/20 to-black/35" />
+        {/* Monochromatic ambient glow */}
+        <div className="absolute inset-0 bg-linear-to-b from-black/60 via-transparent to-black/40" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,0,0,0.05)_0%,transparent_60%)]" />
 
         {/* Hero Content */}
-        <div className="absolute inset-x-0 bottom-0 px-6 md:px-12 lg:px-16 pb-12 lg:pb-20 flex flex-col md:flex-row justify-between items-start md:items-end gap-10">
-          <div className="max-w-[700px]">
-            <h1 className="font-extrabold text-[2.8rem] md:text-[4.5rem] lg:text-[6rem] leading-[0.95] tracking-[-0.04em] text-white m-0">
-              Where Aesthetics Meet<br />Purposeful Living
-            </h1>
-            <p className="text-white/70 text-sm md:text-base leading-relaxed mt-6 max-w-md">
-              We create interiors that blend timeless elegance with modern functionality,
-              reflecting your story and lifestyle. Let's build something beautiful together.
-            </p>
-          </div>
-
-          {/* Floating project card - hidden on small mobile if needed, but here kept small */}
-          <Link href="/projects" className="shrink-0 transition-transform active:scale-95 group">
-            <div className="bg-white/15 backdrop-blur-xl border border-white/25 rounded-2xl overflow-hidden w-48 md:w-56">
-              <div className="relative h-32">
-                <Image src="/images/project1.png" alt="Azure Hallway" fill sizes="224px" className="object-cover group-hover:scale-105 transition-transform duration-500" />
-              </div>
-              <div className="p-3.5 flex justify-between items-center bg-white/5">
-                <span className="font-bold text-[12px] md:text-[13px] text-white">Azure Hallway</span>
-                <ArrowUpRight size={16} className="text-white" />
-              </div>
+        <div className="absolute inset-x-0 bottom-0 pb-16 lg:pb-24 px-6 md:px-12 lg:px-16 container mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-12">
+            <div className="max-w-[850px]">
+              <motion.h1 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] as any }}
+                className="font-black text-[3rem] md:text-[4.5rem] lg:text-[6.5rem] leading-[0.85] tracking-[-0.05em] text-white m-0"
+              >
+                Visionary<br />Spaces.
+              </motion.h1>
+              <p className="text-white/80 text-lg md:text-xl leading-relaxed mt-8 max-w-lg">
+                We blend timeless elegance with modern functionality, crafting
+                interiors that are as purposeful as they are beautiful.
+              </p>
             </div>
-          </Link>
+
+            {/* Floating Glass Project card */}
+            <Link href="/projects" className="shrink-0 transition-all hover:scale-105 active:scale-95 group relative z-10">
+              <div className="glass rounded-[32px] overflow-hidden w-56 md:w-64 p-3 shadow-2xl">
+                <div className="relative h-40 rounded-[22px] overflow-hidden">
+                  <Image src="/images/project1.png" alt="Azure Hallway" fill sizes="256px" className="object-cover transition-transform duration-700 group-hover:scale-110" />
+                </div>
+                <div className="pt-4 px-2 pb-2 flex justify-between items-center">
+                  <span className="font-bold text-[14px] text-[#111]">Exclusive Work</span>
+                  <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white">
+                    <ArrowUpRight size={16} />
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* ── STUDIO SECTION ── */}
-      <section className="bg-[#f0f0f0] px-6 md:px-12 lg:px-16">
+      <section className="px-6 md:px-12 lg:px-16">
         <div className="max-w-7xl mx-auto">
           <SectionHeader
             label="Studio"
-            heading={<>Rooted in Clear Vision.<br />Driven by Detail.</>}
-            desc="Our design philosophy blends story, structure, and soul to craft environments."
+            heading={<>Clear Vision.<br />Masterful Detail.</>}
+            desc="Our philosophy blends contemporary aesthetics with deep functional purpose in every environment we touch."
             rightEl={
-              <Link href="/about" className="inline-flex items-center gap-1.5 font-bold text-sm text-[#111] hover:underline underline-offset-4 decoration-2">
-                About Us <ArrowUpRight size={14} />
+              <Link href="/about" className="inline-flex items-center gap-2 group font-bold text-base text-primary">
+                Learn our story <ArrowUpRight size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
               </Link>
             }
           />
@@ -105,24 +122,24 @@ export default function Home() {
       </section>
 
       {/* ── FULL-WIDTH IMAGE + STATS ── */}
-      <section className="bg-[#f0f0f0] px-6 md:px-12 lg:px-16 pb-16 lg:pb-24">
+      <section className="px-6 md:px-12 lg:px-16 py-20 lg:py-32">
         <div className="max-w-7xl mx-auto">
-          {/* Full-width rounded image */}
-          <div className="relative rounded-3xl overflow-hidden aspect-[16/9] md:aspect-[21/9] mb-12 lg:mb-16">
+          {/* Large radius image */}
+          <div className="relative rounded-[48px] overflow-hidden aspect-[21/9] mb-16 lg:mb-24 shadow-2xl">
             <Image src="/images/project2.png" alt="Studio" fill sizes="100vw" className="object-cover" />
           </div>
 
-          {/* Stats row */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+          {/* New Stats design */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-16 lg:gap-24">
             {[
-              { val: "46+", label: "Homes transformed", desc: "From apartments to luxurious villas, each project is a unique story of style." },
-              { val: "29+", label: "Commercial spaces", desc: "Innovative designs that enhance functionality while maintaining aesthetic." },
-              { val: "756+", label: "Satisfied Clients", desc: "Whether a homeowner or investor, our clients celebrate every transformation." },
+              { val: "150+", label: "Transformative Designs", desc: "Crafting narratives through physical space since 2012." },
+              { val: "45", label: "Design Awards", desc: "Recognized internationally for innovation and craft." },
+              { val: "12ct", label: "Global Reach", desc: "Delivering world-class interiors across 12 countries." },
             ].map((s, i) => (
-              <div key={i}>
-                <p className="font-extrabold text-[2.8rem] lg:text-[3.5rem] tracking-[-0.04em] text-[#666] m-0 leading-none">{s.val}</p>
-                <p className="font-bold text-sm lg:text-base text-[#111] mt-2 mb-3 lg:mb-4">{s.label}</p>
-                <p className="text-[13px] lg:text-sm text-[#666] leading-relaxed m-0">{s.desc}</p>
+              <div key={i} className="flex flex-col border-l-2 border-black/5 pl-8">
+                <p className="font-black text-[3.5rem] lg:text-[4rem] tracking-[-0.05em] text-[#111] m-0 leading-none">{s.val}</p>
+                <p className="font-black text-lg text-[#111] mt-4 mb-4 uppercase tracking-tighter">{s.label}</p>
+                <p className="text-base text-[#666] leading-relaxed m-0">{s.desc}</p>
               </div>
             ))}
           </div>
@@ -130,45 +147,40 @@ export default function Home() {
       </section>
 
       {/* ── EXCLUSIVE PROJECTS (carousel) ── */}
-      <section className="bg-[#f0f0f0] px-6 md:px-12 lg:px-16">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-[180px_1fr_1fr] gap-6 lg:gap-8 py-10 lg:py-14 border-b border-[#e0e0e0]">
-            <div className="flex items-start gap-2 pt-1">
-              <span className="w-2 h-2 rounded-full bg-[#111] shrink-0 mt-1.5 block" />
-              <span className="font-medium text-[13px] text-[#111]">Exclusive Projects</span>
+      <section className="px-6 md:px-12 lg:px-16 bg-muted relative">
+        {/* Subtle glow layer */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgba(0,0,0,0.02)_0%,transparent_50%)]" />
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          <SectionHeader
+            label="Exclusive"
+            heading={<>Boldly Rooted.<br />Flawlessly Executed.</>}
+            desc="A curated selection of our most ambitious architectural interventions and luxury residential projects."
+          />
+          
+          <div className="py-20">
+            <div className="flex gap-4 justify-end mb-8">
+              <button onClick={prevSlide} className="h-14 w-14 rounded-full glass flex items-center justify-center hover:bg-black hover:text-white transition-all active:scale-95">
+                <ChevronLeft size={24} />
+              </button>
+              <button onClick={nextSlide} className="h-14 w-14 rounded-full glass flex items-center justify-center hover:bg-black hover:text-white transition-all active:scale-95">
+                <ChevronRight size={24} />
+              </button>
             </div>
-            <div>
-              <h2 className="font-bold text-[1.6rem] md:text-[2.2rem] lg:text-[2.5rem] leading-[1.1] tracking-[-0.03em] text-[#111] m-0">
-                Boldly Rooted in Vision.<br />Exclusive In Execution.
-              </h2>
-            </div>
-            <div className="flex flex-col justify-between gap-6 lg:gap-8">
-              <p className="text-sm text-[#666] leading-relaxed m-0">A visual library of interiors brought to life from blueprint to beauty.</p>
-              <div className="flex gap-2.5 justify-start lg:justify-end">
-                <button onClick={prevSlide} className="h-10 w-10 rounded-full bg-[#111] text-white flex items-center justify-center transition-colors active:bg-[#333]">
-                  <ChevronLeft size={18} />
-                </button>
-                <button onClick={nextSlide} className="h-10 w-10 rounded-full bg-[#111] text-white flex items-center justify-center transition-colors active:bg-[#333]">
-                  <ChevronRight size={18} />
-                </button>
-              </div>
-            </div>
-          </div>
 
-          <div className="py-8 lg:py-14">
             <motion.div
               key={carouselIdx}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-              className="relative rounded-3xl overflow-hidden aspect-[16/9] md:aspect-[21/9]"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as any }}
+              className="relative rounded-[48px] overflow-hidden aspect-[21/9] shadow-3xl"
             >
-              <Image src={slide.image} alt={slide.title} fill sizes="100vw" className="object-cover transition-transform duration-700" />
-              <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
-              <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10">
-                <p className="font-bold text-lg md:text-2xl text-white m-0 tracking-tight">{slide.title}</p>
-                <Link href={`/projects/${slide.title.toLowerCase().replace(/ /g, "-")}`} className="mt-2.5 inline-flex items-center gap-1.5 text-xs md:text-sm text-white/70 hover:text-white transition-colors">
-                  View Detail <ArrowUpRight size={14} />
+              <Image src={slide.image} alt={slide.title} fill sizes="100vw" className="object-cover" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/10 to-transparent" />
+              <div className="absolute bottom-12 left-12">
+                <p className="font-black text-[2rem] md:text-[3rem] text-white m-0 tracking-[-0.05em]">{slide.title}</p>
+                <Link href={`/projects/${slide.title.toLowerCase().replace(/ /g, "-")}`} className="mt-6 inline-flex h-12 items-center px-8 rounded-full glass text-sm font-bold text-white hover:bg-white hover:text-black transition-all">
+                  Exploration <ArrowUpRight size={16} className="ml-2" />
                 </Link>
               </div>
             </motion.div>
@@ -177,39 +189,37 @@ export default function Home() {
       </section>
 
       {/* ── FEATURED PROJECTS ── */}
-      <section className="bg-[#f0f0f0] px-6 md:px-12 lg:px-16 pb-16 lg:pb-24">
+      <section className="px-6 md:px-12 lg:px-16 py-20 lg:py-32">
         <div className="max-w-7xl mx-auto">
           <SectionHeader
-            label="Featured Projects"
-            heading={<>Spaces That Inspire.<br />Projects That Last.</>}
-            desc="Discover our range of interior designs that turn ideas into stunning spaces!"
+            label="Portfolio"
+            heading={<>Inspiring Spaces.<br />Resonant Experience.</>}
+            desc="Our diverse range of work spans from boutique retail to high-end hospitality."
           />
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 lg:gap-8 pt-10 lg:pt-14">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 pt-20">
             {featuredProjects.map((p, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 15 }}
+                initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.45, delay: i * 0.08 }}
-                className="flex flex-col gap-4 group cursor-pointer"
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.7, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] as any }}
+                className="flex flex-col gap-6 group"
               >
-                <div className="relative rounded-2xl overflow-hidden aspect-square">
-                  <Image src={p.image} alt={p.title} fill sizes="(max-width:768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
-                </div>
-                <div className="flex justify-between items-start gap-4">
-                  <div>
-                    <p className="font-bold text-[15px] lg:text-[17px] text-[#111] mb-2 leading-tight tracking-tight">{p.title}</p>
-                    <div className="flex gap-2 flex-wrap">
-                      {p.tags.map((tag) => (
-                        <span key={tag} className="text-[10px] md:text-[11px] font-semibold text-[#555] border border-[#c0c0c0] rounded-full px-2.5 py-1">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
+                <div className="relative rounded-[32px] overflow-hidden aspect-square shadow-lg">
+                  <Image src={p.image} alt={p.title} fill sizes="(max-width:768px) 100vw, 33vw" className="object-cover group-hover:scale-110 transition-transform duration-1000 ease-out" />
+                  <div className="absolute top-6 left-6 flex gap-2">
+                    {p.tags.map(t => (
+                      <span key={t} className="glass text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full text-[#111]">
+                        {t}
+                      </span>
+                    ))}
                   </div>
-                  <div className="h-9 w-9 rounded-full border border-[#c0c0c0] flex items-center justify-center transition-colors group-hover:bg-[#111] group-hover:border-[#111] group-hover:text-white shrink-0">
-                    <ArrowUpRight size={14} />
+                </div>
+                <div className="flex justify-between items-center pr-4">
+                  <p className="font-black text-2xl text-[#111] leading-tight tracking-tighter">{p.title}</p>
+                  <div className="h-12 w-12 rounded-full border border-black/10 flex items-center justify-center transition-all group-hover:bg-primary group-hover:border-primary group-hover:text-white">
+                    <ArrowUpRight size={20} />
                   </div>
                 </div>
               </motion.div>
@@ -219,30 +229,34 @@ export default function Home() {
       </section>
 
       {/* ── BLOG STRIP ── */}
-      <section className="bg-[#f0f0f0] px-6 md:px-12 lg:px-16 pb-20 lg:pb-32">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center pb-8 border-b border-[#e0e0e0]">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#111] block" />
-              <span className="font-medium text-[13px] text-[#111]">Latest Blogs</span>
+      <section className="px-6 md:px-12 lg:px-16 py-20 lg:py-40 bg-muted overflow-hidden relative">
+        <div className="absolute top-0 left-0 w-full h-[1px] bg-linear-to-r from-transparent via-black/10 to-transparent" />
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex justify-between items-end pb-12 border-b border-black/5">
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <span className="w-2.5 h-2.5 rounded-full bg-primary block" />
+                <span className="font-bold text-[14px] uppercase tracking-widest text-[#555]">Journal</span>
+              </div>
+               <h2 className="font-black text-[2.5rem] md:text-[3.5rem] text-[#111] leading-[0.9] tracking-[-0.05em] m-0">Latest Stories.</h2>
             </div>
-            <Link href="/blog" className="font-bold text-[13px] text-[#111] hover:underline underline-offset-4 decoration-2 flex items-center gap-1">
-              View All <ArrowUpRight size={14} />
+            <Link href="/blog" className="h-14 w-14 rounded-full glass flex items-center justify-center hover:bg-primary hover:text-white transition-all text-primary">
+              <ArrowUpRight size={24} />
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 lg:gap-10 pt-10 lg:pt-14">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pt-20">
             {[
-              { title: "The Future of Sustainable Design", date: "Mar 20, 2026", image: "/images/hero.png" },
-              { title: "Minimalism vs. Maximalism in 2026", date: "Mar 15, 2026", image: "/images/project1.png" },
-              { title: "Color Psychology in Workspaces", date: "Mar 10, 2026", image: "/images/project2.png" },
+              { title: "Future of Sustainable Design", date: "20.03.26", image: "/images/hero.png" },
+              { title: "Minimalism vs. Maximalism", date: "15.03.26", image: "/images/project1.png" },
+              { title: "Psychology in Workspace", date: "10.03.26", image: "/images/project2.png" },
             ].map((b, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.07 }}>
+              <motion.div key={i} {...fade(i * 0.1)}>
                 <Link href={`/blog/${b.title.toLowerCase().replace(/ /g, "-")}`} className="group block">
-                  <div className="relative rounded-2xl overflow-hidden aspect-[16/10] mb-5">
-                    <Image src={b.image} alt={b.title} fill sizes="(max-width:768px) 100vw, 33vw" className="object-cover grow group-hover:scale-105 transition-transform duration-700" />
+                  <div className="relative rounded-[32px] overflow-hidden aspect-[16/10] mb-8 shadow-md">
+                    <Image src={b.image} alt={b.title} fill sizes="(max-width:768px) 100vw, 33vw" className="object-cover grow group-hover:scale-110 transition-transform duration-1000" />
                   </div>
-                  <p className="text-[11px] font-bold text-[#888] mb-2.5 flex items-center gap-2">{b.date}</p>
-                  <p className="font-bold text-base lg:text-lg text-[#111] leading-snug tracking-tight m-0 group-hover:underline decoration-1 underline-offset-4">{b.title}</p>
+                  <p className="text-[11px] font-black text-primary mb-3 flex items-center gap-2 uppercase tracking-widest">{b.date}</p>
+                  <p className="font-black text-2xl text-[#111] leading-tight tracking-tight m-0 hover:text-primary transition-colors">{b.title}</p>
                 </Link>
               </motion.div>
             ))}

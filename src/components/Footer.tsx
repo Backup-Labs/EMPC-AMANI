@@ -35,43 +35,37 @@ const IconLinkedIn = () => (
 
 export function Footer() {
   return (
-    <footer className="bg-[#111111] relative overflow-hidden">
-      {/* Subtle radial glow */}
-      <div className="absolute bottom-0 left-1/4 w-[600px] h-[300px] pointer-events-none bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,transparent_70%)] blur-[50px] opacity-20" />
-
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pt-20 pb-12 relative z-10">
-        {/* Top Content Row */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-16 md:gap-0">
-          
-          {/* Logo & Info */}
-          <div className="flex flex-col gap-6">
-            <Link href="/" className="font-extrabold text-2xl text-white tracking-tighter no-underline">
+    <footer className="bg-white relative overflow-hidden pt-32 pb-16">
+      {/* Monochromatic Mirror Glow Layer */}
+      <div className="absolute top-0 right-0 w-1/3 h-full bg-[radial-gradient(circle_at_100%_0%,rgba(0,0,0,0.02)_0%,transparent_70%)] pointer-events-none" />
+      
+      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 relative z-10">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-16 md:gap-0 pb-20 border-b border-black/5">
+          <div className="flex flex-col gap-8">
+            <Link href="/" className="font-black text-3xl text-[#111] tracking-tighter no-underline">
               EMPC-AMANI
             </Link>
-            <div className="flex flex-col gap-1.5">
-              <p className="text-white/40 text-sm font-medium">Lane London EC1R 0BJ</p>
-              <p className="text-white/40 text-sm font-medium">info@empc-amani.com</p>
+            <div className="flex flex-col gap-2">
+              <p className="text-[#555] text-lg font-bold">Lane London EC1R 0BJ</p>
+              <Link href="mailto:info@empc-amani.com" className="text-[#111] text-lg font-bold hover:underline">info@empc-amani.com</Link>
             </div>
           </div>
 
-          {/* Navigation & Socials */}
-          <div className="flex flex-col gap-10 md:items-end">
-            {/* Links Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-12 gap-y-4 md:flex md:gap-8">
+          <div className="flex flex-col gap-12 md:items-end">
+            <nav className="flex flex-wrap gap-x-12 gap-y-4 justify-start md:justify-end">
               {navLinks.map((l) => (
-                <Link key={l.name} href={l.href} className="text-[13px] font-bold text-white/50 no-underline hover:text-white transition-colors">{l.name}</Link>
+                <Link key={l.name} href={l.href} className="text-base font-black text-[#888] no-underline hover:text-[#111] transition-colors uppercase tracking-widest">{l.name}</Link>
               ))}
-            </div>
+            </nav>
 
-            {/* Social Icons */}
-            <div className="flex gap-3">
+            <div className="flex gap-4">
               {[
                 { Icon: IconInstagram, label: "Instagram" },
                 { Icon: IconFacebook, label: "Facebook" },
                 { Icon: IconX, label: "X" },
                 { Icon: IconLinkedIn, label: "LinkedIn" },
               ].map(({ Icon, label }) => (
-                <Link key={label} href="#" aria-label={label} className="h-11 w-11 rounded-full flex items-center justify-center text-white/40 border border-white/10 hover:border-white/30 hover:text-white transition-all transform hover:-translate-y-1">
+                <Link key={label} href="#" className="h-12 w-12 rounded-full flex items-center justify-center text-[#111] border border-black/5 hover:bg-black hover:text-white transition-all transform hover:-translate-y-1 shadow-sm">
                   <Icon />
                 </Link>
               ))}
@@ -79,23 +73,23 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Big Brand Statement */}
-        <div className="mt-20 md:mt-32 mb-10 overflow-hidden">
-          <span className="font-black text-[12vw] lg:text-[11rem] leading-[0.85] tracking-[-0.05em] text-white select-none whitespace-nowrap md:whitespace-normal">
+        {/* Big Brand Statement - Reduced Size */}
+        <div className="py-20 lg:py-32 overflow-hidden text-center">
+          <h2 className="font-black text-[12vw] lg:text-[10rem] leading-[0.75] tracking-[-0.06em] text-[#111] m-0 select-none opacity-5">
             EMPC-AMANI
-          </span>
+          </h2>
         </div>
 
         {/* Bottom Bar */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-6 pt-10 border-t border-white/5">
-          <div className="flex gap-8">
-            <p className="text-[11px] font-bold text-white/20 uppercase tracking-widest no-underline hover:text-white/40 transition-colors cursor-pointer">Terms & Condition</p>
-            <p className="text-[11px] font-bold text-white/20 uppercase tracking-widest no-underline hover:text-white/40 transition-colors cursor-pointer">Privacy Policy</p>
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-8">
+          <div className="flex gap-10">
+            <Link href="/terms" className="text-[11px] font-black text-[#aaa] uppercase tracking-[0.2em] no-underline hover:text-[#111]">Terms</Link>
+            <Link href="/privacy" className="text-[11px] font-black text-[#aaa] uppercase tracking-[0.2em] no-underline hover:text-[#111]">Privacy</Link>
           </div>
-          <div className="flex gap-4 items-center">
-            <p className="text-[11px] font-bold text-white/20 uppercase tracking-widest">©2026 EMPC-AMANI</p>
-            <span className="h-1 w-1 rounded-full bg-white/10" />
-            <p className="text-[11px] font-bold text-white/20 uppercase tracking-widest">Amani Studio</p>
+          <div className="flex gap-6 items-center">
+            <p className="text-[11px] font-black text-[#aaa] uppercase tracking-[0.2em]">©2026 EMPC-AMANI</p>
+            <div className="h-1 w-1 rounded-full bg-[#111]" />
+            <p className="text-[11px] font-black text-[#aaa] uppercase tracking-[0.2em]">London Studio</p>
           </div>
         </div>
       </div>
