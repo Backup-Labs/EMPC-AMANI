@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowUpRight, CheckCircle, ShieldCheck, Target } from "lucide-react";
+import { Counter } from "@/components/AnimatedComponents";
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 15 },
@@ -12,12 +13,6 @@ const fade = (delay = 0) => ({
   viewport: { once: true },
   transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as any, delay },
 });
-
-const values = [
-  { title: "Craftsmanship", desc: "Every intersection of material and light is considered with extreme care.", icon: ShieldCheck },
-  { title: "Innovation", desc: "We push the boundaries of what's possible in modern living environments.", icon: Target },
-  { title: "Integrity", desc: "Our commitment to quality is unwavering from blueprint to final reveal.", icon: CheckCircle },
-];
 
 const milestones = [
   { year: "2012", title: "Workshop Founded", desc: "EMPC-AMANI begins with two benches and a passion for solid wood.", images: ["/images/hero.png", "/images/project1.png"] },
@@ -97,11 +92,15 @@ export default function About() {
               </p>
               <div className="grid grid-cols-2 gap-12 pt-12 border-t border-border">
                 <div>
-                  <p className="font-black text-[2.5rem] lg:text-[3.5rem] tracking-[-0.05em] text-foreground m-0 leading-none">250+</p>
+                  <p className="font-black text-[2.5rem] lg:text-[3.5rem] tracking-[-0.05em] text-foreground m-0 leading-none">
+                    <Counter value={250} suffix="+" />
+                  </p>
                   <p className="text-[11px] font-black text-foreground/40 tracking-[0.2em] uppercase mt-4">Trained Artisans</p>
                 </div>
                 <div>
-                  <p className="font-black text-[2.5rem] lg:text-[3.5rem] tracking-[-0.05em] text-foreground m-0 leading-none">14y</p>
+                  <p className="font-black text-[2.5rem] lg:text-[3.5rem] tracking-[-0.05em] text-foreground m-0 leading-none">
+                    <Counter value={14} suffix="y" />
+                  </p>
                   <p className="text-[11px] font-black text-foreground/40 tracking-[0.2em] uppercase mt-4">Of Heritage</p>
                 </div>
               </div>

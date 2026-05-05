@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import { Counter } from "@/components/AnimatedComponents";
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 15 },
@@ -42,7 +43,8 @@ const services = [
     num: "01",
     title: "Bespoke Furniture",
     desc: "From concept sketches to the final coat of oil. We craft tables, chairs, and cabinets that become the heart of any room.",
-    stat: "2500+",
+    stat: 2500,
+    suffix: "+",
     statLabel: "Crafted Pieces",
     image: "/images/hero.png",
   },
@@ -50,7 +52,8 @@ const services = [
     num: "02",
     title: "Commercial Woodwork",
     desc: "Large-scale carpentry for boutique hotels, modern offices, and artisanal retail environments.",
-    stat: "85+",
+    stat: 85,
+    suffix: "+",
     statLabel: "Enterprises",
     image: "/images/project1.png",
   },
@@ -58,9 +61,19 @@ const services = [
     num: "03",
     title: "Restoration & Care",
     desc: "Breathe new life into heritage timber. We restore, rework, and refine existing woodwork with expert care.",
-    stat: "150+",
+    stat: 150,
+    suffix: "+",
     statLabel: "Master Restorations",
     image: "/images/project2.png",
+  },
+  {
+    num: "04",
+    title: "Internships & Training",
+    desc: "Empowering the next generation. We provide certified vocational training and real-world industrial experience in partnership with RTB.",
+    stat: 500,
+    suffix: "+",
+    statLabel: "Certified Artisans",
+    image: "/images/project1.png",
   },
 ];
 
@@ -113,7 +126,9 @@ export default function Services() {
                     </div>
                     <div className="flex gap-16 items-center">
                       <div>
-                        <p className="font-black text-[2.5rem] md:text-[3.5rem] tracking-[-0.05em] text-foreground m-0 leading-none">{s.stat}</p>
+                        <p className="font-black text-[2.5rem] md:text-[3.5rem] tracking-[-0.05em] text-foreground m-0 leading-none">
+                          <Counter value={s.stat} suffix={s.suffix} />
+                        </p>
                         <p className="text-[11px] font-black text-foreground/40 tracking-[0.2em] uppercase mt-4">{s.statLabel}</p>
                       </div>
                       <Link href="/contact" className="h-16 w-16 glass rounded-full flex items-center justify-center group-hover:bg-primary group-hover:text-background transition-all shadow-sm text-foreground">

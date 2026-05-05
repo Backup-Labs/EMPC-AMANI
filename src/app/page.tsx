@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { Counter, LogoMarquee } from "@/components/AnimatedComponents";
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
 
@@ -18,6 +19,15 @@ const featuredProjects = [
   { title: "Master Suite Set", tags: ["Oak", "Bespoke"], image: "/images/hero.png" },
   { title: "Floating Bed Frame", tags: ["Maple", "Modern"], image: "/images/project1.png" },
   { title: "Live Edge Desk", tags: ["Walnut", "Office"], image: "/images/project2.png" },
+];
+
+const partners = [
+  { name: "RTB", icon: "R" },
+  { name: "WoodMaster", icon: "W" },
+  { name: "EcoTimber", icon: "E" },
+  { name: "Vocation", icon: "V" },
+  { name: "Heritage", icon: "H" },
+  { name: "CraftHub", icon: "C" },
 ];
 
 const fade = (delay = 0) => ({
@@ -65,11 +75,9 @@ export default function Home() {
       {/* ── HERO ── */}
       <section className="relative h-screen min-h-[800px] overflow-hidden">
         <Image src="/images/hero.png" alt="EMPC-AMANI Interior" fill priority sizes="100vw" className="object-cover" />
-        {/* Monochromatic ambient glow */}
         <div className="absolute inset-0 bg-linear-to-b from-black/60 via-transparent to-black/40" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,0,0,0.05)_0%,transparent_60%)]" />
 
-        {/* Hero Content */}
         <div className="absolute inset-x-0 bottom-0 pb-16 lg:pb-24 px-6 md:px-12 lg:px-16 container mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-12">
             <div className="max-w-[850px]">
@@ -87,7 +95,6 @@ export default function Home() {
               </p>
             </div>
 
-            {/* Floating Glass Project card */}
             <Link href="/gallery" className="shrink-0 transition-all hover:scale-105 active:scale-95 group relative z-10">
               <div className="glass rounded-[32px] overflow-hidden w-56 md:w-64 p-3 shadow-2xl">
                 <div className="relative h-40 rounded-[22px] overflow-hidden">
@@ -124,20 +131,20 @@ export default function Home() {
       {/* ── FULL-WIDTH IMAGE + STATS ── */}
       <section className="px-6 md:px-12 lg:px-16 py-12 lg:py-20">
         <div className="max-w-7xl mx-auto">
-          {/* Large radius image */}
           <div className="relative rounded-[48px] overflow-hidden aspect-[21/9] mb-16 lg:mb-24 shadow-2xl">
             <Image src="/images/project2.png" alt="Studio" fill sizes="100vw" className="object-cover" />
           </div>
 
-          {/* New Stats design */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-16 lg:gap-24">
             {[
-              { val: "2500+", label: "Bespoke Pieces", desc: "Hand-crafted furniture delivered to homes and offices since 2012." },
-              { val: "85", label: "Master Artisans", desc: "Trained through our workshop and now leading the industry." },
+              { val: 2500, suffix: "+", label: "Bespoke Pieces", desc: "Hand-crafted furniture delivered to homes and offices since 2012." },
+              { val: 85, label: "Master Artisans", desc: "Trained through our workshop and now leading the industry." },
               { val: "RTB", label: "Certified Excellence", desc: "Official partner in vocational training and professional certification." },
             ].map((s, i) => (
               <div key={i} className="flex flex-col border-l-2 border-border pl-8">
-                <p className="font-black text-[3.5rem] lg:text-[4rem] tracking-[-0.05em] text-foreground m-0 leading-none">{s.val}</p>
+                <p className="font-black text-[3.5rem] lg:text-[4rem] tracking-[-0.05em] text-foreground m-0 leading-none">
+                  <Counter value={s.val} suffix={s.suffix} />
+                </p>
                 <p className="font-black text-lg text-foreground mt-4 mb-4 uppercase tracking-tighter">{s.label}</p>
                 <p className="text-base text-foreground/60 leading-relaxed m-0">{s.desc}</p>
               </div>
@@ -148,7 +155,6 @@ export default function Home() {
 
       {/* ── EXCLUSIVE PROJECTS (carousel) ── */}
       <section className="px-6 md:px-12 lg:px-16 bg-muted relative">
-        {/* Subtle glow layer */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgba(0,0,0,0.02)_0%,transparent_50%)]" />
         
         <div className="max-w-7xl mx-auto relative z-10">
@@ -228,50 +234,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── PARTNERS SECTION ── */}
-      <section className="px-6 md:px-12 lg:px-16 py-12 lg:py-20">
+      {/* ── PARTNERS LOGO MARQUEE ── */}
+      <section className="px-6 md:px-12 lg:px-16 py-12 lg:py-20 border-t border-border">
         <div className="max-w-7xl mx-auto">
-          <SectionHeader
-            label="Partners"
-            heading={<>Collaborative<br />Excellence.</>}
-            desc="We believe in empowering the next generation. Through our partnership with RTB, we provide students with hands-on carpentry experience and professional certification."
-          />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-20">
-            <motion.div 
-              {...fade(0.1)}
-              className="bg-muted p-12 rounded-[48px] flex flex-col justify-between"
-            >
-              <div>
-                <div className="h-16 w-32 bg-foreground/5 rounded-2xl mb-8 flex items-center justify-center font-black text-xl tracking-tighter text-foreground/20">
-                  RTB
-                </div>
-                <h3 className="font-black text-3xl text-foreground mb-6 tracking-tight">Vocational Empowerment</h3>
-                <p className="text-lg text-foreground/60 leading-relaxed mb-8">
-                  Our collaboration with Rwanda TVET Board (RTB) bridges the gap between classroom learning and industry mastery. 
-                  Students engage in real-world carpentry projects, mastering traditional techniques and modern precision.
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-3">
-                {["Internships", "Real-world Experience", "Certification"].map(tag => (
-                  <span key={tag} className="px-4 py-2 bg-background rounded-full text-xs font-bold uppercase tracking-widest text-foreground shadow-sm">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </motion.div>
-
-            <motion.div 
-              {...fade(0.2)}
-              className="relative rounded-[48px] overflow-hidden aspect-square md:aspect-auto"
-            >
-              <Image src="/images/hero.png" alt="Carpentry Workshop" fill className="object-cover" />
-              <div className="absolute inset-0 bg-black/20" />
-              <div className="absolute bottom-10 left-10 right-10">
-                <p className="text-white font-bold text-xl leading-snug">
-                  "Building futures, one joint at a time. Our workshop is a classroom of the real world."
-                </p>
-              </div>
-            </motion.div>
+          <div className="flex flex-col gap-12">
+            <div className="flex flex-col gap-4">
+              <span className="font-black text-[14px] uppercase tracking-widest text-foreground/40">Collaborations</span>
+              <h2 className="font-black text-3xl md:text-4xl text-foreground tracking-tight">Our Trusted Partners.</h2>
+            </div>
+            <LogoMarquee logos={partners} />
           </div>
         </div>
       </section>

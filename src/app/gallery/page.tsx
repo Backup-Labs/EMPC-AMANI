@@ -48,6 +48,11 @@ const featuredProjects = [
   { title: "Industrial Bookshelf", tags: ["Steel", "Pine"], image: "/images/project2.png", span: "md:col-span-1 md:row-span-2" },
   { title: "Artisan Credenza", tags: ["Walnut", "Mid-Century"], image: "/images/hero.png", span: "md:col-span-1 md:row-span-1" },
   { title: "Floating Bed Frame", tags: ["Maple", "Modern"], image: "/images/project1.png", span: "md:col-span-2 md:row-span-1" },
+  { title: "Minimalist Desk", tags: ["Ash", "Office"], image: "/images/project2.png", span: "md:col-span-1 md:row-span-1" },
+  { title: "Legacy Wardrobe", tags: ["Teak", "Bedroom"], image: "/images/hero.png", span: "md:col-span-1 md:row-span-2" },
+  { title: "Zen Coffee Table", tags: ["Bamboo", "Living"], image: "/images/project1.png", span: "md:col-span-1 md:row-span-1" },
+  { title: "Brutalist Bench", tags: ["Concrete", "Wood"], image: "/images/project2.png", span: "md:col-span-1 md:row-span-1" },
+  { title: "Sculptural Stool", tags: ["Ebony", "Art"], image: "/images/hero.png", span: "md:col-span-2 md:row-span-1" },
 ];
 
 export default function Gallery() {
