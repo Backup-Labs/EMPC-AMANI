@@ -112,8 +112,8 @@ export default function ProjectDetail() {
       {/* ── NAVIGATION ── */}
       <section className="px-6 md:px-12 lg:px-16 pb-20 lg:pb-32">
         <div className="max-w-7xl mx-auto border-t border-[#e0e0e0] pt-10 flex flex-col sm:flex-row justify-between items-center gap-6">
-          <Link href="/projects" className="inline-flex items-center gap-2 font-bold text-sm md:text-base text-[#111] hover:underline underline-offset-8 decoration-2 order-2 sm:order-1">
-            <ArrowLeft size={18} /> Back to Projects
+          <Link href="/gallery" className="inline-flex items-center gap-2 font-bold text-sm md:text-base text-[#111] hover:underline underline-offset-8 decoration-2 order-2 sm:order-1">
+            <ArrowLeft size={18} /> Back to Gallery
           </Link>
           <Link href="/contact" className="inline-flex items-center gap-2 font-bold text-sm md:text-base text-[#111] hover:underline underline-offset-8 decoration-2 order-1 sm:order-2">
             Start a Project <ArrowUpRight size={18} />

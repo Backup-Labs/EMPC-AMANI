@@ -9,15 +9,15 @@ import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 // ─── DATA ────────────────────────────────────────────────────────────────────
 
 const exclusiveProjects = [
-  { title: "Coastal Serenity", category: "Residential", year: "2024", image: "/images/hero.png" },
-  { title: "Azure Hallway", category: "Commercial", year: "2025", image: "/images/project1.png" },
-  { title: "Urban Tranquility", category: "Hospitality", year: "2024", image: "/images/project2.png" },
+  { title: "Siam Teak Table", category: "Dining", year: "2024", image: "/images/hero.png" },
+  { title: "Artisan Credenza", category: "Storage", year: "2025", image: "/images/project1.png" },
+  { title: "Nordic Lounge", category: "Seating", year: "2024", image: "/images/project2.png" },
 ];
 
 const featuredProjects = [
-  { title: "Nordic Light Loft", tags: ["Scandinavian", "Functional"], image: "/images/hero.png" },
-  { title: "Redwood Horizon", tags: ["Timber", "Nature"], image: "/images/project1.png" },
-  { title: "Atelier Noir", tags: ["Monochrome", "Industrial"], image: "/images/project2.png" },
+  { title: "Master Suite Set", tags: ["Oak", "Bespoke"], image: "/images/hero.png" },
+  { title: "Floating Bed Frame", tags: ["Maple", "Modern"], image: "/images/project1.png" },
+  { title: "Live Edge Desk", tags: ["Walnut", "Office"], image: "/images/project2.png" },
 ];
 
 const fade = (delay = 0) => ({
@@ -30,21 +30,21 @@ const fade = (delay = 0) => ({
 // Shared section-label row (Responsive)
 function SectionHeader({ label, heading, desc, rightEl }: { label: string; heading: React.ReactNode; desc?: string; rightEl?: React.ReactNode }) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr_1fr] gap-10 lg:gap-16 py-20 lg:py-32 border-b border-black/5">
+    <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr_1fr] gap-10 lg:gap-16 py-12 lg:py-20 border-b border-border">
       {/* Label */}
       <div className="flex items-start gap-3 pt-2">
         <span className="w-2.5 h-2.5 rounded-full bg-primary shrink-0 mt-2 block" />
-        <span className="font-bold text-[14px] uppercase tracking-widest text-[#111]">{label}</span>
+        <span className="font-bold text-[14px] uppercase tracking-widest text-foreground">{label}</span>
       </div>
       {/* Heading */}
       <div>
-        <h2 className="font-black text-[2.5rem] md:text-[3.2rem] lg:text-[3.8rem] leading-[0.9] tracking-[-0.05em] text-[#111] m-0">
+        <h2 className="font-black text-[2.5rem] md:text-[3.2rem] lg:text-[3.8rem] leading-[0.9] tracking-[-0.05em] text-foreground m-0">
           {heading}
         </h2>
       </div>
       {/* Description / CTA */}
       <div className="flex flex-col justify-between gap-6">
-        {desc && <p className="text-lg text-[#555] leading-relaxed m-0 max-w-md">{desc}</p>}
+        {desc && <p className="text-lg text-foreground/60 leading-relaxed m-0 max-w-md">{desc}</p>}
         {rightEl}
       </div>
     </div>
@@ -60,7 +60,7 @@ export default function Home() {
   const slide = exclusiveProjects[carouselIdx];
 
   return (
-    <div className="bg-white min-h-screen overflow-x-hidden relative">
+    <div className="bg-background min-h-screen overflow-x-hidden relative text-foreground transition-colors duration-300">
 
       {/* ── HERO ── */}
       <section className="relative h-screen min-h-[800px] overflow-hidden">
@@ -79,23 +79,23 @@ export default function Home() {
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] as any }}
                 className="font-black text-[3rem] md:text-[4.5rem] lg:text-[6.5rem] leading-[0.85] tracking-[-0.05em] text-white m-0"
               >
-                Visionary<br />Spaces.
+                Masterful<br />Carpentry.
               </motion.h1>
               <p className="text-white/80 text-lg md:text-xl leading-relaxed mt-8 max-w-lg">
-                We blend timeless elegance with modern functionality, crafting
-                interiors that are as purposeful as they are beautiful.
+                Precision in wood, excellence in craft. We create bespoke furniture 
+                while empowering the next generation of master artisans.
               </p>
             </div>
 
             {/* Floating Glass Project card */}
-            <Link href="/projects" className="shrink-0 transition-all hover:scale-105 active:scale-95 group relative z-10">
+            <Link href="/gallery" className="shrink-0 transition-all hover:scale-105 active:scale-95 group relative z-10">
               <div className="glass rounded-[32px] overflow-hidden w-56 md:w-64 p-3 shadow-2xl">
                 <div className="relative h-40 rounded-[22px] overflow-hidden">
                   <Image src="/images/project1.png" alt="Azure Hallway" fill sizes="256px" className="object-cover transition-transform duration-700 group-hover:scale-110" />
                 </div>
                 <div className="pt-4 px-2 pb-2 flex justify-between items-center">
-                  <span className="font-bold text-[14px] text-[#111]">Exclusive Work</span>
-                  <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white">
+                  <span className="font-bold text-[14px] text-foreground">Workshop Excellence</span>
+                  <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-background">
                     <ArrowUpRight size={16} />
                   </div>
                 </div>
@@ -109,9 +109,9 @@ export default function Home() {
       <section className="px-6 md:px-12 lg:px-16">
         <div className="max-w-7xl mx-auto">
           <SectionHeader
-            label="Studio"
-            heading={<>Clear Vision.<br />Masterful Detail.</>}
-            desc="Our philosophy blends contemporary aesthetics with deep functional purpose in every environment we touch."
+            label="Workshop"
+            heading={<>Raw Material.<br />Masterful Detail.</>}
+            desc="Our carpentry workshop is where traditional techniques meet modern precision to create furniture that lasts generations."
             rightEl={
               <Link href="/about" className="inline-flex items-center gap-2 group font-bold text-base text-primary">
                 Learn our story <ArrowUpRight size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
@@ -122,7 +122,7 @@ export default function Home() {
       </section>
 
       {/* ── FULL-WIDTH IMAGE + STATS ── */}
-      <section className="px-6 md:px-12 lg:px-16 py-20 lg:py-32">
+      <section className="px-6 md:px-12 lg:px-16 py-12 lg:py-20">
         <div className="max-w-7xl mx-auto">
           {/* Large radius image */}
           <div className="relative rounded-[48px] overflow-hidden aspect-[21/9] mb-16 lg:mb-24 shadow-2xl">
@@ -132,14 +132,14 @@ export default function Home() {
           {/* New Stats design */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-16 lg:gap-24">
             {[
-              { val: "150+", label: "Transformative Designs", desc: "Crafting narratives through physical space since 2012." },
-              { val: "45", label: "Design Awards", desc: "Recognized internationally for innovation and craft." },
-              { val: "12ct", label: "Global Reach", desc: "Delivering world-class interiors across 12 countries." },
+              { val: "2500+", label: "Bespoke Pieces", desc: "Hand-crafted furniture delivered to homes and offices since 2012." },
+              { val: "85", label: "Master Artisans", desc: "Trained through our workshop and now leading the industry." },
+              { val: "RTB", label: "Certified Excellence", desc: "Official partner in vocational training and professional certification." },
             ].map((s, i) => (
-              <div key={i} className="flex flex-col border-l-2 border-black/5 pl-8">
-                <p className="font-black text-[3.5rem] lg:text-[4rem] tracking-[-0.05em] text-[#111] m-0 leading-none">{s.val}</p>
-                <p className="font-black text-lg text-[#111] mt-4 mb-4 uppercase tracking-tighter">{s.label}</p>
-                <p className="text-base text-[#666] leading-relaxed m-0">{s.desc}</p>
+              <div key={i} className="flex flex-col border-l-2 border-border pl-8">
+                <p className="font-black text-[3.5rem] lg:text-[4rem] tracking-[-0.05em] text-foreground m-0 leading-none">{s.val}</p>
+                <p className="font-black text-lg text-foreground mt-4 mb-4 uppercase tracking-tighter">{s.label}</p>
+                <p className="text-base text-foreground/60 leading-relaxed m-0">{s.desc}</p>
               </div>
             ))}
           </div>
@@ -160,10 +160,10 @@ export default function Home() {
           
           <div className="py-20">
             <div className="flex gap-4 justify-end mb-8">
-              <button onClick={prevSlide} className="h-14 w-14 rounded-full glass flex items-center justify-center hover:bg-black hover:text-white transition-all active:scale-95">
+              <button onClick={prevSlide} className="h-14 w-14 rounded-full glass flex items-center justify-center hover:bg-primary hover:text-background transition-all active:scale-95 text-foreground">
                 <ChevronLeft size={24} />
               </button>
-              <button onClick={nextSlide} className="h-14 w-14 rounded-full glass flex items-center justify-center hover:bg-black hover:text-white transition-all active:scale-95">
+              <button onClick={nextSlide} className="h-14 w-14 rounded-full glass flex items-center justify-center hover:bg-primary hover:text-background transition-all active:scale-95 text-foreground">
                 <ChevronRight size={24} />
               </button>
             </div>
@@ -179,7 +179,7 @@ export default function Home() {
               <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/10 to-transparent" />
               <div className="absolute bottom-12 left-12">
                 <p className="font-black text-[2rem] md:text-[3rem] text-white m-0 tracking-[-0.05em]">{slide.title}</p>
-                <Link href={`/projects/${slide.title.toLowerCase().replace(/ /g, "-")}`} className="mt-6 inline-flex h-12 items-center px-8 rounded-full glass text-sm font-bold text-white hover:bg-white hover:text-black transition-all">
+                <Link href="/gallery" className="mt-6 inline-flex h-12 items-center px-8 rounded-full glass text-sm font-bold text-white hover:bg-white hover:text-black transition-all">
                   Exploration <ArrowUpRight size={16} className="ml-2" />
                 </Link>
               </div>
@@ -189,10 +189,10 @@ export default function Home() {
       </section>
 
       {/* ── FEATURED PROJECTS ── */}
-      <section className="px-6 md:px-12 lg:px-16 py-20 lg:py-32">
+      <section className="px-6 md:px-12 lg:px-16 py-12 lg:py-20">
         <div className="max-w-7xl mx-auto">
           <SectionHeader
-            label="Portfolio"
+            label="Gallery"
             heading={<>Inspiring Spaces.<br />Resonant Experience.</>}
             desc="Our diverse range of work spans from boutique retail to high-end hospitality."
           />
@@ -210,15 +210,15 @@ export default function Home() {
                   <Image src={p.image} alt={p.title} fill sizes="(max-width:768px) 100vw, 33vw" className="object-cover group-hover:scale-110 transition-transform duration-1000 ease-out" />
                   <div className="absolute top-6 left-6 flex gap-2">
                     {p.tags.map(t => (
-                      <span key={t} className="glass text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full text-[#111]">
+                      <span key={t} className="glass text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full text-white">
                         {t}
                       </span>
                     ))}
                   </div>
                 </div>
                 <div className="flex justify-between items-center pr-4">
-                  <p className="font-black text-2xl text-[#111] leading-tight tracking-tighter">{p.title}</p>
-                  <div className="h-12 w-12 rounded-full border border-black/10 flex items-center justify-center transition-all group-hover:bg-primary group-hover:border-primary group-hover:text-white">
+                  <p className="font-black text-2xl text-foreground leading-tight tracking-tighter">{p.title}</p>
+                  <div className="h-12 w-12 rounded-full border border-border flex items-center justify-center transition-all group-hover:bg-primary group-hover:border-primary group-hover:text-background text-foreground">
                     <ArrowUpRight size={20} />
                   </div>
                 </div>
@@ -228,35 +228,83 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── PARTNERS SECTION ── */}
+      <section className="px-6 md:px-12 lg:px-16 py-12 lg:py-20">
+        <div className="max-w-7xl mx-auto">
+          <SectionHeader
+            label="Partners"
+            heading={<>Collaborative<br />Excellence.</>}
+            desc="We believe in empowering the next generation. Through our partnership with RTB, we provide students with hands-on carpentry experience and professional certification."
+          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-20">
+            <motion.div 
+              {...fade(0.1)}
+              className="bg-muted p-12 rounded-[48px] flex flex-col justify-between"
+            >
+              <div>
+                <div className="h-16 w-32 bg-foreground/5 rounded-2xl mb-8 flex items-center justify-center font-black text-xl tracking-tighter text-foreground/20">
+                  RTB
+                </div>
+                <h3 className="font-black text-3xl text-foreground mb-6 tracking-tight">Vocational Empowerment</h3>
+                <p className="text-lg text-foreground/60 leading-relaxed mb-8">
+                  Our collaboration with Rwanda TVET Board (RTB) bridges the gap between classroom learning and industry mastery. 
+                  Students engage in real-world carpentry projects, mastering traditional techniques and modern precision.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {["Internships", "Real-world Experience", "Certification"].map(tag => (
+                  <span key={tag} className="px-4 py-2 bg-background rounded-full text-xs font-bold uppercase tracking-widest text-foreground shadow-sm">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </motion.div>
+
+            <motion.div 
+              {...fade(0.2)}
+              className="relative rounded-[48px] overflow-hidden aspect-square md:aspect-auto"
+            >
+              <Image src="/images/hero.png" alt="Carpentry Workshop" fill className="object-cover" />
+              <div className="absolute inset-0 bg-black/20" />
+              <div className="absolute bottom-10 left-10 right-10">
+                <p className="text-white font-bold text-xl leading-snug">
+                  "Building futures, one joint at a time. Our workshop is a classroom of the real world."
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* ── BLOG STRIP ── */}
-      <section className="px-6 md:px-12 lg:px-16 py-20 lg:py-40 bg-muted overflow-hidden relative">
-        <div className="absolute top-0 left-0 w-full h-[1px] bg-linear-to-r from-transparent via-black/10 to-transparent" />
+      <section className="px-6 md:px-12 lg:px-16 py-12 lg:py-24 bg-muted overflow-hidden relative">
+        <div className="absolute top-0 left-0 w-full h-[1px] bg-linear-to-r from-transparent via-border to-transparent" />
         <div className="max-w-7xl mx-auto relative z-10">
-          <div className="flex justify-between items-end pb-12 border-b border-black/5">
+          <div className="flex justify-between items-end pb-12 border-b border-border">
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <span className="w-2.5 h-2.5 rounded-full bg-primary block" />
-                <span className="font-bold text-[14px] uppercase tracking-widest text-[#555]">Journal</span>
+                <span className="font-bold text-[14px] uppercase tracking-widest text-foreground/60">News</span>
               </div>
-               <h2 className="font-black text-[2.5rem] md:text-[3.5rem] text-[#111] leading-[0.9] tracking-[-0.05em] m-0">Latest Stories.</h2>
+               <h2 className="font-black text-[2.5rem] md:text-[3.5rem] text-foreground leading-[0.9] tracking-[-0.05em] m-0">Latest Stories.</h2>
             </div>
-            <Link href="/blog" className="h-14 w-14 rounded-full glass flex items-center justify-center hover:bg-primary hover:text-white transition-all text-primary">
+            <Link href="/news" className="h-14 w-14 rounded-full glass flex items-center justify-center hover:bg-primary hover:text-background transition-all text-primary">
               <ArrowUpRight size={24} />
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pt-20">
             {[
-              { title: "Future of Sustainable Design", date: "20.03.26", image: "/images/hero.png" },
-              { title: "Minimalism vs. Maximalism", date: "15.03.26", image: "/images/project1.png" },
-              { title: "Psychology in Workspace", date: "10.03.26", image: "/images/project2.png" },
+              { title: "The Heritage of Wood", date: "20.03.26", image: "/images/hero.png" },
+              { title: "Art of Joinery", date: "15.03.26", image: "/images/project1.png" },
+              { title: "Workshop Milestones", date: "10.03.26", image: "/images/project2.png" },
             ].map((b, i) => (
               <motion.div key={i} {...fade(i * 0.1)}>
-                <Link href={`/blog/${b.title.toLowerCase().replace(/ /g, "-")}`} className="group block">
+                <Link href={`/news/${b.title.toLowerCase().replace(/ /g, "-")}`} className="group block">
                   <div className="relative rounded-[32px] overflow-hidden aspect-[16/10] mb-8 shadow-md">
                     <Image src={b.image} alt={b.title} fill sizes="(max-width:768px) 100vw, 33vw" className="object-cover grow group-hover:scale-110 transition-transform duration-1000" />
                   </div>
                   <p className="text-[11px] font-black text-primary mb-3 flex items-center gap-2 uppercase tracking-widest">{b.date}</p>
-                  <p className="font-black text-2xl text-[#111] leading-tight tracking-tight m-0 hover:text-primary transition-colors">{b.title}</p>
+                  <p className="font-black text-2xl text-foreground leading-tight tracking-tight m-0 hover:text-primary transition-colors">{b.title}</p>
                 </Link>
               </motion.div>
             ))}

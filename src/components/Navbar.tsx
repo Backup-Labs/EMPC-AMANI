@@ -4,22 +4,26 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sun, Moon } from "lucide-react";
+import { useTheme } from "next-themes";
 
 const navLinks = [
   { name: "About", href: "/about" },
-  { name: "Projects", href: "/projects" },
+  { name: "Gallery", href: "/gallery" },
   { name: "Services", href: "/services" },
-  { name: "Blogs", href: "/blog" },
+  { name: "News", href: "/news" },
   { name: "Contact", href: "/contact" },
 ];
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const { theme, setTheme } = useTheme();
   const pathname = usePathname();
 
   useEffect(() => {
+    setMounted(true);
     const handler = () => {
       setScrolled(window.scrollY > 60);
     };
@@ -41,7 +45,7 @@ export function Navbar() {
           className="transition-all duration-500 ease-in-out mx-auto px-6 md:px-12 lg:px-16"
           style={{
             marginTop: scrolled ? "16px" : "0",
-            maxWidth: scrolled ? "720px" : "1344px",
+            maxWidth: scrolled ? "850px" : "1344px",
             width: "100%",
           }}
         >
@@ -59,7 +63,7 @@ export function Navbar() {
               href="/"
               className={`
                 font-bold text-xl tracking-tighter transition-all duration-300 no-underline
-                ${scrolled ? "text-[#111]" : "text-white"}
+                ${scrolled ? "text-foreground" : "text-white"}
               `}
             >
               EMPC-AMANI
@@ -76,7 +80,7 @@ export function Navbar() {
                     className={`
                       text-[13px] font-bold no-underline transition-colors tracking-tight
                       ${scrolled 
-                        ? (active ? "text-[#111]" : "text-[#555] hover:text-[#111]") 
+                        ? (active ? "text-foreground" : "text-foreground/60 hover:text-foreground") 
                         : "text-white/80 hover:text-white"
                       }
                     `}
@@ -85,19 +89,43 @@ export function Navbar() {
                   </Link>
                 );
               })}
+              
+              {/* Theme Toggle */}
+              {mounted && (
+                <button
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className={`
+                    p-2 rounded-full transition-colors
+                    ${scrolled ? "hover:bg-black/5 dark:hover:bg-white/10" : "hover:bg-white/10"}
+                    ${scrolled ? "text-foreground" : "text-white"}
+                  `}
+                >
+                  {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+                </button>
+              )}
             </nav>
 
             {/* Mobile hamburger */}
-            <button
-              className={`
-                flex md:hidden items-center justify-center transition-colors
-                ${scrolled ? "text-[#111]" : "text-white"}
-              `}
-              onClick={() => setMobileOpen(true)}
-              aria-label="Open menu"
-            >
-              <Menu size={24} />
-            </button>
+            <div className="flex md:hidden items-center gap-4">
+               {mounted && (
+                <button
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className={`p-2 ${scrolled ? "text-foreground" : "text-white"}`}
+                >
+                  {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+                </button>
+              )}
+              <button
+                className={`
+                  flex items-center justify-center transition-colors
+                  ${scrolled ? "text-foreground" : "text-white"}
+                `}
+                onClick={() => setMobileOpen(true)}
+                aria-label="Open menu"
+              >
+                <Menu size={24} />
+              </button>
+            </div>
           </div>
         </div>
       </motion.header>

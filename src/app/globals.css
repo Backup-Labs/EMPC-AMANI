@@ -3,17 +3,33 @@
 @theme inline {
   --font-sans: "Satoshi", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-satoshi: "Satoshi", sans-serif;
-  --color-background: #ffffff;
-  --color-foreground: #111111;
-  --color-primary: #111111;
-  --color-muted: #f8fafc;
-  --color-border: rgba(0, 0, 0, 0.05);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
   --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 20px;
   --radius-xl: 32px;
   --radius-2xl: 48px;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #111111;
+  --primary: #111111;
+  --muted: #f8fafc;
+  --border: rgba(0, 0, 0, 0.05);
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #f8fafc;
+  --primary: #ffffff;
+  --muted: #1a1a1a;
+  --border: rgba(255, 255, 255, 0.1);
 }
 
 @layer base {
@@ -30,23 +46,9 @@
     font-family: "Satoshi", "Inter", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #ffffff;
-  }
-
-  /* The "Mirror" Ambient Glow Effect - High-end Halo */
-  body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: 
-      radial-gradient(circle at 10% 10%, rgba(0, 0, 0, 0.03) 0%, transparent 40%),
-      radial-gradient(circle at 90% 10%, rgba(0, 0, 0, 0.02) 0%, transparent 40%),
-      radial-gradient(circle at 50% 100%, rgba(0, 0, 0, 0.01) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: -1;
+    background-color: var(--background);
+    color: var(--foreground);
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   /* Glassmorphism utility */
@@ -55,5 +57,10 @@
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.5);
+  }
+
+  .dark .glass {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 }
