@@ -65,7 +65,7 @@ export default function Gallery() {
     <div className="bg-background min-h-screen overflow-x-hidden relative text-foreground transition-colors duration-300">
 
       {/* ── HERO ── */}
-      <section className="relative h-[65vh] min-h-[500px] overflow-hidden">
+      <section className="relative h-[65vh] min-h-125 overflow-hidden">
         <Image src="/images/hero.png" alt="Gallery" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-linear-to-b from-black/60 via-transparent to-black/40" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,0,0,0.05)_0%,transparent_60%)]" />
