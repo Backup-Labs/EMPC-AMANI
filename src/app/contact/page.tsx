@@ -57,7 +57,7 @@ export default function Contact() {
     <div className="bg-background min-h-screen overflow-x-hidden relative text-foreground transition-colors duration-300">
 
       {/* ── HERO ── */}
-      <section className="relative h-[65vh] min-h-[500px] overflow-hidden">
+      <section className="relative h-[65vh] min-h-125 overflow-hidden">
         <Image src="/images/hero.png" alt="Contact" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-linear-to-b from-black/60 via-transparent to-black/40" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,0,0,0.05)_0%,transparent_60%)]" />
@@ -108,7 +108,7 @@ export default function Contact() {
           </div>
 
           {/* Form */}
-          <div className="glass rounded-[48px] p-12 lg:p-16 shadow-3xl">
+          <div className="glass rounded-2xl p-12 lg:p-16 shadow-3xl">
             <form onSubmit={handleSubmit} className="flex flex-col gap-10">
               <div className="grid grid-cols-2 gap-8">
                 <div className="flex flex-col gap-3">
