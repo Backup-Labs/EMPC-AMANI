@@ -69,7 +69,7 @@ export default function News() {
     <div className="bg-background min-h-screen overflow-x-hidden relative text-foreground transition-colors duration-300">
 
       {/* ── HERO ── */}
-      <section className="relative h-[65vh] min-h-[500px] overflow-hidden">
+      <section className="relative h-[65vh] min-h-125 overflow-hidden">
         <Image src="/images/hero.png" alt="News" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-linear-to-b from-black/60 via-transparent to-black/40" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,0,0,0.05)_0%,transparent_60%)]" />
@@ -103,7 +103,7 @@ export default function News() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 lg:gap-20 pt-20">
           {posts.map((post, i) => (
             <motion.article key={i} {...fade(i * 0.1)} className="group flex flex-col gap-10">
-              <Link href={`/news/${post.title.toLowerCase().replace(/ /g, "-")}`} className="relative rounded-[40px] overflow-hidden aspect-[4/5] block shadow-3xl transition-all duration-1000">
+              <Link href={`/news/${post.title.toLowerCase().replace(/ /g, "-")}`} className="relative rounded-[40px] overflow-hidden aspect-4/5 block shadow-3xl transition-all duration-1000">
                 <Image src={post.image} alt={post.title} fill sizes="(max-width:768px) 100vw, 33vw" className="object-cover group-hover:scale-110 transition-transform duration-1000" />
                 <div className="absolute top-8 left-8">
                   <span className="glass px-4 py-2 rounded-full text-[10px] font-black text-white uppercase tracking-widest">{post.category}</span>
@@ -112,11 +112,11 @@ export default function News() {
               <div className="flex flex-col gap-6">
                 <div className="flex items-center gap-4">
                   <p className="text-[11px] font-black text-foreground uppercase tracking-[0.2em] m-0">{post.date}</p>
-                  <div className="h-[1px] w-8 bg-border" />
+                  <div className="h-px w-8 bg-border" />
                   <p className="text-[11px] font-black text-foreground/40 uppercase tracking-[0.2em] m-0">{post.author}</p>
                 </div>
                 <Link href={`/news/${post.title.toLowerCase().replace(/ /g, "-")}`} className="no-underline group/link">
-                  <h2 className="font-black text-[2.5rem] leading-[1] tracking-[-0.05em] text-foreground m-0 mb-4 group-hover/link:translate-x-2 transition-transform duration-500">
+                  <h2 className="font-black text-[2.5rem] leading-none tracking-[-0.05em] text-foreground m-0 mb-4 group-hover/link:translate-x-2 transition-transform duration-500">
                     {post.title}
                   </h2>
                   <p className="text-foreground/60 text-lg leading-relaxed m-0 line-clamp-2">{post.excerpt}</p>

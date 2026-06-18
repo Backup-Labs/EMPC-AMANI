@@ -73,14 +73,14 @@ export default function Home() {
     <div className="bg-background min-h-screen overflow-x-hidden relative text-foreground transition-colors duration-300">
 
       {/* ── HERO ── */}
-      <section className="relative h-screen min-h-[800px] overflow-hidden">
+      <section className="relative h-screen min-h-200 overflow-hidden">
         <Image src="/images/hero.png" alt="EMPC-AMANI Interior" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-linear-to-b from-black/60 via-transparent to-black/40" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,0,0,0.05)_0%,transparent_60%)]" />
 
         <div className="absolute inset-x-0 bottom-0 pb-16 lg:pb-24 px-6 md:px-12 lg:px-16 container mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-12">
-            <div className="max-w-[850px]">
+            <div className="max-w-212.5">
               <motion.h1 
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -131,7 +131,7 @@ export default function Home() {
       {/* ── FULL-WIDTH IMAGE + STATS ── */}
       <section className="px-6 md:px-12 lg:px-16 py-12 lg:py-20">
         <div className="max-w-7xl mx-auto">
-          <div className="relative rounded-[48px] overflow-hidden aspect-[21/9] mb-16 lg:mb-24 shadow-2xl">
+          <div className="relative rounded-2xl overflow-hidden aspect-21/9 mb-16 lg:mb-24 shadow-2xl">
             <Image src="/images/project2.png" alt="Studio" fill sizes="100vw" className="object-cover" />
           </div>
 
@@ -179,7 +179,7 @@ export default function Home() {
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as any }}
-              className="relative rounded-[48px] overflow-hidden aspect-[21/9] shadow-3xl"
+              className="relative rounded-2xl overflow-hidden aspect-21/9 shadow-3xl"
             >
               <Image src={slide.image} alt={slide.title} fill sizes="100vw" className="object-cover" />
               <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/10 to-transparent" />
@@ -249,7 +249,7 @@ export default function Home() {
 
       {/* ── BLOG STRIP ── */}
       <section className="px-6 md:px-12 lg:px-16 py-12 lg:py-24 bg-muted overflow-hidden relative">
-        <div className="absolute top-0 left-0 w-full h-[1px] bg-linear-to-r from-transparent via-border to-transparent" />
+        <div className="absolute top-0 left-0 w-full h-1px bg-linear-to-r from-transparent via-border to-transparent" />
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="flex justify-between items-end pb-12 border-b border-border">
             <div>
@@ -271,7 +271,7 @@ export default function Home() {
             ].map((b, i) => (
               <motion.div key={i} {...fade(i * 0.1)}>
                 <Link href={`/news/${b.title.toLowerCase().replace(/ /g, "-")}`} className="group block">
-                  <div className="relative rounded-[32px] overflow-hidden aspect-[16/10] mb-8 shadow-md">
+                  <div className="relative rounded-[32px] overflow-hidden aspect-16/10 mb-8 shadow-md">
                     <Image src={b.image} alt={b.title} fill sizes="(max-width:768px) 100vw, 33vw" className="object-cover grow group-hover:scale-110 transition-transform duration-1000" />
                   </div>
                   <p className="text-[11px] font-black text-primary mb-3 flex items-center gap-2 uppercase tracking-widest">{b.date}</p>
