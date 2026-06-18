@@ -43,7 +43,7 @@ export default function ProjectDetail() {
   return (
     <div className="bg-[#f0f0f0] min-h-screen">
       {/* ── HERO ── */}
-      <section className="relative h-[80vh] min-h-[500px] overflow-hidden">
+      <section className="relative h-[80vh] min-h-125 overflow-hidden">
         <Image src={project.image} alt={project.title} fill sizes="100vw" priority className="object-cover" />
         <div className="absolute inset-0 bg-linear-to-b from-black/30 to-black/70" />
         
@@ -89,20 +89,20 @@ export default function ProjectDetail() {
                 {project.description}
               </p>
             </div>
-            <div className="relative rounded-3xl overflow-hidden aspect-[4/3] shadow-sm">
+            <div className="relative rounded-3xl overflow-hidden aspect-4/3 shadow-sm">
               <Image src={project.gallery[0]} alt="Process" fill sizes="(max-width:1024px) 100vw, 50vw" className="object-cover" />
             </div>
           </div>
 
           {/* Gallery grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mt-16 md:mt-24 lg:mt-32">
-            <div className="relative rounded-3xl overflow-hidden aspect-[16/9] md:aspect-auto md:row-span-2 shadow-sm group">
+            <div className="relative rounded-3xl overflow-hidden aspect-video md:aspect-auto md:row-span-2 shadow-sm group">
               <Image src={project.gallery[1]} alt="Interior 1" fill sizes="100vw" className="object-cover group-hover:scale-105 transition-transform duration-700" />
             </div>
-            <div className="relative rounded-3xl overflow-hidden aspect-[4/5] shadow-sm group">
+            <div className="relative rounded-3xl overflow-hidden aspect-4/5 shadow-sm group">
               <Image src={project.gallery[2]} alt="Interior 2" fill sizes="(max-width:768px) 100vw, 50vw" className="object-cover group-hover:scale-105 transition-transform duration-700" />
             </div>
-            <div className="relative rounded-3xl overflow-hidden aspect-[4/5] shadow-sm group">
+            <div className="relative rounded-3xl overflow-hidden aspect-4/5 shadow-sm group">
               <Image src={project.image} alt="Interior 3" fill sizes="(max-width:768px) 100vw, 50vw" className="object-cover group-hover:scale-105 transition-transform duration-700" />
             </div>
           </div>
