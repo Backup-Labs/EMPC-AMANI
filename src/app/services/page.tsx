@@ -82,7 +82,7 @@ export default function Services() {
     <div className="bg-background min-h-screen overflow-x-hidden relative text-foreground transition-colors duration-300">
 
       {/* ── HERO ── */}
-      <section className="relative h-[65vh] min-h-[500px] overflow-hidden">
+      <section className="relative h-[65vh] min-h-125 overflow-hidden">
         <Image src="/images/project2.png" alt="Our Services" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-linear-to-b from-black/60 via-transparent to-black/40" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,0,0,0.05)_0%,transparent_60%)]" />
@@ -136,7 +136,7 @@ export default function Services() {
                       </Link>
                     </div>
                   </div>
-                  <div className="relative rounded-[40px] overflow-hidden aspect-[4/3] shadow-3xl transition-all duration-1000">
+                  <div className="relative rounded-[40px] overflow-hidden aspect-4/3 shadow-3xl transition-all duration-1000">
                     <Image src={s.image} alt={s.title} fill sizes="(max-width:768px) 100vw, 33vw" className="object-cover group-hover:scale-110 transition-transform duration-1000" />
                   </div>
                 </div>
