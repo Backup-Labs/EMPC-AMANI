@@ -64,7 +64,7 @@ export default function NewsDetail() {
       {/* ── HERO IMAGE ── */}
       <section className="px-6 md:px-12 lg:px-16">
         <div className="max-w-7xl mx-auto">
-          <div className="relative rounded-[48px] overflow-hidden aspect-[16/9] lg:aspect-[21/9] shadow-3xl grayscale group hover:grayscale-0 transition-all duration-1000">
+          <div className="relative rounded-2xl overflow-hidden aspect-video lg:aspect-21/9 shadow-3xl grayscale group hover:grayscale-0 transition-all duration-1000">
             <Image src={blog.image} alt={blog.title} fill sizes="100vw" priority className="object-cover" />
           </div>
         </div>
@@ -76,7 +76,7 @@ export default function NewsDetail() {
           <div className="flex flex-col gap-12 md:gap-16">
             {blog.content?.map((item: any, i: number) => {
               if (item.type === "h2") return (
-                <h2 key={i} className="font-black text-[2rem] md:text-[2.8rem] tracking-[-0.05em] leading-[1] m-0 mt-12 text-foreground">
+                <h2 key={i} className="font-black text-[2rem] md:text-[2.8rem] tracking-[-0.05em] leading-none m-0 mt-12 text-foreground">
                   {item.text}
                 </h2>
               );
@@ -86,7 +86,7 @@ export default function NewsDetail() {
                 </p>
               );
               if (item.type === "image") return (
-                <div key={i} className="relative rounded-[40px] overflow-hidden aspect-[16/10] my-12 shadow-3xl grayscale hover:grayscale-0 transition-all duration-1000">
+                <div key={i} className="relative rounded-2xl overflow-hidden aspect-video my-12 shadow-3xl grayscale hover:grayscale-0 transition-all duration-1000">
                   <Image src={item.src} alt="Article Detail" fill sizes="(max-width:768px) 100vw, 800px" className="object-cover" />
                 </div>
               );
