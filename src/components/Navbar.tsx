@@ -138,7 +138,7 @@ export function Navbar() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed inset-0 z-[100] flex flex-col bg-white"
+            className="fixed inset-0 z-100 flex flex-col bg-white"
           >
             <div className="flex items-center justify-between p-6 md:p-10">
               <span className="font-bold text-lg tracking-tighter">
