@@ -54,7 +54,7 @@ export default function About() {
     <div className="bg-background min-h-screen overflow-x-hidden relative text-foreground transition-colors duration-300">
 
       {/* ── HERO ── */}
-      <section className="relative h-[65vh] min-h-[500px] overflow-hidden">
+      <section className="relative h-[65vh] min-h-125 overflow-hidden">
         <Image src="/images/hero.png" alt="About Studio" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-linear-to-b from-black/60 via-transparent to-black/40" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,0,0,0.05)_0%,transparent_60%)]" />
@@ -106,10 +106,10 @@ export default function About() {
               </div>
             </motion.div>
             <motion.div {...fade(0.1)} className="grid grid-cols-2 gap-4 lg:gap-6">
-              <div className="relative rounded-[40px] overflow-hidden aspect-[3/4] shadow-2xl">
+              <div className="relative rounded-[40px] overflow-hidden aspect-3/4 shadow-2xl">
                 <Image src="/images/project1.png" alt="Detail" fill sizes="50vw" className="object-cover" />
               </div>
-              <div className="relative rounded-[40px] overflow-hidden aspect-[3/4] mt-12 shadow-2xl">
+              <div className="relative rounded-[40px] overflow-hidden aspect-3/4 mt-12 shadow-2xl">
                 <Image src="/images/project2.png" alt="Space" fill sizes="50vw" className="object-cover" />
               </div>
             </motion.div>
@@ -165,7 +165,7 @@ export default function About() {
                 <p className="text-foreground/60 text-lg leading-relaxed m-0">{milestones[activeMile].desc}</p>
                 <div className="grid grid-cols-2 gap-6">
                   {milestones[activeMile].images.map((img, j) => (
-                    <div key={j} className="relative rounded-[24px] overflow-hidden aspect-[4/3] shadow-lg">
+                    <div key={j} className="relative rounded-3xl overflow-hidden aspect-4/3 shadow-lg">
                       <Image src={img} alt={milestones[activeMile].title} fill sizes="25vw" className="object-cover" />
                     </div>
                   ))}
