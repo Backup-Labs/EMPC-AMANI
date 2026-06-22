@@ -59,7 +59,7 @@ export default function About() {
         <div className="absolute inset-0 bg-linear-to-b from-black/60 via-transparent to-black/40" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,0,0,0.05)_0%,transparent_60%)]" />
         
-        {/* Hero Content */}
+        {/* Hero Content  */}
         <div className="absolute inset-x-0 bottom-0 pb-16 lg:pb-24 px-6 md:px-12 lg:px-16 container mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-10">
             <motion.h1
