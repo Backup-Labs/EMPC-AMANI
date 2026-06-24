@@ -138,7 +138,7 @@ export function Navbar() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed inset-0 z-100 flex flex-col bg-white"
+            className="fixed inset-0 z-100 flex flex-col bg-background text-foreground"
           >
             <div className="flex items-center justify-between p-6 md:p-10">
               <span className="font-bold text-lg tracking-tighter">
@@ -146,7 +146,7 @@ export function Navbar() {
               </span>
               <button
                 onClick={() => setMobileOpen(false)}
-                className="h-12 w-12 flex items-center justify-center rounded-3xl bg-[#f0f0f0] transition-transform active:scale-90"
+                className="h-12 w-12 flex items-center justify-center rounded-3xl bg-muted hover:bg-foreground/10 text-foreground transition-transform active:scale-90"
               >
                 <X size={20} />
               </button>
@@ -163,7 +163,7 @@ export function Navbar() {
                   <Link
                     href={link.href}
                     onClick={() => setMobileOpen(false)}
-                    className="font-bold text-[2.5rem] text-[#111] no-underline tracking-tighter block hover:translate-x-2 transition-transform"
+                    className="font-bold text-[2.5rem] text-foreground no-underline tracking-tighter block hover:translate-x-2 transition-transform"
                   >
                     {link.name}
                   </Link>
@@ -173,10 +173,10 @@ export function Navbar() {
             
             {/* Mobile Footer */}
             <div className="mt-auto p-10 flex flex-col gap-2">
-              <p className="text-[10px] font-bold text-[#888] tracking-widest uppercase mb-2">Socials</p>
+              <p className="text-[10px] font-bold text-foreground/60 tracking-widest uppercase mb-2">Socials</p>
               <div className="flex gap-4">
                 {["Instagram", "Twitter", "LinkedIn"].map(s => (
-                  <span key={s} className="text-xs font-bold text-[#111]">{s}</span>
+                  <span key={s} className="text-xs font-bold text-foreground">{s}</span>
                 ))}
               </div>
             </div>

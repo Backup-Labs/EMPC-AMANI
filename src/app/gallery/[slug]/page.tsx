@@ -41,7 +41,7 @@ export default function ProjectDetail() {
   const project = projectData[slug] || projectData["coastal-serenity"]; // Default fallback
 
   return (
-    <div className="bg-[#f0f0f0] min-h-screen">
+    <div className="bg-background min-h-screen text-foreground transition-colors duration-300">
       {/* ── HERO ── */}
       <section className="relative h-[80vh] min-h-125 overflow-hidden">
         <Image src={project.image} alt={project.title} fill sizes="100vw" priority className="object-cover" />
@@ -60,7 +60,7 @@ export default function ProjectDetail() {
       </section>
 
       {/* ── INFO BAR ── */}
-      <section className="bg-white border-b border-[#e0e0e0] px-6 md:px-12 lg:px-16">
+      <section className="bg-muted border-b border-border px-6 md:px-12 lg:px-16">
         <div className="max-w-7xl mx-auto py-10 lg:py-14">
           <div className="grid grid-cols-2 md:grid-cols-5 gap-8 md:gap-12 lg:gap-16">
             {[
@@ -71,8 +71,8 @@ export default function ProjectDetail() {
               { label: "Style", value: project.style },
             ].map((item, i) => (
               <div key={i}>
-                <p className="text-[10px] md:text-[11px] font-bold tracking-widest text-[#888] uppercase mb-2">{item.label}</p>
-                <p className="text-[#111] text-sm md:text-base font-bold m-0">{item.value}</p>
+                <p className="text-[10px] md:text-[11px] font-bold tracking-widest text-foreground/50 uppercase mb-2">{item.label}</p>
+                <p className="text-foreground text-sm md:text-base font-bold m-0">{item.value}</p>
               </div>
             ))}
           </div>
@@ -85,7 +85,7 @@ export default function ProjectDetail() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
             <div className="flex flex-col gap-6 md:gap-8">
               <h2 className="font-bold text-[1.8rem] md:text-[2.2rem] lg:text-[2.8rem] leading-tight tracking-tight m-0">Concept &amp; Objective</h2>
-              <p className="text-[#555] text-base md:text-lg leading-relaxed m-0 max-w-lg">
+              <p className="text-foreground/75 text-base md:text-lg leading-relaxed m-0 max-w-lg">
                 {project.description}
               </p>
             </div>
@@ -111,11 +111,11 @@ export default function ProjectDetail() {
 
       {/* ── NAVIGATION ── */}
       <section className="px-6 md:px-12 lg:px-16 pb-20 lg:pb-32">
-        <div className="max-w-7xl mx-auto border-t border-[#e0e0e0] pt-10 flex flex-col sm:flex-row justify-between items-center gap-6">
-          <Link href="/gallery" className="inline-flex items-center gap-2 font-bold text-sm md:text-base text-[#111] hover:underline underline-offset-8 decoration-2 order-2 sm:order-1">
+        <div className="max-w-7xl mx-auto border-t border-border pt-10 flex flex-col sm:flex-row justify-between items-center gap-6">
+          <Link href="/gallery" className="inline-flex items-center gap-2 font-bold text-sm md:text-base text-foreground hover:underline underline-offset-8 decoration-2 order-2 sm:order-1">
             <ArrowLeft size={18} /> Back to Gallery
           </Link>
-          <Link href="/contact" className="inline-flex items-center gap-2 font-bold text-sm md:text-base text-[#111] hover:underline underline-offset-8 decoration-2 order-1 sm:order-2">
+          <Link href="/contact" className="inline-flex items-center gap-2 font-bold text-sm md:text-base text-foreground hover:underline underline-offset-8 decoration-2 order-1 sm:order-2">
             Start a Project <ArrowUpRight size={18} />
           </Link>
         </div>

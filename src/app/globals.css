@@ -8,6 +8,8 @@
   --color-primary: var(--primary);
   --color-muted: var(--muted);
   --color-border: var(--border);
+  --color-accent-pink: var(--accent-pink);
+  --color-accent-coral: var(--accent-coral);
   --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -17,19 +19,23 @@
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #111111;
-  --primary: #111111;
-  --muted: #f8fafc;
-  --border: rgba(0, 0, 0, 0.05);
+  --background: #ffebe4;
+  --foreground: #030436;
+  --primary: #0a0c82;
+  --muted: #fff3ef;
+  --border: rgba(10, 12, 130, 0.08);
+  --accent-pink: #ffcccc;
+  --accent-coral: #ffb3b3;
 }
 
 .dark {
-  --background: #0a0a0a;
-  --foreground: #f8fafc;
-  --primary: #ffffff;
-  --muted: #1a1a1a;
-  --border: rgba(255, 255, 255, 0.1);
+  --background: #030436;
+  --foreground: #ffebe4;
+  --primary: #ffb3b3;
+  --muted: #0a0c82;
+  --border: rgba(255, 179, 179, 0.15);
+  --accent-pink: #ffcccc;
+  --accent-coral: #ffb3b3;
 }
 
 @layer base {
