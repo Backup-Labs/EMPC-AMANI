@@ -88,7 +88,7 @@ export default function Home() {
                 className="font-black text-[3rem] md:text-[4.5rem] lg:text-[6.5rem] leading-[0.85] tracking-[-0.05em] text-white m-0"
               >
                 Masterful<br />
-                <span className="text-transparent bg-clip-text bg-linear-to-r from-accent-cyan via-accent-coral to-accent-pink drop-shadow-[0_0_20px_rgba(0,240,255,0.35)]">
+                <span className="text-white bg-clip-text bg-linear-to-r from-accent-cyan via-accent-coral to-accent-pink drop-shadow-[0_0_20px_rgba(0,240,255,0.35)]">
                   Carpentry.
                 </span>
               </motion.h1>
