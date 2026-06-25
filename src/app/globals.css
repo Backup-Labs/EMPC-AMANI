@@ -104,52 +104,17 @@
 /* Layered & Architectural Border Cards */
 .card-double-border {
   position: relative;
-  border: 1.5px solid var(--primary);
   border-radius: var(--radius-lg);
   background: var(--muted);
   z-index: 1;
-}
-
-.card-double-border::before {
-  content: "";
-  position: absolute;
-  inset: 5px;
-  border: 1.5px solid var(--primary);
-  border-radius: calc(var(--radius-lg) - 5px);
-  pointer-events: none;
-  z-index: 2;
-  opacity: 0.85;
 }
 
 .card-layered {
   position: relative;
-  border: 1.5px solid var(--primary);
   border-radius: var(--radius-lg);
   background: var(--muted);
   z-index: 1;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.card-layered::before {
-  content: "";
-  position: absolute;
-  inset: 5px;
-  border: 1.5px solid var(--accent-coral);
-  border-radius: calc(var(--radius-lg) - 5px);
-  pointer-events: none;
-  z-index: 2;
-}
-
-.card-layered::after {
-  content: "";
-  position: absolute;
-  inset: -6px;
-  border: 1.5px dashed var(--accent-pink);
-  border-radius: calc(var(--radius-lg) + 6px);
-  pointer-events: none;
-  opacity: 0.6;
-  z-index: -1;
-  transition: opacity 0.3s ease;
 }
 
 .card-layered:hover {
@@ -159,7 +124,6 @@
 
 /* Solid Offset Shadow Cards (Neobrutalism/Architectural) */
 .card-offset-border {
-  border: 1.5px solid var(--primary);
   border-radius: var(--radius-lg);
   background: var(--muted);
   box-shadow: 6px 6px 0px var(--primary);
