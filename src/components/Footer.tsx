@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const navLinks = [
   { name: "About", href: "/about" },
@@ -42,8 +43,19 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 relative z-10">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-16 md:gap-0 pb-20 border-b border-border">
           <div className="flex flex-col gap-8">
-            <Link href="/" className="font-black text-3xl text-foreground tracking-tighter no-underline">
-              EMPC-AMANI
+            <Link href="/" className="flex items-center gap-4 no-underline group">
+              <div className="relative h-12 w-12 overflow-hidden rounded-full bg-white flex items-center justify-center p-1 border border-black/5 shadow-sm transition-transform group-hover:scale-105">
+                <Image
+                  src="/logo.jpg"
+                  alt="EMPC-AMANI Logo"
+                  fill
+                  sizes="48px"
+                  className="object-contain p-1"
+                />
+              </div>
+              <span className="font-black text-3xl text-foreground tracking-tighter">
+                EMPC-AMANI
+              </span>
             </Link>
             <div className="flex flex-col gap-2">
               <p className="text-foreground/60 text-lg font-bold italic">Artisanal Workshop & Master Carpentry</p>

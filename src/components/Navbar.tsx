@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
@@ -12,6 +13,7 @@ const navLinks = [
   { name: "Services", href: "/services" },
   { name: "News", href: "/news" },
   { name: "Contact", href: "/contact" },
+  { name: "Portals", href: "/portal" },
 ];
 
 export function Navbar() {
@@ -57,12 +59,25 @@ export function Navbar() {
             {/* Logo */}
             <Link
               href="/"
-              className={`
-                font-bold text-xl tracking-tighter transition-all duration-300 no-underline
-                ${scrolled ? "text-foreground" : "text-white"}
-              `}
+              className="flex items-center gap-3 no-underline group"
             >
-              EMPC-AMANI
+              <div className="relative h-10 w-10 overflow-hidden rounded-full bg-white flex items-center justify-center p-1 border border-white/20 shadow-sm transition-transform group-hover:scale-105">
+                <Image
+                  src="/logo.jpg"
+                  alt="EMPC-AMANI Logo"
+                  fill
+                  sizes="40px"
+                  className="object-contain p-1"
+                />
+              </div>
+              <span
+                className={`
+                  font-bold text-xl tracking-tighter transition-all duration-300
+                  ${scrolled ? "text-foreground" : "text-white"}
+                `}
+              >
+                EMPC-AMANI
+              </span>
             </Link>
 
             {/* Desktop links */}
@@ -115,9 +130,20 @@ export function Navbar() {
             className="fixed inset-0 z-100 flex flex-col bg-background text-foreground"
           >
             <div className="flex items-center justify-between p-6 md:p-10">
-              <span className="font-bold text-lg tracking-tighter">
-                EMPC-AMANI
-              </span>
+              <div className="flex items-center gap-3">
+                <div className="relative h-9 w-9 overflow-hidden rounded-full bg-white flex items-center justify-center p-1 border border-black/5 shadow-sm">
+                  <Image
+                    src="/logo.jpg"
+                    alt="EMPC-AMANI Logo"
+                    fill
+                    sizes="36px"
+                    className="object-contain p-1"
+                  />
+                </div>
+                <span className="font-bold text-lg tracking-tighter">
+                  EMPC-AMANI
+                </span>
+              </div>
               <button
                 onClick={() => setMobileOpen(false)}
                 className="h-12 w-12 flex items-center justify-center rounded-3xl bg-muted hover:bg-foreground/10 text-foreground transition-transform active:scale-90"

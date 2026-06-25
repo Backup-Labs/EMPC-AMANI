@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus, ArrowUpRight } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 15 },
@@ -45,12 +46,55 @@ const faqs = [
 
 export default function Contact() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Form states
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [subject, setSubject] = useState("");
+  const [inquiryType, setInquiryType] = useState("furniture");
+  const [message, setMessage] = useState("");
+
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 4000);
+    if (!name || !message) return;
+
+    setSubmitting(true);
+    setErrorMsg("");
+    try {
+      const { error } = await supabase.from("inquiries").insert([
+        {
+          full_name: name,
+          email: email || null,
+          phone: phone || null,
+          subject: subject || null,
+          message,
+          inquiry_type: inquiryType,
+          status: "new",
+        },
+      ]);
+
+      if (error) throw error;
+
+      setSubmitted(true);
+      setName("");
+      setEmail("");
+      setPhone("");
+      setSubject("");
+      setMessage("");
+      setInquiryType("furniture");
+
+      setTimeout(() => setSubmitted(false), 5000);
+    } catch (err: any) {
+      console.error("Error submitting inquiry:", err);
+      setErrorMsg(err.message || "Failed to send inquiry. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -113,32 +157,100 @@ export default function Contact() {
               <div className="grid grid-cols-2 gap-8">
                 <div className="flex flex-col gap-3">
                   <label className="text-[11px] font-black uppercase tracking-widest text-foreground/40">Name</label>
-                  <input required placeholder="Name" className="h-14 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-lg transition-colors" />
+                  <input
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Name"
+                    disabled={submitting}
+                    className="h-14 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-lg transition-colors disabled:opacity-50"
+                  />
                 </div>
                 <div className="flex flex-col gap-3">
                   <label className="text-[11px] font-black uppercase tracking-widest text-foreground/40">Email</label>
-                  <input required type="email" placeholder="Email" className="h-14 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-lg transition-colors" />
+                  <input
+                    required
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Email"
+                    disabled={submitting}
+                    className="h-14 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-lg transition-colors disabled:opacity-50"
+                  />
                 </div>
               </div>
+
+              <div className="grid grid-cols-2 gap-8">
+                <div className="flex flex-col gap-3">
+                  <label className="text-[11px] font-black uppercase tracking-widest text-foreground/40">Phone (Optional)</label>
+                  <input
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="Phone"
+                    disabled={submitting}
+                    className="h-14 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-lg transition-colors disabled:opacity-50"
+                  />
+                </div>
+                <div className="flex flex-col gap-3">
+                  <label className="text-[11px] font-black uppercase tracking-widest text-foreground/40">Subject</label>
+                  <input
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    placeholder="Subject"
+                    disabled={submitting}
+                    className="h-14 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-lg transition-colors disabled:opacity-50"
+                  />
+                </div>
+              </div>
+
               <div className="flex flex-col gap-3">
                 <label className="text-[11px] font-black uppercase tracking-widest text-foreground/40">Inquiry Type</label>
-                <select className="h-14 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-lg transition-colors cursor-pointer appearance-none">
-                  <option className="bg-background">Custom Furniture</option>
-                  <option className="bg-background">Internship Inquiry</option>
-                  <option className="bg-background">Bespoke Workshop Project</option>
+                <select
+                  value={inquiryType}
+                  onChange={(e) => setInquiryType(e.target.value)}
+                  disabled={submitting}
+                  className="h-14 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-lg transition-colors cursor-pointer appearance-none disabled:opacity-50"
+                >
+                  <option value="furniture" className="bg-background">Furniture Inquiry</option>
+                  <option value="custom_order" className="bg-background">Custom Order</option>
+                  <option value="training" className="bg-background">Carpentry Training</option>
+                  <option value="general" className="bg-background">General Inquiry</option>
                 </select>
               </div>
+
               <div className="flex flex-col gap-3">
                 <label className="text-[11px] font-black uppercase tracking-widest text-foreground/40">Message</label>
-                <textarea rows={4} placeholder="Your vision..." className="bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-lg transition-colors resize-none" />
+                <textarea
+                  required
+                  rows={4}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Your vision..."
+                  disabled={submitting}
+                  className="bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-lg transition-colors resize-none disabled:opacity-50"
+                />
               </div>
-              <button 
-                type="submit" 
-                disabled={submitted}
-                className="inline-flex h-16 items-center px-12 rounded-full bg-primary text-background font-black hover:opacity-90 transition-all shadow-xl group self-start disabled:opacity-50 disabled:bg-green-600"
-              >
-                {submitted ? "Message Sent" : "Send Inquiry"} <ArrowUpRight size={20} className="ml-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-              </button>
+
+              <div className="flex flex-col gap-2">
+                <button
+                  type="submit"
+                  disabled={submitting || submitted}
+                  className={`inline-flex h-16 items-center px-12 rounded-full bg-primary text-background font-black hover:opacity-90 transition-all shadow-xl group self-start disabled:opacity-60 cursor-pointer`}
+                >
+                  {submitting ? "Sending..." : submitted ? "Message Sent" : "Send Inquiry"}
+                  <ArrowUpRight size={20} className="ml-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                </button>
+                {submitted && (
+                  <p className="text-sm font-bold text-green-600 px-4 mt-2">
+                    Thank you! Your inquiry has been submitted successfully.
+                  </p>
+                )}
+                {errorMsg && (
+                  <p className="text-sm font-bold text-red-500 px-4 mt-2">
+                    {errorMsg}
+                  </p>
+                )}
+              </div>
             </form>
           </div>
 

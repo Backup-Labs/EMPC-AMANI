@@ -6,6 +6,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Counter, LogoMarquee } from "@/components/AnimatedComponents";
+import { Testimonials } from "@/components/Testimonials";
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
 
@@ -88,7 +89,7 @@ export default function Home() {
                 className="font-black text-[3rem] md:text-[4.5rem] lg:text-[6.5rem] leading-[0.85] tracking-[-0.05em] text-white m-0"
               >
                 Masterful<br />
-                <span className="text-white bg-clip-text bg-linear-to-r from-accent-cyan via-accent-coral to-accent-pink drop-shadow-[0_0_20px_rgba(0,240,255,0.35)]">
+                <span className="text-white bg-clip-text bg-linear-to-r from-accent-cyan via-accent-coral to-accent-pink">
                   Carpentry.
                 </span>
               </motion.h1>
@@ -283,6 +284,18 @@ export default function Home() {
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── TESTIMONIALS SECTION ── */}
+      <section className="px-6 md:px-12 lg:px-16 py-12 lg:py-24">
+        <div className="max-w-7xl mx-auto">
+          <SectionHeader
+            label="Reviews"
+            heading={<>Shared Experiences.<br />Verified Trust.</>}
+            desc="What our clients and carpentry training graduates have to say about EMPC."
+          />
+          <Testimonials />
         </div>
       </section>
 
