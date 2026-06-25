@@ -131,13 +131,13 @@ export default function Services() {
                         </p>
                         <p className="text-[11px] font-black text-foreground/40 tracking-[0.2em] uppercase mt-4">{s.statLabel}</p>
                       </div>
-                      <Link href="/contact" className="h-16 w-16 glass rounded-full flex items-center justify-center group-hover:bg-primary group-hover:text-background transition-all shadow-sm text-foreground">
+                      <Link href="/contact" className="h-16 w-16 rounded-full flex items-center justify-center border-2 border-primary/20 bg-muted hover:border-primary group-hover:bg-primary group-hover:text-background transition-all text-primary shrink-0">
                         <ArrowUpRight size={24} />
                       </Link>
                     </div>
                   </div>
-                  <div className="relative rounded-[40px] overflow-hidden aspect-4/3 shadow-3xl transition-all duration-1000">
-                    <Image src={s.image} alt={s.title} fill sizes="(max-width:768px) 100vw, 33vw" className="object-cover group-hover:scale-110 transition-transform duration-1000" />
+                  <div className="relative rounded-2xl overflow-hidden aspect-4/3 card-layered transition-all duration-1000 shrink-0">
+                    <Image src={s.image} alt={s.title} fill sizes="(max-width:768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-1000" />
                   </div>
                 </div>
               </motion.div>

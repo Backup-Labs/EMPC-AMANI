@@ -4,8 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Sun, Moon } from "lucide-react";
-import { useTheme } from "next-themes";
+import { Menu, X } from "lucide-react";
 
 const navLinks = [
   { name: "About", href: "/about" },
@@ -18,12 +17,9 @@ const navLinks = [
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
   const pathname = usePathname();
 
   useEffect(() => {
-    setMounted(true);
     const handler = () => {
       setScrolled(window.scrollY > 60);
     };
@@ -89,32 +85,10 @@ export function Navbar() {
                   </Link>
                 );
               })}
-              
-              {/* Theme Toggle */}
-              {mounted && (
-                <button
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className={`
-                    p-2 rounded-full transition-colors
-                    ${scrolled ? "hover:bg-black/5 dark:hover:bg-white/10" : "hover:bg-white/10"}
-                    ${scrolled ? "text-foreground" : "text-white"}
-                  `}
-                >
-                  {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-                </button>
-              )}
             </nav>
 
             {/* Mobile hamburger */}
             <div className="flex md:hidden items-center gap-4">
-               {mounted && (
-                <button
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className={`p-2 ${scrolled ? "text-foreground" : "text-white"}`}
-                >
-                  {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
-                </button>
-              )}
               <button
                 className={`
                   flex items-center justify-center transition-colors

@@ -108,7 +108,7 @@ export default function Contact() {
           </div>
 
           {/* Form */}
-          <div className="glass rounded-2xl p-12 lg:p-16 shadow-3xl">
+          <div className="card-layered p-12 lg:p-16">
             <form onSubmit={handleSubmit} className="flex flex-col gap-10">
               <div className="grid grid-cols-2 gap-8">
                 <div className="flex flex-col gap-3">
@@ -157,10 +157,10 @@ export default function Contact() {
             <div key={i} className="flex flex-col gap-4">
               <button
                 onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                className={`w-full flex items-center justify-between p-10 rounded-[32px] transition-all duration-500 group ${openFaq === i ? "bg-primary text-background" : "glass hover:bg-primary hover:text-background"}`}
+                className={`w-full flex items-center justify-between p-8 card-offset-border hover:scale-[1.01] transition-all duration-300 group ${openFaq === i ? "bg-primary text-background" : "bg-muted text-foreground"}`}
               >
                 <span className="font-black text-xl text-left tracking-tighter">{faq.q}</span>
-                <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 transition-all duration-500 ${openFaq === i ? "bg-background text-primary rotate-180" : "bg-foreground/5 group-hover:bg-background group-hover:text-primary"}`}>
+                <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${openFaq === i ? "bg-background text-primary rotate-180" : "bg-primary/10 group-hover:bg-primary group-hover:text-background text-primary"}`}>
                   {openFaq === i ? <Minus size={18} /> : <Plus size={18} />}
                 </div>
               </button>

@@ -87,7 +87,10 @@ export default function Home() {
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] as any }}
                 className="font-black text-[3rem] md:text-[4.5rem] lg:text-[6.5rem] leading-[0.85] tracking-[-0.05em] text-white m-0"
               >
-                Masterful<br />Carpentry.
+                Masterful<br />
+                <span className="text-transparent bg-clip-text bg-linear-to-r from-accent-cyan via-accent-coral to-accent-pink drop-shadow-[0_0_20px_rgba(0,240,255,0.35)]">
+                  Carpentry.
+                </span>
               </motion.h1>
               <p className="text-white/80 text-lg md:text-xl leading-relaxed mt-8 max-w-lg">
                 Precision in wood, excellence in craft. We create bespoke furniture 
@@ -135,18 +138,18 @@ export default function Home() {
             <Image src="/images/project2.png" alt="Studio" fill sizes="100vw" className="object-cover" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-16 lg:gap-24">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
             {[
               { val: 2500, suffix: "+", label: "Bespoke Pieces", desc: "Hand-crafted furniture delivered to homes and offices since 2012." },
               { val: 85, label: "Master Artisans", desc: "Trained through our workshop and now leading the industry." },
               { val: "RTB", label: "Certified Excellence", desc: "Official partner in vocational training and professional certification." },
             ].map((s, i) => (
-              <div key={i} className="flex flex-col border-l-2 border-border pl-8">
-                <p className="font-black text-[3.5rem] lg:text-[4rem] tracking-[-0.05em] text-foreground m-0 leading-none">
+              <div key={i} className="card-double-border p-8 flex flex-col hover:scale-[1.03] transition-all duration-300 shadow-sm">
+                <p className="font-black text-[3.5rem] lg:text-[4rem] tracking-[-0.05em] text-primary m-0 leading-none">
                   <Counter value={s.val} suffix={s.suffix} />
                 </p>
-                <p className="font-black text-lg text-foreground mt-4 mb-4 uppercase tracking-tighter">{s.label}</p>
-                <p className="text-base text-foreground/60 leading-relaxed m-0">{s.desc}</p>
+                <p className="font-black text-lg text-foreground mt-6 mb-3 uppercase tracking-tighter">{s.label}</p>
+                <p className="text-base text-foreground/70 leading-relaxed m-0">{s.desc}</p>
               </div>
             ))}
           </div>
@@ -202,7 +205,7 @@ export default function Home() {
             heading={<>Inspiring Spaces.<br />Resonant Experience.</>}
             desc="Our diverse range of work spans from boutique retail to high-end hospitality."
           />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 pt-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 pt-20">
             {featuredProjects.map((p, i) => (
               <motion.div
                 key={i}
@@ -210,22 +213,22 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.7, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] as any }}
-                className="flex flex-col gap-6 group"
+                className="card-layered p-6 flex flex-col gap-6 group cursor-pointer"
               >
-                <div className="relative rounded-[32px] overflow-hidden aspect-square shadow-lg">
-                  <Image src={p.image} alt={p.title} fill sizes="(max-width:768px) 100vw, 33vw" className="object-cover group-hover:scale-110 transition-transform duration-1000 ease-out" />
-                  <div className="absolute top-6 left-6 flex gap-2">
+                <div className="relative rounded-2xl overflow-hidden aspect-square shadow-md">
+                  <Image src={p.image} alt={p.title} fill sizes="(max-width:768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-1000 ease-out" />
+                  <div className="absolute top-4 left-4 flex gap-1.5">
                     {p.tags.map(t => (
-                      <span key={t} className="glass text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full text-white">
+                      <span key={t} className="glass text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-full text-white">
                         {t}
                       </span>
                     ))}
                   </div>
                 </div>
-                <div className="flex justify-between items-center pr-4">
-                  <p className="font-black text-2xl text-foreground leading-tight tracking-tighter">{p.title}</p>
-                  <div className="h-12 w-12 rounded-full border border-border flex items-center justify-center transition-all group-hover:bg-primary group-hover:border-primary group-hover:text-background text-foreground">
-                    <ArrowUpRight size={20} />
+                <div className="flex justify-between items-center pr-1">
+                  <p className="font-black text-xl text-foreground leading-tight tracking-tight m-0">{p.title}</p>
+                  <div className="h-10 w-10 rounded-full border border-primary/20 flex items-center justify-center transition-all group-hover:bg-primary group-hover:text-background text-primary shrink-0 ml-4">
+                    <ArrowUpRight size={18} />
                   </div>
                 </div>
               </motion.div>
@@ -263,19 +266,19 @@ export default function Home() {
               <ArrowUpRight size={24} />
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pt-20">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10 pt-20">
             {[
               { title: "The Heritage of Wood", date: "20.03.26", image: "/images/hero.png" },
               { title: "Art of Joinery", date: "15.03.26", image: "/images/project1.png" },
               { title: "Workshop Milestones", date: "10.03.26", image: "/images/project2.png" },
             ].map((b, i) => (
-              <motion.div key={i} {...fade(i * 0.1)}>
-                <Link href={`/news/${b.title.toLowerCase().replace(/ /g, "-")}`} className="group block">
-                  <div className="relative rounded-[32px] overflow-hidden aspect-16/10 mb-8 shadow-md">
-                    <Image src={b.image} alt={b.title} fill sizes="(max-width:768px) 100vw, 33vw" className="object-cover grow group-hover:scale-110 transition-transform duration-1000" />
+              <motion.div key={i} {...fade(i * 0.1)} className="card-offset-border p-6 flex flex-col group cursor-pointer">
+                <Link href={`/news/${b.title.toLowerCase().replace(/ /g, "-")}`} className="group block no-underline text-foreground">
+                  <div className="relative rounded-2xl overflow-hidden aspect-16/10 mb-6 shadow-sm">
+                    <Image src={b.image} alt={b.title} fill sizes="(max-width:768px) 100vw, 33vw" className="object-cover grow group-hover:scale-105 transition-transform duration-700" />
                   </div>
-                  <p className="text-[11px] font-black text-primary mb-3 flex items-center gap-2 uppercase tracking-widest">{b.date}</p>
-                  <p className="font-black text-2xl text-foreground leading-tight tracking-tight m-0 hover:text-primary transition-colors">{b.title}</p>
+                  <p className="text-[10px] font-black text-primary mb-3 flex items-center gap-2 uppercase tracking-widest">{b.date}</p>
+                  <p className="font-black text-xl text-foreground leading-tight tracking-tight m-0 group-hover:text-primary transition-colors">{b.title}</p>
                 </Link>
               </motion.div>
             ))}
