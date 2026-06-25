@@ -39,13 +39,21 @@ export async function POST(req: NextRequest) {
       console.warn("Could not load system prompt from settings, falling back to default.", dbErr);
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    
+    // Find the index of the first user message. The history must start with a user message.
+    const firstUserIndex = messages.findIndex((m: any) => m.role === "user");
+    const historyMessages = firstUserIndex !== -1 ? messages.slice(firstUserIndex, -1) : [];
+
     const chat = model.startChat({
-      history: messages.slice(0, -1).map((m: any) => ({
+      history: historyMessages.map((m: any) => ({
         role: m.role === "user" ? "user" : "model",
         parts: [{ text: m.content }],
       })),
-      systemInstruction: systemPrompt,
+      systemInstruction: {
+        role: "system",
+        parts: [{ text: systemPrompt }],
+      },
     });
 
     const lastMessage = messages.at(-1);

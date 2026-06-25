@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { MessageSquare, X, Send } from "lucide-react";
 
 interface Message {
   role: "user" | "assistant";
@@ -86,7 +85,7 @@ export function ChatbotWidget() {
         className="fixed bottom-24 right-6 z-50 h-[56px] w-[56px] rounded-full bg-primary text-background flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-transform duration-300 cursor-pointer"
         aria-label="Open chat assistant"
       >
-        {open ? <X size={24} /> : <MessageSquare size={24} />}
+        {open ? <i className="fa-solid fa-xmark text-[22px]"></i> : <i className="fa-solid fa-robot text-[22px]"></i>}
       </button>
 
       {/* Chat Window */}
@@ -100,10 +99,10 @@ export function ChatbotWidget() {
             </div>
             <button
               onClick={() => setOpen(false)}
-              className="text-background/80 hover:text-background transition-colors"
+              className="text-background/80 hover:text-background transition-colors flex items-center justify-center"
               aria-label="Close chat"
             >
-              <X size={18} />
+              <i className="fa-solid fa-xmark text-base"></i>
             </button>
           </div>
 
@@ -146,7 +145,7 @@ export function ChatbotWidget() {
               disabled={loading || !input.trim()}
               className="h-10 w-10 bg-primary text-background rounded-full flex items-center justify-center hover:opacity-90 active:scale-95 transition-all disabled:opacity-50 shrink-0 cursor-pointer"
             >
-              <Send size={14} />
+              <i className="fa-solid fa-paper-plane text-xs"></i>
             </button>
           </form>
         </div>

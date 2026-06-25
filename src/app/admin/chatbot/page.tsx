@@ -142,7 +142,7 @@ export default function AdminChatbotConfig() {
             
             <div className="flex flex-col gap-4 text-xs font-bold leading-relaxed text-foreground/60">
               <p className="m-0">
-                The chatbot uses the <span className="text-primary font-black">Gemini 1.5 Flash</span> model. Changes to the system prompt take effect immediately on next visitor questions.
+                The chatbot uses the <span className="text-primary font-black">Gemini 2.5 Flash</span> model. Changes to the system prompt take effect immediately on next visitor questions.
               </p>
               <p className="m-0 border-t border-border/40 pt-4">
                 <span className="text-foreground block mb-1">PROMPT GUIDELINES:</span>
