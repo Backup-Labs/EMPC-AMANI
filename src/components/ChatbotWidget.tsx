@@ -15,7 +15,7 @@ export function ChatbotWidget() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Initialize with a welcome message on mount or first open
+  // Initializ with a welcome message on mount or first open
   useEffect(() => {
     if (messages.length === 0) {
       setMessages([
