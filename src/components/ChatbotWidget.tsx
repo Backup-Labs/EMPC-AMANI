@@ -82,7 +82,7 @@ export function ChatbotWidget() {
       {/* Launcher Button */}
       <button
         onClick={() => setOpen(!open)}
-        className="fixed bottom-24 right-6 z-50 h-[56px] w-[56px] rounded-full bg-primary text-background flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-transform duration-300 cursor-pointer"
+        className="fixed bottom-24 right-6 z-50 h-14 w-14 rounded-full bg-primary text-background flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-transform duration-300 cursor-pointer"
         aria-label="Open chat assistant"
       >
         {open ? <i className="fa-solid fa-xmark text-[22px]"></i> : <i className="fa-solid fa-robot text-[22px]"></i>}
@@ -90,7 +90,7 @@ export function ChatbotWidget() {
 
       {/* Chat Window */}
       {open && (
-        <div className="fixed bottom-44 right-6 z-50 w-80 h-[480px] max-h-[75vh] flex flex-col bg-background border border-border rounded-2xl shadow-2xl overflow-hidden transition-all duration-300">
+        <div className="fixed bottom-44 right-6 z-50 w-80 h-120 max-h-[75vh] flex flex-col bg-background border border-border rounded-2xl shadow-2xl overflow-hidden transition-all duration-300">
           {/* Header */}
           <div className="bg-primary text-background px-4 py-3.5 flex items-center justify-between">
             <div className="flex items-center gap-2">
