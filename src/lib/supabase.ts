@@ -1,10 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/client";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder-key";
-
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-  console.warn("Supabase credentials missing from environment variables. Using placeholder values.");
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+/** Browser Supabase client — use in Client Components */
+export const supabase = createClient();

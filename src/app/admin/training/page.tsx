@@ -1,8 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Check, X, AlertTriangle } from "lucide-react";
+import React, { useState, useEffect, useMemo } from "react";
+import { Check, X, AlertTriangle, GraduationCap } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { AdminPageHeader } from "@/components/admin/ui/AdminPageHeader";
+import { AdminSearchBar } from "@/components/admin/ui/AdminSearchBar";
+import { AdminFilterTabs } from "@/components/admin/ui/AdminFilterTabs";
+import { AdminLoading } from "@/components/admin/ui/AdminLoading";
+import { AdminEmptyState } from "@/components/admin/ui/AdminEmptyState";
+import { useToast } from "@/components/ui/Toast";
 
 interface Enrollment {
   id: string;
@@ -16,183 +22,114 @@ interface Enrollment {
   created_at: string;
 }
 
+const statusColors: Record<string, string> = {
+  confirmed: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
+  cancelled: "bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300",
+  pending: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
+};
+
 export default function AdminTraining() {
+  const { toast } = useToast();
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    fetchEnrollments();
-  }, []);
+  useEffect(() => { fetchEnrollments(); }, []);
 
   const fetchEnrollments = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("training_enrollments")
-        .select("*")
-        .order("created_at", { ascending: false });
-
+      const { data, error } = await supabase.from("training_enrollments").select("*").order("created_at", { ascending: false });
       if (error) throw error;
       setEnrollments(data || []);
-    } catch (err) {
-      console.error("Error loading enrollments:", err);
+    } catch {
+      toast("Failed to load enrollments", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleUpdateStatus = async (id: string, newStatus: "pending" | "confirmed" | "cancelled") => {
+  const handleUpdateStatus = async (id: string, newStatus: Enrollment["status"]) => {
     try {
-      const { error } = await supabase
-        .from("training_enrollments")
-        .update({ status: newStatus })
-        .eq("id", id);
-
+      const { error } = await supabase.from("training_enrollments").update({ status: newStatus }).eq("id", id);
       if (error) throw error;
-
-      setEnrollments(
-        enrollments.map((enr) =>
-          enr.id === id ? { ...enr, status: newStatus } : enr
-        )
-      );
-    } catch (err) {
-      console.error("Error updating enrollment status:", err);
-      alert("Failed to update status.");
+      setEnrollments(enrollments.map((enr) => (enr.id === id ? { ...enr, status: newStatus } : enr)));
+      toast(`Enrollment ${newStatus}`);
+    } catch {
+      toast("Failed to update status", "error");
     }
   };
 
-  const filteredEnrollments = enrollments.filter((enr) => {
-    if (filterStatus === "all") return true;
-    return enr.status === filterStatus;
-  });
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase();
+    return enrollments.filter((enr) => {
+      const matchesStatus = filterStatus === "all" || enr.status === filterStatus;
+      const matchesSearch = !search || [enr.full_name, enr.email, enr.course_name, enr.sponsor].some((f) => f?.toLowerCase().includes(q));
+      return matchesStatus && matchesSearch;
+    });
+  }, [enrollments, filterStatus, search]);
 
-  const getStatusBadgeClass = (status: string) => {
-    switch (status) {
-      case "confirmed":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "cancelled":
-        return "bg-red-100 text-red-800 border-red-200";
-      default:
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-    }
-  };
+  const statusTabs = [
+    { id: "all", label: "All", count: enrollments.length },
+    { id: "pending", label: "Pending", count: enrollments.filter((e) => e.status === "pending").length },
+    { id: "confirmed", label: "Confirmed", count: enrollments.filter((e) => e.status === "confirmed").length },
+    { id: "cancelled", label: "Cancelled", count: enrollments.filter((e) => e.status === "cancelled").length },
+  ];
 
   return (
-    <div className="flex flex-col gap-10">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div>
-          <span className="font-black text-[12px] uppercase tracking-widest text-primary">Education</span>
-          <h1 className="font-black text-[2.5rem] md:text-[3.2rem] leading-none tracking-[-0.05em] mt-3 mb-0">
-            Training Enrollments
-          </h1>
-          <p className="text-foreground/50 font-bold text-sm mt-2 mb-0">
-            Manage student registrations for vocational carpentry programs.
-          </p>
-        </div>
+    <div className="flex flex-col gap-8">
+      <AdminPageHeader label="Education" title="Training Enrollments" description="Manage student registrations for vocational carpentry programs." />
 
-        {/* Filter Tab bar */}
-        <div className="flex bg-muted rounded-full p-1 border border-border">
-          {["all", "pending", "confirmed", "cancelled"].map((status) => (
-            <button
-              key={status}
-              onClick={() => setFilterStatus(status)}
-              className={`
-                px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider cursor-pointer transition-colors
-                ${
-                  filterStatus === status
-                    ? "bg-primary text-background"
-                    : "text-foreground/60 hover:text-foreground"
-                }
-              `}
-            >
-              {status}
-            </button>
-          ))}
-        </div>
+      <div className="flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
+        <AdminFilterTabs tabs={statusTabs} active={filterStatus} onChange={setFilterStatus} />
+        <AdminSearchBar value={search} onChange={setSearch} placeholder="Search enrollments..." />
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-24">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
-        </div>
-      ) : filteredEnrollments.length === 0 ? (
-        <div className="bg-muted p-16 rounded-3xl border border-border/40 text-center">
-          <p className="text-foreground/60 text-lg font-bold m-0">No enrollments found for the selected status.</p>
-        </div>
+        <AdminLoading />
+      ) : filtered.length === 0 ? (
+        <AdminEmptyState icon={GraduationCap} title="No enrollments" description="No enrollments match your filters." />
       ) : (
-        <div className="card-layered overflow-hidden shadow-xs border border-border/40">
+        <div className="card-elevated overflow-hidden border border-border/40">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-border bg-muted/50">
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Student</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Course & Sponsor</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Notes</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Registered</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Status</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45 text-right">Approve/Reject</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/45">Student</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/45">Course</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/45">Notes</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/45">Registered</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/45">Status</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/45 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/40">
-                {filteredEnrollments.map((enr) => (
+                {filtered.map((enr) => (
                   <tr key={enr.id} className="hover:bg-muted/10 transition-colors">
-                    <td className="p-5">
-                      <div className="flex flex-col">
-                        <span className="font-bold text-base text-foreground leading-snug">{enr.full_name}</span>
-                        <span className="text-xs text-foreground/50 font-medium">{enr.email}</span>
-                        {enr.phone && <span className="text-[11px] text-foreground/40 font-mono mt-0.5">{enr.phone}</span>}
-                      </div>
+                    <td className="p-4">
+                      <span className="font-bold text-sm block">{enr.full_name}</span>
+                      <span className="text-xs text-foreground/50">{enr.email}</span>
                     </td>
-                    <td className="p-5">
-                      <div className="flex flex-col">
-                        <span className="font-bold text-sm text-foreground uppercase tracking-wide">{enr.course_name}</span>
-                        {enr.sponsor && (
-                          <span className="text-xs text-primary font-bold italic mt-0.5">
-                            Sponsor: {enr.sponsor}
-                          </span>
-                        )}
-                      </div>
+                    <td className="p-4">
+                      <span className="font-bold text-sm uppercase">{enr.course_name}</span>
+                      {enr.sponsor && <span className="block text-xs text-primary font-bold italic">Sponsor: {enr.sponsor}</span>}
                     </td>
-                    <td className="p-5 text-sm text-foreground/60 max-w-xs truncate" title={enr.message}>
-                      {enr.message || "—"}
+                    <td className="p-4 text-sm text-foreground/60 max-w-xs truncate" title={enr.message}>{enr.message || "—"}</td>
+                    <td className="p-4 text-xs font-bold text-foreground/70">{new Date(enr.created_at).toLocaleDateString()}</td>
+                    <td className="p-4">
+                      <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-full border ${statusColors[enr.status]}`}>{enr.status}</span>
                     </td>
-                    <td className="p-5 text-sm font-bold text-foreground/75">
-                      {new Date(enr.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="p-5">
-                      <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-full border ${getStatusBadgeClass(enr.status)}`}>
-                        {enr.status}
-                      </span>
-                    </td>
-                    <td className="p-5 text-right">
+                    <td className="p-4 text-right">
                       <div className="flex justify-end gap-2">
                         {enr.status !== "confirmed" && (
-                          <button
-                            onClick={() => handleUpdateStatus(enr.id, "confirmed")}
-                            className="h-8 w-8 rounded-full border border-border flex items-center justify-center text-green-600 hover:bg-green-50 transition-colors cursor-pointer"
-                            title="Confirm Enrollment"
-                          >
-                            <Check size={14} />
-                          </button>
+                          <button onClick={() => handleUpdateStatus(enr.id, "confirmed")} className="h-8 w-8 rounded-full border border-border flex items-center justify-center text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950 cursor-pointer" title="Confirm"><Check size={13} /></button>
                         )}
                         {enr.status !== "pending" && (
-                          <button
-                            onClick={() => handleUpdateStatus(enr.id, "pending")}
-                            className="h-8 w-8 rounded-full border border-border flex items-center justify-center text-yellow-600 hover:bg-yellow-50 transition-colors cursor-pointer"
-                            title="Set to Pending"
-                          >
-                            <AlertTriangle size={14} />
-                          </button>
+                          <button onClick={() => handleUpdateStatus(enr.id, "pending")} className="h-8 w-8 rounded-full border border-border flex items-center justify-center text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950 cursor-pointer" title="Pending"><AlertTriangle size={13} /></button>
                         )}
                         {enr.status !== "cancelled" && (
-                          <button
-                            onClick={() => handleUpdateStatus(enr.id, "cancelled")}
-                            className="h-8 w-8 rounded-full border border-border flex items-center justify-center text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
-                            title="Cancel Registration"
-                          >
-                            <X size={14} />
-                          </button>
+                          <button onClick={() => handleUpdateStatus(enr.id, "cancelled")} className="h-8 w-8 rounded-full border border-border flex items-center justify-center text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950 cursor-pointer" title="Cancel"><X size={13} /></button>
                         )}
                       </div>
                     </td>

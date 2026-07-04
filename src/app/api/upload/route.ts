@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 
-// Configure Cloudinary from env variables
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -10,6 +10,20 @@ cloudinary.config({
 
 export async function POST(req: NextRequest) {
   try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const { data: profile } = await supabase
+      .from("admin_profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+    if (!profile || (profile.role !== "admin" && profile.role !== "editor")) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const formData = await req.formData();
     const file = formData.get("file") as File;
 
@@ -18,38 +32,24 @@ export async function POST(req: NextRequest) {
     }
 
     if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-      return NextResponse.json(
-        { error: "Cloudinary credentials are not configured in environment variables." },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Cloudinary credentials are not configured." }, { status: 500 });
     }
 
-    // Convert file to buffer stream
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Promise wrapper for stream upload
-    const result = await new Promise<any>((resolve, reject) => {
+    const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
       cloudinary.uploader
-        .upload_stream(
-          {
-            folder: "empc_site",
-            resource_type: "auto",
-          },
-          (error, result) => {
-            if (error) {
-              reject(error);
-            } else {
-              resolve(result);
-            }
-          }
-        )
+        .upload_stream({ folder: "empc_site", resource_type: "auto" }, (error, result) => {
+          if (error) reject(error);
+          else resolve(result as { secure_url: string });
+        })
         .end(buffer);
     });
 
     return NextResponse.json({ url: result.secure_url });
-  } catch (err: any) {
-    console.error("Cloudinary upload route error:", err);
-    return NextResponse.json({ error: err.message || "Failed to upload image." }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Failed to upload image.";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

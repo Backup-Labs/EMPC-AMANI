@@ -1,31 +1,40 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, X } from "lucide-react";
+import React, { useState, useEffect, useMemo } from "react";
+import { Plus, Edit2, Trash2, Star, Eye, EyeOff, Package } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { AdminPageHeader } from "@/components/admin/ui/AdminPageHeader";
+import { AdminModal } from "@/components/admin/ui/AdminModal";
+import { AdminSearchBar } from "@/components/admin/ui/AdminSearchBar";
+import { AdminFilterTabs } from "@/components/admin/ui/AdminFilterTabs";
+import { AdminLoading } from "@/components/admin/ui/AdminLoading";
+import { AdminEmptyState } from "@/components/admin/ui/AdminEmptyState";
+import { useToast } from "@/components/ui/Toast";
+import type { Product } from "@/types/database";
 
-interface Product {
-  id: string;
-  title: string;
-  category: string;
-  price: number;
-  image_url: string;
-  tags: string[];
-  created_at: string;
-}
+const PAGE_SIZE = 10;
 
 export default function AdminProducts() {
+  const { toast } = useToast();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [sortBy, setSortBy] = useState<"newest" | "title" | "price">("newest");
+  const [page, setPage] = useState(1);
 
-  // Modal / Form state
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [price, setPrice] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [description, setDescription] = useState("");
   const [tagsInput, setTagsInput] = useState("");
+  const [published, setPublished] = useState(true);
+  const [featured, setFeatured] = useState(false);
+  const [inStock, setInStock] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -35,27 +44,67 @@ export default function AdminProducts() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .order("created_at", { ascending: false });
-
+      const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
       if (error) throw error;
       setProducts(data || []);
     } catch (err) {
       console.error("Error loading products:", err);
+      toast("Failed to load products. Check database configuration.", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleOpenCreate = () => {
+  const categories = useMemo(
+    () => [...new Set(products.map((p) => p.category).filter(Boolean))] as string[],
+    [products]
+  );
+
+  const filtered = useMemo(() => {
+    let list = [...products];
+    if (search) {
+      const q = search.toLowerCase();
+      list = list.filter(
+        (p) =>
+          p.title.toLowerCase().includes(q) ||
+          p.category?.toLowerCase().includes(q) ||
+          p.tags?.some((t) => t.toLowerCase().includes(q))
+      );
+    }
+    if (statusFilter === "published") list = list.filter((p) => p.published !== false);
+    if (statusFilter === "draft") list = list.filter((p) => p.published === false);
+    if (statusFilter === "featured") list = list.filter((p) => p.featured);
+    if (statusFilter === "out_of_stock") list = list.filter((p) => p.in_stock === false);
+    if (categoryFilter !== "all") list = list.filter((p) => p.category === categoryFilter);
+
+    list.sort((a, b) => {
+      if (sortBy === "title") return a.title.localeCompare(b.title);
+      if (sortBy === "price") return (b.price || 0) - (a.price || 0);
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+    return list;
+  }, [products, search, statusFilter, categoryFilter, sortBy]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  useEffect(() => setPage(1), [search, statusFilter, categoryFilter, sortBy]);
+
+  const resetForm = () => {
     setEditingProduct(null);
     setTitle("");
     setCategory("");
     setPrice("");
     setImageUrl("");
+    setDescription("");
     setTagsInput("");
+    setPublished(true);
+    setFeatured(false);
+    setInStock(true);
+  };
+
+  const handleOpenCreate = () => {
+    resetForm();
     setModalOpen(true);
   };
 
@@ -65,260 +114,267 @@ export default function AdminProducts() {
     setCategory(product.category || "");
     setPrice(product.price ? product.price.toString() : "");
     setImageUrl(product.image_url || "");
+    setDescription(product.description || "");
     setTagsInput(product.tags ? product.tags.join(", ") : "");
+    setPublished(product.published !== false);
+    setFeatured(!!product.featured);
+    setInStock(product.in_stock !== false);
     setModalOpen(true);
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this product?")) return;
-
+    if (!confirm("Delete this product permanently?")) return;
     try {
       const { error } = await supabase.from("products").delete().eq("id", id);
       if (error) throw error;
       setProducts(products.filter((p) => p.id !== id));
-    } catch (err) {
-      console.error("Error deleting product:", err);
-      alert("Failed to delete product. Please verify database table exists.");
+      toast("Product deleted");
+    } catch {
+      toast("Failed to delete product", "error");
+    }
+  };
+
+  const handleTogglePublish = async (product: Product) => {
+    const next = product.published === false;
+    try {
+      const { error } = await supabase.from("products").update({ published: next }).eq("id", product.id);
+      if (error) throw error;
+      setProducts(products.map((p) => (p.id === product.id ? { ...p, published: next } : p)));
+      toast(next ? "Product published" : "Product moved to draft");
+    } catch {
+      toast("Failed to update status", "error");
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title) return;
-
     setSubmitting(true);
-    const parsedTags = tagsInput
-      .split(",")
-      .map((t) => t.trim())
-      .filter((t) => t !== "");
 
+    const parsedTags = tagsInput.split(",").map((t) => t.trim()).filter(Boolean);
     const payload = {
       title,
       category: category || null,
       price: price ? parseFloat(price) : null,
       image_url: imageUrl || null,
+      description: description || null,
       tags: parsedTags,
+      published,
+      featured,
+      in_stock: inStock,
     };
 
     try {
       if (editingProduct) {
-        const { error } = await supabase
-          .from("products")
-          .update(payload)
-          .eq("id", editingProduct.id);
-
+        const { error } = await supabase.from("products").update(payload).eq("id", editingProduct.id);
         if (error) throw error;
+        toast("Product updated");
       } else {
         const { error } = await supabase.from("products").insert([payload]);
         if (error) throw error;
+        toast("Product created");
       }
-
       setModalOpen(false);
       fetchProducts();
-    } catch (err: any) {
-      console.error("Error saving product:", err);
-      alert(err.message || "Failed to save product. Please check database configuration.");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to save product";
+      toast(msg, "error");
     } finally {
       setSubmitting(false);
     }
   };
 
+  const statusTabs = [
+    { id: "all", label: "All", count: products.length },
+    { id: "published", label: "Published", count: products.filter((p) => p.published !== false).length },
+    { id: "draft", label: "Drafts", count: products.filter((p) => p.published === false).length },
+    { id: "featured", label: "Featured", count: products.filter((p) => p.featured).length },
+    { id: "out_of_stock", label: "Out of Stock", count: products.filter((p) => p.in_stock === false).length },
+  ];
+
   return (
-    <div className="flex flex-col gap-10">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div>
-          <span className="font-black text-[12px] uppercase tracking-widest text-primary">Catalog</span>
-          <h1 className="font-black text-[2.5rem] md:text-[3.2rem] leading-none tracking-[-0.05em] mt-3 mb-0">
-            Products Manager
-          </h1>
-          <p className="text-foreground/50 font-bold text-sm mt-2 mb-0">
-            Add, update, or remove furniture inventory items.
-          </p>
+    <div className="flex flex-col gap-8">
+      <AdminPageHeader
+        label="Catalog"
+        title="Products Manager"
+        description="Full CRUD for inventory — search, filter, draft/publish, and featured products."
+        actions={
+          <button
+            onClick={handleOpenCreate}
+            className="inline-flex h-11 items-center px-5 rounded-full bg-primary text-background font-black hover:opacity-90 active:scale-95 transition-all text-sm cursor-pointer shadow-md"
+          >
+            Add Product <Plus size={16} className="ml-2" />
+          </button>
+        }
+      />
+
+      <div className="flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
+        <AdminFilterTabs tabs={statusTabs} active={statusFilter} onChange={setStatusFilter} />
+        <div className="flex flex-wrap gap-3 items-center">
+          <AdminSearchBar value={search} onChange={setSearch} placeholder="Search products..." />
+          {categories.length > 0 && (
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="h-11 px-4 rounded-full border border-border bg-muted/50 text-sm font-bold focus:outline-none focus:border-primary"
+            >
+              <option value="all">All Categories</option>
+              {categories.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          )}
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+            className="h-11 px-4 rounded-full border border-border bg-muted/50 text-sm font-bold focus:outline-none focus:border-primary"
+          >
+            <option value="newest">Newest</option>
+            <option value="title">Title A–Z</option>
+            <option value="price">Price High–Low</option>
+          </select>
         </div>
-        <button
-          onClick={handleOpenCreate}
-          className="inline-flex h-12 items-center px-6 rounded-full bg-primary text-background font-black hover:opacity-90 active:scale-95 transition-all text-sm cursor-pointer shadow-md"
-        >
-          Add Product <Plus size={16} className="ml-2" />
-        </button>
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-24">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
-        </div>
-      ) : products.length === 0 ? (
-        <div className="bg-muted p-16 rounded-3xl border border-border/40 text-center">
-          <p className="text-foreground/60 text-lg font-bold m-0">No products found in the catalog.</p>
-        </div>
+        <AdminLoading />
+      ) : filtered.length === 0 ? (
+        <AdminEmptyState icon={Package} title="No products found" description="Adjust filters or add your first product." />
       ) : (
-        <div className="card-layered overflow-hidden shadow-xs border border-border/40">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-border bg-muted/50">
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Item</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Category</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Price</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Tags</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/40">
-                {products.map((p) => (
-                  <tr key={p.id} className="hover:bg-muted/10 transition-colors">
-                    <td className="p-5">
-                      <div className="flex items-center gap-4">
-                        {p.image_url ? (
-                          <div className="h-12 w-12 rounded-lg overflow-hidden relative border border-border bg-white">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={p.image_url} alt={p.title} className="object-cover h-full w-full" />
-                          </div>
-                        ) : (
-                          <div className="h-12 w-12 rounded-lg border border-border flex items-center justify-center text-xs font-bold text-foreground/40 bg-muted">
-                            No Img
-                          </div>
-                        )}
-                        <span className="font-bold text-base text-foreground">{p.title}</span>
-                      </div>
-                    </td>
-                    <td className="p-5 text-sm font-bold text-foreground/75 uppercase tracking-wide">
-                      {p.category || "—"}
-                    </td>
-                    <td className="p-5 text-sm font-bold text-primary">
-                      {p.price ? `$${p.price.toLocaleString()}` : "Contact for price"}
-                    </td>
-                    <td className="p-5 text-xs">
-                      <div className="flex flex-wrap gap-1.5">
-                        {p.tags?.map((t) => (
-                          <span key={t} className="bg-muted px-2.5 py-1 rounded-full text-foreground/60 font-bold uppercase tracking-wider">
-                            {t}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="p-5 text-right">
-                      <div className="flex justify-end gap-3">
-                        <button
-                          onClick={() => handleOpenEdit(p)}
-                          className="h-9 w-9 rounded-full flex items-center justify-center text-foreground/60 border border-border hover:bg-primary hover:text-background transition-colors cursor-pointer"
-                          aria-label="Edit product"
-                        >
-                          <Edit2 size={14} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(p.id)}
-                          className="h-9 w-9 rounded-full flex items-center justify-center text-red-500 border border-border hover:bg-red-50 transition-colors cursor-pointer"
-                          aria-label="Delete product"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </td>
+        <>
+          <div className="card-elevated overflow-hidden border border-border/40">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-border bg-muted/50">
+                    <th className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/45">Item</th>
+                    <th className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/45">Category</th>
+                    <th className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/45">Price</th>
+                    <th className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/45">Status</th>
+                    <th className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/45 text-right">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* Editor Modal */}
-      {modalOpen && (
-        <div
-          onClick={() => setModalOpen(false)}
-          className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-fade-in"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-lg bg-background rounded-3xl border border-border shadow-2xl overflow-hidden flex flex-col relative"
-          >
-            {/* Header */}
-            <div className="flex justify-between items-center p-6 border-b border-border">
-              <span className="font-black text-xl uppercase tracking-wider text-foreground">
-                {editingProduct ? "Edit Product" : "Create Product"}
-              </span>
-              <button
-                onClick={() => setModalOpen(false)}
-                className="h-10 w-10 flex items-center justify-center rounded-full bg-muted hover:bg-foreground/10 text-foreground transition-transform active:scale-90"
-              >
-                <X size={18} />
-              </button>
+                </thead>
+                <tbody className="divide-y divide-border/40">
+                  {paginated.map((p) => (
+                    <tr key={p.id} className="hover:bg-muted/10 transition-colors">
+                      <td className="p-4">
+                        <div className="flex items-center gap-3">
+                          {p.image_url ? (
+                            <div className="h-11 w-11 rounded-lg overflow-hidden border border-border bg-white shrink-0">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={p.image_url} alt={p.title} className="object-cover h-full w-full" />
+                            </div>
+                          ) : (
+                            <div className="h-11 w-11 rounded-lg border border-border flex items-center justify-center text-[10px] font-bold text-foreground/40 bg-muted shrink-0">—</div>
+                          )}
+                          <div>
+                            <span className="font-bold text-sm text-foreground flex items-center gap-1.5">
+                              {p.title}
+                              {p.featured && <Star size={12} className="fill-amber-400 text-amber-400" />}
+                            </span>
+                            {p.tags?.length > 0 && (
+                              <span className="text-[10px] text-foreground/45 font-bold">{p.tags.slice(0, 2).join(" · ")}</span>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-4 text-xs font-bold text-foreground/70 uppercase">{p.category || "—"}</td>
+                      <td className="p-4 text-sm font-bold text-primary">
+                        {p.price ? `$${p.price.toLocaleString()}` : "Quote"}
+                      </td>
+                      <td className="p-4">
+                        <div className="flex flex-col gap-1">
+                          <button
+                            onClick={() => handleTogglePublish(p)}
+                            className={`inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider cursor-pointer w-fit ${
+                              p.published !== false ? "text-emerald-600" : "text-foreground/40"
+                            }`}
+                          >
+                            {p.published !== false ? <><Eye size={12} /> Live</> : <><EyeOff size={12} /> Draft</>}
+                          </button>
+                          {p.in_stock === false && (
+                            <span className="text-[10px] font-bold text-rose-500 uppercase">Out of stock</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="p-4 text-right">
+                        <div className="flex justify-end gap-2">
+                          <button onClick={() => handleOpenEdit(p)} className="h-8 w-8 rounded-full flex items-center justify-center text-foreground/60 border border-border hover:bg-primary hover:text-background transition-colors cursor-pointer" aria-label="Edit">
+                            <Edit2 size={13} />
+                          </button>
+                          <button onClick={() => handleDelete(p.id)} className="h-8 w-8 rounded-full flex items-center justify-center text-rose-500 border border-border hover:bg-rose-50 transition-colors cursor-pointer" aria-label="Delete">
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="p-6 md:p-8 flex flex-col gap-6">
-              <div className="flex flex-col gap-2">
-                <label className="text-[11px] font-black uppercase tracking-widest text-foreground/40">Title</label>
-                <input
-                  required
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. Siam Teak Table"
-                  className="h-12 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-base transition-colors"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-6">
-                <div className="flex flex-col gap-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-foreground/40">Category</label>
-                  <input
-                    type="text"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    placeholder="e.g. Dining"
-                    className="h-12 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-base transition-colors"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-foreground/40">Price (USD)</label>
-                  <input
-                    type="number"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                    placeholder="e.g. 1200"
-                    className="h-12 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-base transition-colors"
-                  />
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label className="text-[11px] font-black uppercase tracking-widest text-foreground/40">Image URL</label>
-                <input
-                  type="text"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="e.g. /images/hero.png or external link"
-                  className="h-12 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-base transition-colors"
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label className="text-[11px] font-black uppercase tracking-widest text-foreground/40">
-                  Tags (comma-separated)
-                </label>
-                <input
-                  type="text"
-                  value={tagsInput}
-                  onChange={(e) => setTagsInput(e.target.value)}
-                  placeholder="e.g. Hardwood, Bespoke, Luxury"
-                  className="h-12 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-base transition-colors"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={submitting}
-                className="mt-4 h-14 bg-primary text-background font-black rounded-full flex items-center justify-center hover:opacity-90 active:scale-95 transition-all shadow-lg disabled:opacity-50 cursor-pointer"
-              >
-                {submitting ? "Saving..." : editingProduct ? "Update Catalog" : "Add to Catalog"}
-              </button>
-            </form>
           </div>
-        </div>
+
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-bold text-foreground/50 m-0">
+                Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
+              </p>
+              <div className="flex gap-2">
+                <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)} className="h-9 px-4 rounded-full border border-border text-sm font-bold disabled:opacity-40 cursor-pointer">Prev</button>
+                <button disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)} className="h-9 px-4 rounded-full border border-border text-sm font-bold disabled:opacity-40 cursor-pointer">Next</button>
+              </div>
+            </div>
+          )}
+        </>
       )}
+
+      <AdminModal open={modalOpen} onClose={() => setModalOpen(false)} title={editingProduct ? "Edit Product" : "Create Product"} size="lg">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Title</label>
+            <input required type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Siam Teak Table" className="h-11 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-sm" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Category</label>
+              <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} placeholder="Dining" className="h-11 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-sm" />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Price (USD)</label>
+              <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="1200" className="h-11 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-sm" />
+            </div>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Image URL</label>
+            <input type="text" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="/images/product.jpg" className="h-11 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-sm" />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Description</label>
+            <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Product description..." className="bg-transparent border border-border rounded-xl focus:border-foreground outline-none font-medium text-sm p-3 resize-none" />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Tags (comma-separated)</label>
+            <input type="text" value={tagsInput} onChange={(e) => setTagsInput(e.target.value)} placeholder="Hardwood, Bespoke" className="h-11 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-sm" />
+          </div>
+          <div className="flex flex-wrap gap-5">
+            <label className="flex items-center gap-2 text-sm font-bold cursor-pointer">
+              <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} className="h-4 w-4 rounded accent-primary" />
+              Published
+            </label>
+            <label className="flex items-center gap-2 text-sm font-bold cursor-pointer">
+              <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} className="h-4 w-4 rounded accent-primary" />
+              Featured
+            </label>
+            <label className="flex items-center gap-2 text-sm font-bold cursor-pointer">
+              <input type="checkbox" checked={inStock} onChange={(e) => setInStock(e.target.checked)} className="h-4 w-4 rounded accent-primary" />
+              In Stock
+            </label>
+          </div>
+          <button type="submit" disabled={submitting} className="h-12 bg-primary text-background font-black rounded-full hover:opacity-90 active:scale-95 transition-all disabled:opacity-50 cursor-pointer">
+            {submitting ? "Saving..." : editingProduct ? "Update Product" : "Create Product"}
+          </button>
+        </form>
+      </AdminModal>
     </div>
   );
 }

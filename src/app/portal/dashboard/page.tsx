@@ -1,371 +1,226 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { LogOut, Plus, X, ArrowUpRight } from "lucide-react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { Package, Heart, MessageSquare, Bell, ArrowUpRight, Plus, Star, Clock } from "lucide-react";
+import Image from "next/image";
 import { supabase } from "@/lib/supabase";
-
-interface Inquiry {
-  id: string;
-  subject: string;
-  message: string;
-  inquiry_type: string;
-  status: "new" | "in_progress" | "resolved";
-  created_at: string;
-}
-
-interface Enrollment {
-  id: string;
-  course_name: string;
-  sponsor: string;
-  message: string;
-  status: "pending" | "confirmed" | "cancelled";
-  created_at: string;
-}
+import { AdminModal } from "@/components/admin/ui/AdminModal";
+import { useToast } from "@/components/ui/Toast";
+import { getRecentlyViewed, type RecentProduct } from "@/lib/portal/recentlyViewed";
+import { formatPrice } from "@/lib/data/products";
+import type { Order, CustomerProfile } from "@/types/database";
 
 export default function PortalDashboard() {
-  const router = useRouter();
-  const [userEmail, setUserEmail] = useState<string>("");
-  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
-  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  const { toast } = useToast();
+  const [profile, setProfile] = useState<CustomerProfile | null>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [inquiryCount, setInquiryCount] = useState(0);
+  const [wishlistCount, setWishlistCount] = useState(0);
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [recentProducts, setRecentProducts] = useState<RecentProduct[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // New Inquiry Form State
   const [modalOpen, setModalOpen] = useState(false);
   const [subject, setSubject] = useState("");
-  const [inquiryType, setInquiryType] = useState("furniture");
   const [message, setMessage] = useState("");
-  const [phone, setPhone] = useState("");
-  const [formSubmitting, setFormSubmitting] = useState(false);
-  const [formSuccess, setFormSuccess] = useState(false);
+  const [inquiryType, setInquiryType] = useState("furniture");
 
-  const fetchDashboardData = useCallback(async (email: string) => {
-    try {
-      setLoading(true);
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
 
-      // Fetch inquiries
-      const { data: inqData, error: inqErr } = await supabase
-        .from("inquiries")
-        .select("*")
-        .eq("email", email)
-        .order("created_at", { ascending: false });
+    const email = session.user.email || "";
+    const [{ data: prof }, { data: ords }, { count: inqCount }, { count: wishCount }, { count: notifCount }] = await Promise.all([
+      supabase.from("customer_profiles").select("*").eq("id", session.user.id).maybeSingle(),
+      supabase.from("orders").select("*").eq("customer_email", email).order("created_at", { ascending: false }).limit(5),
+      supabase.from("inquiries").select("*", { count: "exact", head: true }).eq("email", email),
+      supabase.from("wishlist").select("*", { count: "exact", head: true }).eq("user_id", session.user.id),
+      supabase.from("notifications").select("*", { count: "exact", head: true }).eq("user_id", session.user.id).eq("read", false),
+    ]);
 
-      if (inqErr) throw inqErr;
-      setInquiries(inqData || []);
-
-      // Fetch enrollments
-      const { data: enrData, error: enrErr } = await supabase
-        .from("training_enrollments")
-        .select("*")
-        .eq("email", email)
-        .order("created_at", { ascending: false });
-
-      if (enrErr) throw enrErr;
-      setEnrollments(enrData || []);
-    } catch (err) {
-      console.error("Error fetching dashboard data:", err);
-    } finally {
-      setLoading(false);
-    }
+    setProfile(prof || {
+      id: session.user.id,
+      full_name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || email.split("@")[0],
+      email,
+      phone: null, avatar_url: session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture || null,
+      address: null, city: null, country: null, newsletter_subscribed: true, status: "active", created_at: new Date().toISOString(),
+    });
+    setOrders((ords || []).map(normalizeOrder));
+    setInquiryCount(inqCount || 0);
+    setWishlistCount(wishCount || 0);
+    setNotificationCount(notifCount || 0);
+    setRecentProducts(getRecentlyViewed());
+    setLoading(false);
   }, []);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        router.replace("/portal/login");
-      } else {
-        const email = session.user.email || "";
-        setUserEmail(email);
-        fetchDashboardData(email);
-      }
-    };
-    checkAuth();
-  }, [router, fetchDashboardData]);
+  useEffect(() => { loadData(); }, [loadData]);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.replace("/portal/login");
-  };
+  const normalizeOrder = (o: Record<string, unknown>): Order => ({
+    id: o.id as string, customer_id: o.customer_id as string | null,
+    customer_email: o.customer_email as string, customer_name: o.customer_name as string,
+    items: (o.items as Order["items"]) || [], subtotal: Number(o.subtotal), total: Number(o.total),
+    status: o.status as Order["status"], payment_status: o.payment_status as Order["payment_status"],
+    shipping_address: o.shipping_address as string | null, notes: o.notes as string | null,
+    created_at: o.created_at as string,
+  });
 
-  const handleNewInquiry = async (e: React.FormEvent) => {
+  const handleInquiry = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!subject || !message) return;
-
-    setFormSubmitting(true);
-    try {
-      const { error } = await supabase.from("inquiries").insert([
-        {
-          full_name: userEmail.split("@")[0], // Fallback name from email
-          email: userEmail,
-          phone: phone || null,
-          subject,
-          message,
-          inquiry_type: inquiryType,
-          status: "new",
-        },
-      ]);
-
-      if (error) throw error;
-
-      setFormSuccess(true);
-      setSubject("");
-      setMessage("");
-      setPhone("");
-      setInquiryType("furniture");
-      
-      // Refresh dashboard list
-      fetchDashboardData(userEmail);
-
-      setTimeout(() => {
-        setFormSuccess(false);
-        setModalOpen(false);
-      }, 3000);
-    } catch (err) {
-      console.error("Error creating inquiry:", err);
-      alert("Failed to submit inquiry. Please try again.");
-    } finally {
-      setFormSubmitting(false);
-    }
+    if (!profile) return;
+    await supabase.from("inquiries").insert([{
+      full_name: profile.full_name || profile.email.split("@")[0],
+      email: profile.email, subject, message, inquiry_type: inquiryType, status: "new",
+    }]);
+    setModalOpen(false);
+    setSubject(""); setMessage("");
+    toast("Inquiry submitted — we'll respond soon!");
+    loadData();
   };
 
-  const getInquiryStatusStyle = (status: string) => {
-    switch (status) {
-      case "resolved":
-        return "bg-green-100 text-green-800";
-      case "in_progress":
-        return "bg-yellow-100 text-yellow-800";
-      default:
-        return "bg-blue-100 text-blue-800";
-    }
+  const formatPrice = (n: number) =>
+    new Intl.NumberFormat("en-RW", { style: "currency", currency: "RWF", maximumFractionDigits: 0 }).format(n);
+
+  const statusColors: Record<string, string> = {
+    pending: "bg-blue-100 text-blue-800", confirmed: "bg-indigo-100 text-indigo-800",
+    processing: "bg-amber-100 text-amber-800", shipped: "bg-purple-100 text-purple-800",
+    delivered: "bg-emerald-100 text-emerald-800",
   };
 
-  const getEnrollmentStatusStyle = (status: string) => {
-    switch (status) {
-      case "confirmed":
-        return "bg-green-100 text-green-800";
-      case "cancelled":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-yellow-100 text-yellow-800";
-    }
-  };
+  if (loading) {
+    return (
+      <div className="flex justify-center py-24">
+        <div className="h-9 w-9 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-background min-h-screen relative text-foreground pt-32 pb-24 px-6 md:px-12 lg:px-16 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto">
-        {/* Header Row */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-8 border-b border-border">
-          <div>
-            <span className="font-black text-[12px] uppercase tracking-widest text-primary">Customer Portal</span>
-            <h1 className="font-black text-[2.5rem] md:text-[3.2rem] leading-none tracking-[-0.05em] mt-3 mb-0">
-              Welcome Back.
-            </h1>
-            <p className="text-foreground/50 font-bold text-sm mt-2 mb-0">Logged in as {userEmail}</p>
-          </div>
-          <div className="flex gap-4">
-            <button
-              onClick={() => setModalOpen(true)}
-              className="inline-flex h-12 items-center px-6 rounded-full bg-primary text-background font-black hover:opacity-90 active:scale-95 transition-all text-sm group cursor-pointer shadow-md"
-            >
-              New Inquiry <Plus size={16} className="ml-2" />
-            </button>
-            <button
-              onClick={handleLogout}
-              className="inline-flex h-12 items-center px-6 rounded-full bg-muted border border-border text-foreground font-black hover:bg-foreground/5 active:scale-95 transition-all text-sm cursor-pointer"
-            >
-              Sign Out <LogOut size={16} className="ml-2" />
-            </button>
-          </div>
-        </div>
+    <div className="flex flex-col gap-8 max-w-5xl">
+      {/* Welcome */}
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+        <span className="font-bold text-[11px] uppercase tracking-widest text-primary">Dashboard</span>
+        <h1 className="font-black text-[2rem] md:text-[2.6rem] leading-none tracking-[-0.04em] mt-2 mb-0">
+          Welcome back, {profile?.full_name?.split(" ")[0] || "there"}.
+        </h1>
+        <p className="text-foreground/50 text-sm mt-2 font-medium">{profile?.email}</p>
+      </motion.div>
 
-        {loading ? (
-          <div className="flex justify-center py-24">
-            <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 py-16">
-            {/* Inquiries Panel */}
-            <div className="flex flex-col gap-8">
-              <div className="flex items-center gap-3">
-                <span className="w-2 h-2 rounded-full bg-primary block" />
-                <h2 className="font-black text-2xl tracking-tight m-0">Inquiries ({inquiries.length})</h2>
-              </div>
-
-              {inquiries.length === 0 ? (
-                <div className="bg-muted p-10 rounded-2xl border border-border/40 text-center">
-                  <p className="text-foreground/50 text-base font-bold m-0">No inquiries found. Click &quot;New Inquiry&quot; to submit one.</p>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-6">
-                  {inquiries.map((inq) => (
-                    <div key={inq.id} className="card-layered p-8 flex flex-col gap-4 shadow-xs">
-                      <div className="flex justify-between items-start gap-4">
-                        <span className="font-black text-xl tracking-tight text-foreground line-clamp-1">{inq.subject || "Untitled Inquiry"}</span>
-                        <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${getInquiryStatusStyle(inq.status)}`}>
-                          {inq.status}
-                        </span>
-                      </div>
-                      <p className="text-sm text-foreground/70 leading-relaxed m-0 line-clamp-3">{inq.message}</p>
-                      <div className="flex justify-between items-center border-t border-border/40 pt-4 mt-2">
-                        <span className="text-[10px] font-black text-foreground/40 uppercase tracking-wider">
-                          Type: {inq.inquiry_type}
-                        </span>
-                        <span className="text-[10px] font-black text-foreground/40 uppercase tracking-wider">
-                          {new Date(inq.created_at).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Enrollments Panel */}
-            <div className="flex flex-col gap-8">
-              <div className="flex items-center gap-3">
-                <span className="w-2 h-2 rounded-full bg-primary block" />
-                <h2 className="font-black text-2xl tracking-tight m-0">Training Enrollments ({enrollments.length})</h2>
-              </div>
-
-              {enrollments.length === 0 ? (
-                <div className="bg-muted p-10 rounded-2xl border border-border/40 text-center">
-                  <p className="text-foreground/50 text-base font-bold m-0">No course enrollments found under this email.</p>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-6">
-                  {enrollments.map((enr) => (
-                    <div key={enr.id} className="card-layered p-8 flex flex-col gap-4 shadow-xs">
-                      <div className="flex justify-between items-start gap-4">
-                        <span className="font-black text-xl tracking-tight text-foreground line-clamp-1">{enr.course_name}</span>
-                        <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${getEnrollmentStatusStyle(enr.status)}`}>
-                          {enr.status}
-                        </span>
-                      </div>
-                      {enr.message && <p className="text-sm text-foreground/70 leading-relaxed m-0">{enr.message}</p>}
-                      <div className="flex justify-between items-center border-t border-border/40 pt-4 mt-2">
-                        <span className="text-[10px] font-black text-foreground/40 uppercase tracking-wider">
-                          Sponsor: {enr.sponsor || "None"}
-                        </span>
-                        <span className="text-[10px] font-black text-foreground/40 uppercase tracking-wider">
-                          {new Date(enr.created_at).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: "Orders", value: orders.length, icon: Package, href: "/portal/orders", color: "text-primary" },
+          { label: "Wishlist", value: wishlistCount, icon: Heart, href: "/portal/wishlist", color: "text-rose-500" },
+          { label: "Inquiries", value: inquiryCount, icon: MessageSquare, href: "#", color: "text-blue-600" },
+          { label: "Notifications", value: notificationCount, icon: Bell, href: "/portal/dashboard", color: "text-amber-600" },
+        ].map((stat, i) => {
+          const Icon = stat.icon;
+          return (
+            <motion.div key={stat.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}>
+              <Link href={stat.href} className="card-elevated p-5 flex flex-col gap-3 no-underline text-foreground hover:shadow-md transition-shadow block">
+                <Icon size={18} className={stat.color} />
+                <p className="font-black text-2xl m-0">{stat.value}</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/45 m-0">{stat.label}</p>
+              </Link>
+            </motion.div>
+          );
+        })}
       </div>
 
-      {/* New Inquiry Modal */}
-      {modalOpen && (
-        <div
-          onClick={() => setModalOpen(false)}
-          className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-fade-in"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-lg bg-background rounded-3xl border border-border shadow-2xl overflow-hidden flex flex-col relative"
-          >
-            {/* Header */}
-            <div className="flex justify-between items-center p-6 border-b border-border">
-              <span className="font-black text-xl uppercase tracking-wider text-foreground">New CRM Inquiry</span>
-              <button
-                onClick={() => setModalOpen(false)}
-                className="h-10 w-10 flex items-center justify-center rounded-full bg-muted hover:bg-foreground/10 text-foreground transition-transform active:scale-90"
-              >
-                <X size={18} />
-              </button>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent orders */}
+        <div className="card-elevated p-6">
+          <div className="flex justify-between items-center mb-5">
+            <h2 className="font-black text-sm uppercase tracking-wide m-0">Recent Orders</h2>
+            <Link href="/portal/orders" className="text-xs font-bold text-primary no-underline">View all</Link>
+          </div>
+          {orders.length === 0 ? (
+            <p className="text-sm text-foreground/50 py-6 text-center">No orders yet. Browse our <Link href="/products" className="text-primary">products</Link>.</p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {orders.slice(0, 3).map((order) => (
+                <div key={order.id} className="flex justify-between items-center p-3 rounded-xl bg-muted/50">
+                  <div>
+                    <p className="font-bold text-sm m-0">#{order.id.slice(0, 8)}</p>
+                    <p className="text-xs text-foreground/45 m-0">{new Date(order.created_at).toLocaleDateString()}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-black text-sm text-primary m-0">{formatPrice(order.total)}</p>
+                    <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${statusColors[order.status] || "bg-muted text-foreground"}`}>{order.status}</span>
+                  </div>
+                </div>
+              ))}
             </div>
+          )}
+        </div>
 
-            {/* Content / Form */}
-            {formSuccess ? (
-              <div className="p-12 text-center flex flex-col items-center justify-center gap-4">
-                <div className="h-14 w-14 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
-                  <Plus className="rotate-45" size={24} />
+        {/* Quick actions */}
+        <div className="card-elevated p-6">
+          <h2 className="font-black text-sm uppercase tracking-wide m-0 mb-5">Quick Actions</h2>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { label: "New Inquiry", action: () => setModalOpen(true), icon: Plus },
+              { label: "Browse Products", href: "/products", icon: Package },
+              { label: "My Wishlist", href: "/portal/wishlist", icon: Heart },
+              { label: "Leave Review", href: "/portal/support", icon: Star },
+            ].map((item) => {
+              const Icon = item.icon;
+              const cls = "flex flex-col items-center gap-2 p-4 rounded-xl bg-muted hover:bg-primary hover:text-background transition-all cursor-pointer text-foreground no-underline";
+              return item.href ? (
+                <Link key={item.label} href={item.href} className={cls}><Icon size={18} /><span className="text-[10px] font-bold uppercase tracking-wider text-center">{item.label}</span></Link>
+              ) : (
+                <button key={item.label} onClick={item.action} className={cls}><Icon size={18} /><span className="text-[10px] font-bold uppercase tracking-wider">{item.label}</span></button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Recently viewed */}
+      {recentProducts.length > 0 && (
+        <div className="card-elevated p-6">
+          <div className="flex justify-between items-center mb-5">
+            <h2 className="font-black text-sm uppercase tracking-wide m-0 flex items-center gap-2"><Clock size={16} /> Recently Viewed</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {recentProducts.slice(0, 4).map((p) => (
+              <Link key={p.id} href={`/products/${p.id}`} className="group block no-underline text-foreground">
+                <div className="relative aspect-square rounded-xl overflow-hidden bg-muted mb-2">
+                  <Image src={p.image_url} alt={p.title} fill sizes="120px" className="object-cover group-hover:scale-105 transition-transform" />
                 </div>
-                <h4 className="font-black text-2xl text-foreground">Inquiry Submitted</h4>
-                <p className="text-foreground/60 text-base max-w-xs m-0">
-                  Your inquiry has been created successfully. The team will get back to you shortly.
-                </p>
-              </div>
-            ) : (
-              <form onSubmit={handleNewInquiry} className="p-6 md:p-8 flex flex-col gap-6">
-                <div className="flex flex-col gap-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-foreground/40">
-                    Subject
-                  </label>
-                  <input
-                    required
-                    type="text"
-                    value={subject}
-                    onChange={(e) => setSubject(e.target.value)}
-                    placeholder="e.g. Requesting custom dining table pricing"
-                    className="h-12 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-base transition-colors"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/40">
-                      Phone Number (Optional)
-                    </label>
-                    <input
-                      type="text"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="e.g. +1 555-0199"
-                      className="h-12 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-base transition-colors"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/40">
-                      Inquiry Type
-                    </label>
-                    <select
-                      value={inquiryType}
-                      onChange={(e) => setInquiryType(e.target.value)}
-                      className="h-12 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-base transition-colors cursor-pointer appearance-none"
-                    >
-                      <option value="furniture">Furniture Inquiry</option>
-                      <option value="custom_order">Custom Order</option>
-                      <option value="training">Carpentry Training</option>
-                      <option value="general">General Inquiry</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-foreground/40">
-                    Message
-                  </label>
-                  <textarea
-                    required
-                    rows={4}
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Provide specific details about your request..."
-                    className="bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-base transition-colors resize-none py-2"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={formSubmitting}
-                  className="mt-4 h-14 bg-primary text-background font-black rounded-full flex items-center justify-center hover:opacity-90 active:scale-95 transition-all shadow-lg disabled:opacity-50 cursor-pointer"
-                >
-                  {formSubmitting ? "Submitting..." : "Send Inquiry"}
-                  <ArrowUpRight size={18} className="ml-2" />
-                </button>
-              </form>
-            )}
+                <p className="font-bold text-xs m-0 line-clamp-1 group-hover:text-primary">{p.title}</p>
+                <p className="text-[10px] font-bold text-primary m-0">{formatPrice(p.price)}</p>
+              </Link>
+            ))}
           </div>
         </div>
       )}
+
+      {/* Recommended */}
+      <div className="card-elevated p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="font-black text-sm uppercase tracking-wide m-0">Recommended for You</h2>
+          <Link href="/products" className="inline-flex items-center gap-1 text-xs font-bold text-primary no-underline">
+            Shop all <ArrowUpRight size={14} />
+          </Link>
+        </div>
+        <p className="text-sm text-foreground/50 m-0">Explore our latest handcrafted furniture collections.</p>
+      </div>
+
+      <AdminModal open={modalOpen} onClose={() => setModalOpen(false)} title="New Support Inquiry">
+        <form onSubmit={handleInquiry} className="flex flex-col gap-4">
+          <input required placeholder="Subject" value={subject} onChange={(e) => setSubject(e.target.value)} className="h-11 px-4 rounded-xl border border-border bg-muted/50 text-sm font-medium focus:outline-none focus:border-primary" />
+          <select value={inquiryType} onChange={(e) => setInquiryType(e.target.value)} className="h-11 px-4 rounded-xl border border-border bg-muted/50 text-sm font-medium cursor-pointer">
+            <option value="furniture">Furniture Inquiry</option>
+            <option value="custom_order">Custom Order</option>
+            <option value="training">Training</option>
+            <option value="general">General</option>
+          </select>
+          <textarea required placeholder="Your message..." value={message} onChange={(e) => setMessage(e.target.value)} rows={4} className="px-4 py-3 rounded-xl border border-border bg-muted/50 text-sm focus:outline-none focus:border-primary resize-y" />
+          <button type="submit" className="h-11 rounded-full bg-primary text-background font-bold hover:opacity-90 cursor-pointer">Send Inquiry</button>
+        </form>
+      </AdminModal>
     </div>
   );
 }

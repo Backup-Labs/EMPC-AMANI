@@ -1,32 +1,38 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, X, Eye, EyeOff } from "lucide-react";
+import React, { useState, useEffect, useMemo } from "react";
+import { Plus, Edit2, Trash2, Eye, EyeOff, ExternalLink, BookOpen } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-
-interface Post {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string;
-  content: string;
-  cover_image: string;
-  published: boolean;
-  created_at: string;
-}
+import { AdminPageHeader } from "@/components/admin/ui/AdminPageHeader";
+import { AdminModal } from "@/components/admin/ui/AdminModal";
+import { AdminSearchBar } from "@/components/admin/ui/AdminSearchBar";
+import { AdminFilterTabs } from "@/components/admin/ui/AdminFilterTabs";
+import { AdminLoading } from "@/components/admin/ui/AdminLoading";
+import { AdminEmptyState } from "@/components/admin/ui/AdminEmptyState";
+import { useToast } from "@/components/ui/Toast";
+import type { Post } from "@/types/database";
 
 export default function AdminPosts() {
+  const { toast } = useToast();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
 
-  // Form/Modal state
   const [modalOpen, setModalOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
+  const [postType, setPostType] = useState<"internal" | "external">("internal");
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [excerpt, setExcerpt] = useState("");
   const [content, setContent] = useState("");
   const [coverImage, setCoverImage] = useState("");
+  const [externalUrl, setExternalUrl] = useState("");
+  const [externalSource, setExternalSource] = useState("");
+  const [category, setCategory] = useState("");
+  const [tagsInput, setTagsInput] = useState("");
+  const [author, setAuthor] = useState("");
+  const [scheduledAt, setScheduledAt] = useState("");
   const [published, setPublished] = useState(false);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -38,253 +44,272 @@ export default function AdminPosts() {
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("posts")
-        .select("*")
-        .order("created_at", { ascending: false });
-
+      const { data, error } = await supabase.from("posts").select("*").order("created_at", { ascending: false });
       if (error) throw error;
       setPosts(data || []);
     } catch (err) {
       console.error("Error loading posts:", err);
+      toast("Failed to load posts", "error");
     } finally {
       setLoading(false);
     }
   };
 
+  const filtered = useMemo(() => {
+    let list = [...posts];
+    if (search) {
+      const q = search.toLowerCase();
+      list = list.filter(
+        (p) =>
+          p.title.toLowerCase().includes(q) ||
+          p.category?.toLowerCase().includes(q) ||
+          p.external_source?.toLowerCase().includes(q)
+      );
+    }
+    if (typeFilter === "internal") list = list.filter((p) => (p.post_type || "internal") === "internal");
+    if (typeFilter === "external") list = list.filter((p) => p.post_type === "external");
+    if (typeFilter === "published") list = list.filter((p) => p.published);
+    if (typeFilter === "draft") list = list.filter((p) => !p.published);
+    return list;
+  }, [posts, search, typeFilter]);
+
+  const typeTabs = [
+    { id: "all", label: "All", count: posts.length },
+    { id: "internal", label: "Blog", count: posts.filter((p) => (p.post_type || "internal") === "internal").length },
+    { id: "external", label: "Media", count: posts.filter((p) => p.post_type === "external").length },
+    { id: "published", label: "Live", count: posts.filter((p) => p.published).length },
+    { id: "draft", label: "Drafts", count: posts.filter((p) => !p.published).length },
+  ];
+
   const handleTitleChange = (val: string) => {
     setTitle(val);
     if (!editingPost) {
-      // Auto-generate slug for new posts
-      const generated = val
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, "")
-        .replace(/\s+/g, "-")
-        .trim();
-      setSlug(generated);
+      setSlug(val.toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").trim());
     }
   };
 
-  const handleOpenCreate = () => {
+  const resetForm = () => {
     setEditingPost(null);
+    setPostType("internal");
     setTitle("");
     setSlug("");
     setExcerpt("");
     setContent("");
     setCoverImage("");
+    setExternalUrl("");
+    setExternalSource("");
+    setCategory("");
+    setTagsInput("");
+    setAuthor("");
+    setScheduledAt("");
     setPublished(false);
     setUploadFile(null);
+  };
+
+  const handleOpenCreate = (type: "internal" | "external" = "internal") => {
+    resetForm();
+    setPostType(type);
     setModalOpen(true);
   };
 
   const handleOpenEdit = (post: Post) => {
     setEditingPost(post);
+    setPostType(post.post_type || "internal");
     setTitle(post.title);
     setSlug(post.slug);
     setExcerpt(post.excerpt || "");
     setContent(post.content || "");
     setCoverImage(post.cover_image || "");
+    setExternalUrl(post.external_url || "");
+    setExternalSource(post.external_source || "");
+    setCategory(post.category || "");
+    setTagsInput(post.tags?.join(", ") || "");
+    setAuthor(post.author || "");
+    setScheduledAt(post.scheduled_at ? post.scheduled_at.slice(0, 16) : "");
     setPublished(post.published || false);
     setUploadFile(null);
     setModalOpen(true);
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this post?")) return;
-
+    if (!confirm("Delete this post?")) return;
     try {
       const { error } = await supabase.from("posts").delete().eq("id", id);
       if (error) throw error;
       setPosts(posts.filter((p) => p.id !== id));
-    } catch (err) {
-      console.error("Error deleting post:", err);
-      alert("Failed to delete post.");
+      toast("Post deleted");
+    } catch {
+      toast("Failed to delete post", "error");
     }
   };
 
   const handleTogglePublish = async (id: string, currentStatus: boolean) => {
     try {
-      const { error } = await supabase
-        .from("posts")
-        .update({ published: !currentStatus })
-        .eq("id", id);
-
+      const { error } = await supabase.from("posts").update({ published: !currentStatus }).eq("id", id);
       if (error) throw error;
-
-      setPosts(
-        posts.map((p) =>
-          p.id === id ? { ...p, published: !currentStatus } : p
-        )
-      );
-    } catch (err) {
-      console.error("Error toggling publish status:", err);
-      alert("Failed to toggle publish status.");
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setUploadFile(e.target.files[0]);
+      setPosts(posts.map((p) => (p.id === id ? { ...p, published: !currentStatus } : p)));
+      toast(!currentStatus ? "Post published" : "Post unpublished");
+    } catch {
+      toast("Failed to update status", "error");
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title || !slug || !content) return;
+    if (!title || !slug) return;
+    if (postType === "internal" && !content) return;
+    if (postType === "external" && !externalUrl) return;
 
     setSubmitting(true);
     let currentCoverUrl = coverImage;
 
     try {
-      // 1. Optional storage file upload using Cloudinary API route
       if (uploadFile) {
         const formData = new FormData();
         formData.append("file", uploadFile);
-
-        const res = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-
+        const res = await fetch("/api/upload", { method: "POST", body: formData });
         if (!res.ok) {
           const errorData = await res.json();
-          throw new Error(errorData.error || "Failed to upload cover image to Cloudinary.");
+          throw new Error(errorData.error || "Failed to upload cover image.");
         }
-
         const data = await res.json();
         currentCoverUrl = data.url;
       }
 
+      const parsedTags = tagsInput.split(",").map((t) => t.trim()).filter(Boolean);
       const payload = {
         title,
         slug,
         excerpt: excerpt || null,
-        content,
+        content: postType === "external" ? (content || excerpt || title) : content,
         cover_image: currentCoverUrl || null,
-        published,
+        published: scheduledAt ? false : published,
+        post_type: postType,
+        external_url: postType === "external" ? externalUrl : null,
+        external_source: postType === "external" ? externalSource || null : null,
+        category: category || null,
+        tags: parsedTags,
+        author: author || null,
+        scheduled_at: scheduledAt ? new Date(scheduledAt).toISOString() : null,
       };
 
       if (editingPost) {
-        const { error } = await supabase
-          .from("posts")
-          .update(payload)
-          .eq("id", editingPost.id);
-
+        const { error } = await supabase.from("posts").update(payload).eq("id", editingPost.id);
         if (error) throw error;
+        toast("Post updated");
       } else {
         const { error } = await supabase.from("posts").insert([payload]);
         if (error) throw error;
+        toast(scheduledAt ? "Post scheduled" : published ? "Post published" : "Draft saved");
       }
 
       setModalOpen(false);
       fetchPosts();
-    } catch (err: any) {
-      console.error("Error saving post:", err);
-      alert(err.message || "Failed to save post. Verify database table schema and unique slug.");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to save post";
+      toast(msg, "error");
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="flex flex-col gap-10">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div>
-          <span className="font-black text-[12px] uppercase tracking-widest text-primary">Content</span>
-          <h1 className="font-black text-[2.5rem] md:text-[3.2rem] leading-none tracking-[-0.05em] mt-3 mb-0">
-            News & Blog Manager
-          </h1>
-          <p className="text-foreground/50 font-bold text-sm mt-2 mb-0">
-            Create, edit, and publish posts to the EMPC stories section.
-          </p>
-        </div>
-        <button
-          onClick={handleOpenCreate}
-          className="inline-flex h-12 items-center px-6 rounded-full bg-primary text-background font-black hover:opacity-90 active:scale-95 transition-all text-sm cursor-pointer shadow-md"
-        >
-          New Post <Plus size={16} className="ml-2" />
-        </button>
+    <div className="flex flex-col gap-8">
+      <AdminPageHeader
+        label="Content"
+        title="News & Blog Manager"
+        description="Internal articles, external media coverage, scheduling, and draft/publish workflow."
+        actions={
+          <div className="flex flex-wrap gap-2">
+            <button onClick={() => handleOpenCreate("internal")} className="inline-flex h-11 items-center px-5 rounded-full bg-primary text-background font-black hover:opacity-90 text-sm cursor-pointer shadow-md">
+              New Article <Plus size={16} className="ml-2" />
+            </button>
+            <button onClick={() => handleOpenCreate("external")} className="inline-flex h-11 items-center px-5 rounded-full border-2 border-primary text-primary font-black hover:bg-primary/5 text-sm cursor-pointer">
+              Add Media Link <ExternalLink size={16} className="ml-2" />
+            </button>
+          </div>
+        }
+      />
+
+      <div className="flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
+        <AdminFilterTabs tabs={typeTabs} active={typeFilter} onChange={setTypeFilter} />
+        <AdminSearchBar value={search} onChange={setSearch} placeholder="Search posts..." />
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-24">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
-        </div>
-      ) : posts.length === 0 ? (
-        <div className="bg-muted p-16 rounded-3xl border border-border/40 text-center">
-          <p className="text-foreground/60 text-lg font-bold m-0">No posts in the database yet.</p>
-        </div>
+        <AdminLoading />
+      ) : filtered.length === 0 ? (
+        <AdminEmptyState icon={BookOpen} title="No posts yet" description="Create a blog article or add external media coverage." />
       ) : (
-        <div className="card-layered overflow-hidden shadow-xs border border-border/40">
+        <div className="card-elevated overflow-hidden border border-border/40">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-border bg-muted/50">
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Post</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Slug</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Created At</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Status</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45 text-right">Actions</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/45">Post</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/45">Type</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/45">Date</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/45">Status</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/45 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/40">
-                {posts.map((post) => (
+                {filtered.map((post) => (
                   <tr key={post.id} className="hover:bg-muted/10 transition-colors">
-                    <td className="p-5">
-                      <div className="flex items-center gap-4">
+                    <td className="p-4">
+                      <div className="flex items-center gap-3">
                         {post.cover_image ? (
-                          <div className="h-12 w-16 rounded-lg overflow-hidden relative border border-border bg-white">
+                          <div className="h-11 w-14 rounded-lg overflow-hidden border border-border bg-white shrink-0">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={post.cover_image} alt={post.title} className="object-cover h-full w-full" />
                           </div>
                         ) : (
-                          <div className="h-12 w-16 rounded-lg border border-border flex items-center justify-center text-xs font-bold text-foreground/40 bg-muted">
-                            Text
+                          <div className="h-11 w-14 rounded-lg border border-border flex items-center justify-center text-[10px] font-bold text-foreground/40 bg-muted shrink-0">
+                            {post.post_type === "external" ? "🔗" : "📝"}
                           </div>
                         )}
-                        <div className="flex flex-col">
-                          <span className="font-bold text-base text-foreground leading-snug">{post.title}</span>
-                          <span className="text-[11px] text-foreground/50 line-clamp-1">{post.excerpt}</span>
+                        <div>
+                          <span className="font-bold text-sm text-foreground">{post.title}</span>
+                          {post.external_source && (
+                            <span className="block text-[10px] text-foreground/45 font-bold">{post.external_source}</span>
+                          )}
                         </div>
                       </div>
                     </td>
-                    <td className="p-5 text-sm font-mono text-foreground/60">{post.slug}</td>
-                    <td className="p-5 text-sm font-bold text-foreground/75">
-                      {new Date(post.created_at).toLocaleDateString()}
+                    <td className="p-4">
+                      <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-full ${
+                        post.post_type === "external" ? "bg-indigo-100 text-indigo-700" : "bg-muted text-foreground/60"
+                      }`}>
+                        {post.post_type === "external" ? "Media" : "Blog"}
+                      </span>
                     </td>
-                    <td className="p-5">
+                    <td className="p-4 text-xs font-bold text-foreground/70">
+                      {post.scheduled_at && !post.published
+                        ? `Scheduled ${new Date(post.scheduled_at).toLocaleDateString()}`
+                        : new Date(post.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="p-4">
                       <button
                         onClick={() => handleTogglePublish(post.id, post.published)}
-                        className={`inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider cursor-pointer ${
-                          post.published ? "text-primary animate-pulse-once" : "text-foreground/40"
+                        className={`inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider cursor-pointer ${
+                          post.published ? "text-emerald-600" : "text-foreground/40"
                         }`}
                       >
-                        {post.published ? (
-                          <>
-                            <Eye size={14} /> Live
-                          </>
-                        ) : (
-                          <>
-                            <EyeOff size={14} /> Draft
-                          </>
-                        )}
+                        {post.published ? <><Eye size={12} /> Live</> : <><EyeOff size={12} /> Draft</>}
                       </button>
                     </td>
-                    <td className="p-5 text-right">
-                      <div className="flex justify-end gap-3">
-                        <button
-                          onClick={() => handleOpenEdit(post)}
-                          className="h-9 w-9 rounded-full flex items-center justify-center text-foreground/60 border border-border hover:bg-primary hover:text-background transition-colors cursor-pointer"
-                          aria-label="Edit post"
-                        >
-                          <Edit2 size={14} />
+                    <td className="p-4 text-right">
+                      <div className="flex justify-end gap-2">
+                        {post.external_url && (
+                          <a href={post.external_url} target="_blank" rel="noopener noreferrer" className="h-8 w-8 rounded-full flex items-center justify-center text-indigo-600 border border-border hover:bg-indigo-50 transition-colors" aria-label="Open external link">
+                            <ExternalLink size={13} />
+                          </a>
+                        )}
+                        <button onClick={() => handleOpenEdit(post)} className="h-8 w-8 rounded-full flex items-center justify-center text-foreground/60 border border-border hover:bg-primary hover:text-background transition-colors cursor-pointer" aria-label="Edit">
+                          <Edit2 size={13} />
                         </button>
-                        <button
-                          onClick={() => handleDelete(post.id)}
-                          className="h-9 w-9 rounded-full flex items-center justify-center text-red-500 border border-border hover:bg-red-50 transition-colors cursor-pointer"
-                          aria-label="Delete post"
-                        >
-                          <Trash2 size={14} />
+                        <button onClick={() => handleDelete(post.id)} className="h-8 w-8 rounded-full flex items-center justify-center text-rose-500 border border-border hover:bg-rose-50 transition-colors cursor-pointer" aria-label="Delete">
+                          <Trash2 size={13} />
                         </button>
                       </div>
                     </td>
@@ -296,131 +321,100 @@ export default function AdminPosts() {
         </div>
       )}
 
-      {/* Editor Modal */}
-      {modalOpen && (
-        <div
-          onClick={() => setModalOpen(false)}
-          className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-fade-in"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-2xl bg-background rounded-3xl border border-border shadow-2xl overflow-hidden flex flex-col relative max-h-[90vh]"
-          >
-            {/* Header */}
-            <div className="flex justify-between items-center p-6 border-b border-border">
-              <span className="font-black text-xl uppercase tracking-wider text-foreground">
-                {editingPost ? "Edit Blog Post" : "Create Blog Post"}
-              </span>
-              <button
-                onClick={() => setModalOpen(false)}
-                className="h-10 w-10 flex items-center justify-center rounded-full bg-muted hover:bg-foreground/10 text-foreground transition-transform active:scale-90"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="p-6 md:p-8 flex flex-col gap-6 overflow-y-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="flex flex-col gap-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-foreground/40">Title</label>
-                  <input
-                    required
-                    type="text"
-                    value={title}
-                    onChange={(e) => handleTitleChange(e.target.value)}
-                    placeholder="e.g. The Art of Modern Joinery"
-                    className="h-12 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-base transition-colors"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-foreground/40">Slug</label>
-                  <input
-                    required
-                    type="text"
-                    value={slug}
-                    onChange={(e) => setSlug(e.target.value)}
-                    placeholder="art-of-modern-joinery"
-                    className="h-12 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-base transition-colors"
-                  />
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label className="text-[11px] font-black uppercase tracking-widest text-foreground/40">Excerpt</label>
-                <input
-                  type="text"
-                  value={excerpt}
-                  onChange={(e) => setExcerpt(e.target.value)}
-                  placeholder="Summarize the article in one sentence..."
-                  className="h-12 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-base transition-colors"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="flex flex-col gap-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-foreground/40">
-                    Cover Image URL
-                  </label>
-                  <input
-                    type="text"
-                    value={coverImage}
-                    onChange={(e) => setCoverImage(e.target.value)}
-                    placeholder="/images/hero.png"
-                    className="h-12 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-base transition-colors"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-foreground/40">
-                    Upload Cover File (Optional)
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="mt-2 text-sm font-bold text-foreground/60 cursor-pointer file:cursor-pointer file:h-10 file:px-4 file:rounded-full file:border-0 file:bg-muted file:text-foreground file:font-black file:text-xs file:uppercase file:tracking-wide file:mr-4 hover:file:opacity-90"
-                  />
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label className="text-[11px] font-black uppercase tracking-widest text-foreground/40">Content (Markdown/HTML)</label>
-                <textarea
-                  required
-                  rows={8}
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder="Write the blog post contents..."
-                  className="bg-transparent border border-border rounded-xl focus:border-foreground outline-none font-bold text-sm transition-colors resize-none p-4"
-                />
-              </div>
-
-              <div className="flex items-center gap-3">
-                <input
-                  type="checkbox"
-                  id="published"
-                  checked={published}
-                  onChange={(e) => setPublished(e.target.checked)}
-                  className="h-4 w-4 rounded-sm border-border text-primary focus:ring-primary cursor-pointer"
-                />
-                <label htmlFor="published" className="text-sm font-bold text-foreground/75 cursor-pointer select-none">
-                  Publish article immediately
-                </label>
-              </div>
-
-              <button
-                type="submit"
-                disabled={submitting}
-                className="mt-4 h-14 bg-primary text-background font-black rounded-full flex items-center justify-center hover:opacity-90 active:scale-95 transition-all shadow-lg disabled:opacity-50 cursor-pointer"
-              >
-                {submitting ? "Saving..." : editingPost ? "Update Story" : "Publish Story"}
-              </button>
-            </form>
+      <AdminModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title={postType === "external" ? (editingPost ? "Edit Media Coverage" : "Add Media Coverage") : (editingPost ? "Edit Article" : "Create Article")}
+        size="xl"
+      >
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <div className="flex gap-2">
+            <button type="button" onClick={() => setPostType("internal")} className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider cursor-pointer ${postType === "internal" ? "bg-primary text-background" : "bg-muted text-foreground/60"}`}>
+              Internal Blog
+            </button>
+            <button type="button" onClick={() => setPostType("external")} className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider cursor-pointer ${postType === "external" ? "bg-primary text-background" : "bg-muted text-foreground/60"}`}>
+              External Media
+            </button>
           </div>
-        </div>
-      )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Title</label>
+              <input required type="text" value={title} onChange={(e) => handleTitleChange(e.target.value)} className="h-11 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-sm" />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Slug</label>
+              <input required type="text" value={slug} onChange={(e) => setSlug(e.target.value)} className="h-11 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-sm font-mono" />
+            </div>
+          </div>
+
+          {postType === "external" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl bg-indigo-50/50 border border-indigo-100">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-black uppercase tracking-widest text-indigo-700/70">External URL</label>
+                <input required type="url" value={externalUrl} onChange={(e) => setExternalUrl(e.target.value)} placeholder="https://..." className="h-11 bg-white border border-indigo-100 rounded-lg px-3 outline-none font-bold text-sm focus:border-indigo-400" />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-black uppercase tracking-widest text-indigo-700/70">Publication Name</label>
+                <input type="text" value={externalSource} onChange={(e) => setExternalSource(e.target.value)} placeholder="e.g. The New Times" className="h-11 bg-white border border-indigo-100 rounded-lg px-3 outline-none font-bold text-sm focus:border-indigo-400" />
+              </div>
+            </div>
+          )}
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Excerpt</label>
+            <input type="text" value={excerpt} onChange={(e) => setExcerpt(e.target.value)} className="h-11 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-sm" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Category</label>
+              <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} className="h-11 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-sm" />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Author</label>
+              <input type="text" value={author} onChange={(e) => setAuthor(e.target.value)} className="h-11 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-sm" />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Tags</label>
+              <input type="text" value={tagsInput} onChange={(e) => setTagsInput(e.target.value)} placeholder="craft, design" className="h-11 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-sm" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Cover Image URL</label>
+              <input type="text" value={coverImage} onChange={(e) => setCoverImage(e.target.value)} className="h-11 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-sm" />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Upload Cover</label>
+              <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && setUploadFile(e.target.files[0])} className="mt-2 text-xs font-bold file:h-9 file:px-3 file:rounded-full file:border-0 file:bg-muted file:font-black file:text-[10px] file:uppercase cursor-pointer" />
+            </div>
+          </div>
+
+          {postType === "internal" && (
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Content</label>
+              <textarea required rows={8} value={content} onChange={(e) => setContent(e.target.value)} className="bg-transparent border border-border rounded-xl focus:border-foreground outline-none font-medium text-sm p-4 resize-none" />
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Schedule Publish</label>
+              <input type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} className="h-11 px-3 rounded-xl border border-border bg-muted/30 font-bold text-sm focus:border-primary outline-none" />
+            </div>
+            <label className="flex items-center gap-2 text-sm font-bold cursor-pointer h-11">
+              <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} disabled={!!scheduledAt} className="h-4 w-4 rounded accent-primary" />
+              Publish immediately
+            </label>
+          </div>
+
+          <button type="submit" disabled={submitting} className="h-12 bg-primary text-background font-black rounded-full hover:opacity-90 active:scale-95 transition-all disabled:opacity-50 cursor-pointer">
+            {submitting ? "Saving..." : editingPost ? "Update" : scheduledAt ? "Schedule" : published ? "Publish" : "Save Draft"}
+          </button>
+        </form>
+      </AdminModal>
     </div>
   );
 }

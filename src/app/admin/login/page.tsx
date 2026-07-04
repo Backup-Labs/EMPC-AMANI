@@ -133,18 +133,19 @@ function AdminLoginForm() {
 
 export default function AdminLogin() {
   return (
-    <div className="min-h-screen bg-background flex flex-col justify-center items-center px-6 py-12">
-      <div className="w-full max-w-md card-layered p-10 md:p-12">
+    <div className="min-h-screen bg-background flex flex-col justify-center items-center px-6 py-12 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(10,12,130,0.05)_0%,transparent_50%)]" />
+      <div className="w-full max-w-md card-elevated p-10 md:p-12 relative z-10">
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <span className="w-2.5 h-2.5 rounded-full bg-primary block animate-pulse" />
-            <span className="font-black text-xs uppercase tracking-widest text-primary">EMPC Workspace</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 mb-4">
+            <span className="w-2 h-2 rounded-full bg-primary block animate-pulse" />
+            <span className="font-black text-[10px] uppercase tracking-widest text-primary">EMPC Workspace</span>
           </div>
-          <h2 className="font-black text-3xl tracking-tighter text-foreground m-0 uppercase">
-            Admin Portal
+          <h2 className="font-black text-3xl tracking-tight text-foreground m-0">
+            Staff Portal
           </h2>
-          <p className="text-foreground/50 text-sm mt-3 font-bold">
-            Log in to manage site content, inquiries, and enrollments.
+          <p className="text-foreground/50 text-sm mt-3 font-medium">
+            Secure access for administrators and content editors.
           </p>
         </div>
 

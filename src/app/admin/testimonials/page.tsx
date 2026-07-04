@@ -1,76 +1,73 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Check, Trash2, Star } from "lucide-react";
+import { Plus, Check, Trash2, Edit2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-
-interface Testimonial {
-  id: string;
-  name: string;
-  role: string;
-  message: string;
-  rating: number;
-  approved: boolean;
-  created_at: string;
-}
+import { AdminPageHeader } from "@/components/admin/ui/AdminPageHeader";
+import { AdminFilterTabs } from "@/components/admin/ui/AdminFilterTabs";
+import { AdminModal } from "@/components/admin/ui/AdminModal";
+import { AdminEmptyState } from "@/components/admin/ui/AdminEmptyState";
+import { AdminLoading } from "@/components/admin/ui/AdminLoading";
+import { StarRating } from "@/components/admin/ui/StarRating";
+import type { Testimonial } from "@/types/database";
 
 export default function AdminTestimonials() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<"all" | "pending" | "approved">("all");
+  const [filter, setFilter] = useState("all");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editing, setEditing] = useState<Testimonial | null>(null);
+  const [name, setName] = useState("");
+  const [role, setRole] = useState("");
+  const [message, setMessage] = useState("");
+  const [rating, setRating] = useState(5);
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchTestimonials();
-  }, []);
+  useEffect(() => { fetchTestimonials(); }, []);
 
   const fetchTestimonials = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("testimonials")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setTestimonials(data || []);
-    } catch (err) {
-      console.error("Error loading testimonials:", err);
-    } finally {
-      setLoading(false);
-    }
+    setLoading(true);
+    const { data } = await supabase.from("testimonials").select("*").order("created_at", { ascending: false });
+    setTestimonials(data || []);
+    setLoading(false);
   };
 
-  const handleApprove = async (id: string, newStatus: boolean) => {
-    try {
-      const { error } = await supabase
-        .from("testimonials")
-        .update({ approved: newStatus })
-        .eq("id", id);
+  const openCreate = () => {
+    setEditing(null);
+    setName(""); setRole("Customer"); setMessage(""); setRating(5); setAvatarUrl("");
+    setModalOpen(true);
+  };
 
-      if (error) throw error;
+  const openEdit = (t: Testimonial) => {
+    setEditing(t);
+    setName(t.name); setRole(t.role); setMessage(t.message); setRating(t.rating); setAvatarUrl(t.avatar_url || "");
+    setModalOpen(true);
+  };
 
-      setTestimonials(
-        testimonials.map((t) =>
-          t.id === id ? { ...t, approved: newStatus } : t
-        )
-      );
-    } catch (err) {
-      console.error("Error updating review status:", err);
-      alert("Failed to update status.");
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    const payload = { name, role, message, rating, avatar_url: avatarUrl || null, approved: editing?.approved ?? false };
+    if (editing) {
+      await supabase.from("testimonials").update(payload).eq("id", editing.id);
+    } else {
+      await supabase.from("testimonials").insert([payload]);
     }
+    setSubmitting(false);
+    setModalOpen(false);
+    fetchTestimonials();
+  };
+
+  const handleApprove = async (id: string, approved: boolean) => {
+    await supabase.from("testimonials").update({ approved }).eq("id", id);
+    setTestimonials(testimonials.map((t) => (t.id === id ? { ...t, approved } : t)));
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this review?")) return;
-
-    try {
-      const { error } = await supabase.from("testimonials").delete().eq("id", id);
-      if (error) throw error;
-      setTestimonials(testimonials.filter((t) => t.id !== id));
-    } catch (err) {
-      console.error("Error deleting review:", err);
-      alert("Failed to delete review.");
-    }
+    if (!confirm("Delete this review?")) return;
+    await supabase.from("testimonials").delete().eq("id", id);
+    setTestimonials(testimonials.filter((t) => t.id !== id));
   };
 
   const filtered = testimonials.filter((t) => {
@@ -79,132 +76,98 @@ export default function AdminTestimonials() {
     return true;
   });
 
-  const renderStars = (num: number) => {
-    return (
-      <div className="flex gap-0.5">
-        {[1, 2, 3, 4, 5].map((s) => (
-          <Star
-            key={s}
-            size={12}
-            className={s <= num ? "fill-primary text-primary" : "text-primary/20"}
-          />
-        ))}
-      </div>
-    );
-  };
+  if (loading) return <AdminLoading />;
 
   return (
-    <div className="flex flex-col gap-10">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div>
-          <span className="font-black text-[12px] uppercase tracking-widest text-primary">Reviews</span>
-          <h1 className="font-black text-[2.5rem] md:text-[3.2rem] leading-none tracking-[-0.05em] mt-3 mb-0">
-            Testimonials Manager
-          </h1>
-          <p className="text-foreground/50 font-bold text-sm mt-2 mb-0">
-            Review and approve customer quotes before they go live.
-          </p>
-        </div>
+    <div className="flex flex-col gap-8 max-w-6xl">
+      <AdminPageHeader
+        label="Reviews"
+        title="Testimonials Manager"
+        description="Create, edit, and approve customer testimonials."
+        actions={
+          <button onClick={openCreate} className="inline-flex h-11 items-center gap-2 px-5 rounded-full bg-primary text-background font-bold text-sm hover:opacity-90 cursor-pointer">
+            <Plus size={16} /> Add Testimonial
+          </button>
+        }
+      />
 
-        <div className="flex bg-muted rounded-full p-1 border border-border">
-          {["all", "pending", "approved"].map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f as any)}
-              className={`
-                px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider cursor-pointer transition-colors
-                ${
-                  filter === f
-                    ? "bg-primary text-background"
-                    : "text-foreground/60 hover:text-foreground"
-                }
-              `}
-            >
-              {f}
-            </button>
-          ))}
-        </div>
-      </div>
+      <AdminFilterTabs
+        tabs={[
+          { id: "all", label: "All", count: testimonials.length },
+          { id: "pending", label: "Pending", count: testimonials.filter((t) => !t.approved).length },
+          { id: "approved", label: "Approved", count: testimonials.filter((t) => t.approved).length },
+        ]}
+        active={filter}
+        onChange={setFilter}
+      />
 
-      {loading ? (
-        <div className="flex justify-center py-24">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="bg-muted p-16 rounded-3xl border border-border/40 text-center">
-          <p className="text-foreground/60 text-lg font-bold m-0">No reviews found for the selected status.</p>
-        </div>
+      {filtered.length === 0 ? (
+        <AdminEmptyState icon={Check} title="No testimonials" description="Add testimonials or wait for customer submissions." action={
+          <button onClick={openCreate} className="inline-flex h-10 items-center gap-2 px-5 rounded-full bg-primary text-background font-bold text-xs cursor-pointer">
+            <Plus size={14} /> Add Testimonial
+          </button>
+        } />
       ) : (
-        <div className="card-layered overflow-hidden shadow-xs border border-border/40">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-border bg-muted/50">
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Reviewer</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Rating</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Message</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Submitted</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Status</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45 text-right">Approve / Delete</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/40">
-                {filtered.map((t) => (
-                  <tr key={t.id} className="hover:bg-muted/10 transition-colors">
-                    <td className="p-5">
-                      <div className="flex flex-col">
-                        <span className="font-bold text-base text-foreground leading-snug">{t.name}</span>
-                        <span className="text-[11px] font-black text-foreground/50 uppercase mt-0.5">{t.role}</span>
-                      </div>
-                    </td>
-                    <td className="p-5">{renderStars(t.rating)}</td>
-                    <td className="p-5 text-sm text-foreground/75 leading-relaxed italic max-w-sm" title={t.message}>
-                      &ldquo;{t.message}&rdquo;
-                    </td>
-                    <td className="p-5 text-sm font-bold text-foreground/75">
-                      {new Date(t.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="p-5">
-                      <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${
-                        t.approved 
-                          ? "bg-green-100 text-green-800" 
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}>
-                        {t.approved ? "Approved" : "Pending"}
-                      </span>
-                    </td>
-                    <td className="p-5 text-right">
-                      <div className="flex justify-end gap-3">
-                        <button
-                          onClick={() => handleApprove(t.id, !t.approved)}
-                          className={`
-                            h-9 w-9 rounded-full border border-border flex items-center justify-center transition-colors cursor-pointer
-                            ${
-                              t.approved 
-                                ? "text-yellow-600 hover:bg-yellow-50" 
-                                : "text-green-600 hover:bg-green-50"
-                            }
-                          `}
-                          title={t.approved ? "Revoke Approval" : "Approve Review"}
-                        >
-                          <Check size={14} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(t.id)}
-                          className="h-9 w-9 rounded-full border border-border flex items-center justify-center text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
-                          title="Delete Review"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+        <div className="card-elevated overflow-hidden">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-border bg-muted/50">
+                {["Reviewer", "Rating", "Message", "Date", "Status", "Actions"].map((h) => (
+                  <th key={h} className="px-5 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-foreground/45">{h}</th>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((t) => (
+                <tr key={t.id} className="border-b border-border/60 hover:bg-muted/30">
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center font-bold text-sm text-primary overflow-hidden">
+                        {t.avatar_url ? <img src={t.avatar_url} alt="" className="h-full w-full object-cover" /> : t.name[0]}
+                      </div>
+                      <div>
+                        <p className="font-bold text-sm m-0">{t.name}</p>
+                        <p className="text-[10px] text-foreground/45 m-0 uppercase">{t.role}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-5 py-4"><StarRating value={t.rating} readonly size={14} /></td>
+                  <td className="px-5 py-4 text-sm text-foreground/70 italic max-w-xs truncate">&ldquo;{t.message}&rdquo;</td>
+                  <td className="px-5 py-4 text-xs text-foreground/50">{new Date(t.created_at).toLocaleDateString()}</td>
+                  <td className="px-5 py-4">
+                    <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-full ${t.approved ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
+                      {t.approved ? "Approved" : "Pending"}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4">
+                    <div className="flex gap-2">
+                      <button onClick={() => openEdit(t)} className="h-8 w-8 rounded-full hover:bg-muted flex items-center justify-center cursor-pointer"><Edit2 size={14} /></button>
+                      <button onClick={() => handleApprove(t.id, !t.approved)} className="h-8 w-8 rounded-full hover:bg-emerald-50 text-emerald-600 flex items-center justify-center cursor-pointer"><Check size={14} /></button>
+                      <button onClick={() => handleDelete(t.id)} className="h-8 w-8 rounded-full hover:bg-rose-50 text-rose-500 flex items-center justify-center cursor-pointer"><Trash2 size={14} /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
+
+      <AdminModal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? "Edit Testimonial" : "Add Testimonial"}>
+        <form onSubmit={handleSave} className="flex flex-col gap-4">
+          <input required placeholder="Customer name" value={name} onChange={(e) => setName(e.target.value)} className="h-11 px-4 rounded-xl border border-border bg-muted/50 text-sm font-medium focus:outline-none focus:border-primary" />
+          <input placeholder="Role / Position (optional)" value={role} onChange={(e) => setRole(e.target.value)} className="h-11 px-4 rounded-xl border border-border bg-muted/50 text-sm font-medium focus:outline-none focus:border-primary" />
+          <input placeholder="Profile photo URL (optional)" value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} className="h-11 px-4 rounded-xl border border-border bg-muted/50 text-sm font-medium focus:outline-none focus:border-primary" />
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/45 mb-2">Rating</p>
+            <StarRating value={rating} onChange={setRating} size={20} />
+          </div>
+          <textarea required placeholder="Testimonial content" value={message} onChange={(e) => setMessage(e.target.value)} rows={4} className="px-4 py-3 rounded-xl border border-border bg-muted/50 text-sm focus:outline-none focus:border-primary resize-y" />
+          <button type="submit" disabled={submitting} className="h-11 rounded-full bg-primary text-background font-bold hover:opacity-90 cursor-pointer disabled:opacity-50">
+            {submitting ? "Saving..." : editing ? "Update" : "Create"}
+          </button>
+        </form>
+      </AdminModal>
     </div>
   );
 }

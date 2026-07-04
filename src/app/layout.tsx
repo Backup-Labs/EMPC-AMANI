@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ThemeProvider } from "@/components/ui/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "EMPC-AMANI | Master Carpentry & Furniture",
@@ -12,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link
           href="https://api.fontshare.com/v2/css?f[]=satoshi@900,800,700,500,400,300&display=swap"
@@ -30,7 +31,7 @@ export default function RootLayout({
         style={{ fontFamily: "'Satoshi', sans-serif" }}
         className="min-h-screen bg-background text-foreground flex flex-col antialiased"
       >
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

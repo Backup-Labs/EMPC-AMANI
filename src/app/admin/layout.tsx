@@ -4,6 +4,7 @@ import React from "react";
 import { usePathname } from "next/navigation";
 import { AdminGuard } from "@/components/admin/AdminGuard";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { ToastProvider } from "@/components/ui/Toast";
 
 export default function AdminLayout({
   children,
@@ -13,22 +14,24 @@ export default function AdminLayout({
   const pathname = usePathname();
   const isLoginPage = pathname === "/admin/login";
 
-  // Login page should not have sidebar or guard
   if (isLoginPage) {
-    return <>{children}</>;
+    return (
+      <ToastProvider>
+        {children}
+      </ToastProvider>
+    );
   }
 
   return (
-    <AdminGuard>
-      <div className="flex bg-background min-h-screen text-foreground transition-colors duration-300">
-        {/* Sidebar */}
-        <AdminSidebar />
-
-        {/* Workspace content area */}
-        <main className="flex-1 h-screen overflow-y-auto p-8 md:p-12 lg:p-16">
-          {children}
-        </main>
-      </div>
-    </AdminGuard>
+    <ToastProvider>
+      <AdminGuard>
+        <div className="flex bg-background min-h-screen text-foreground transition-colors duration-300">
+          <AdminSidebar />
+          <main className="flex-1 h-screen overflow-y-auto bg-background/80 p-6 md:p-10 lg:p-12">
+            {children}
+          </main>
+        </div>
+      </AdminGuard>
+    </ToastProvider>
   );
 }

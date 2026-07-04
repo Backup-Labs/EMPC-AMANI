@@ -1,8 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Search, Eye, X } from "lucide-react";
+import React, { useState, useEffect, useMemo } from "react";
+import { Eye, Inbox } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { AdminPageHeader } from "@/components/admin/ui/AdminPageHeader";
+import { AdminModal } from "@/components/admin/ui/AdminModal";
+import { AdminSearchBar } from "@/components/admin/ui/AdminSearchBar";
+import { AdminFilterTabs } from "@/components/admin/ui/AdminFilterTabs";
+import { AdminLoading } from "@/components/admin/ui/AdminLoading";
+import { AdminEmptyState } from "@/components/admin/ui/AdminEmptyState";
+import { useToast } from "@/components/ui/Toast";
 
 interface Inquiry {
   id: string;
@@ -16,134 +23,74 @@ interface Inquiry {
   created_at: string;
 }
 
+const statusColors: Record<string, string> = {
+  resolved: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
+  in_progress: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
+  new: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
+};
+
 export default function AdminInquiries() {
+  const { toast } = useToast();
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  // Filters
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
   const [search, setSearch] = useState("");
-
-  // Details Modal
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
 
-  useEffect(() => {
-    fetchInquiries();
-  }, []);
+  useEffect(() => { fetchInquiries(); }, []);
 
   const fetchInquiries = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("inquiries")
-        .select("*")
-        .order("created_at", { ascending: false });
-
+      const { data, error } = await supabase.from("inquiries").select("*").order("created_at", { ascending: false });
       if (error) throw error;
       setInquiries(data || []);
-    } catch (err) {
-      console.error("Error loading inquiries:", err);
+    } catch {
+      toast("Failed to load inquiries", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleStatusChange = async (id: string, newStatus: string) => {
+  const handleStatusChange = async (id: string, newStatus: Inquiry["status"]) => {
     try {
-      const { error } = await supabase
-        .from("inquiries")
-        .update({ status: newStatus })
-        .eq("id", id);
-
+      const { error } = await supabase.from("inquiries").update({ status: newStatus }).eq("id", id);
       if (error) throw error;
-
-      setInquiries(
-        inquiries.map((inq) =>
-          inq.id === id ? { ...inq, status: newStatus as any } : inq
-        )
-      );
-
-      if (selectedInquiry && selectedInquiry.id === id) {
-        setSelectedInquiry({ ...selectedInquiry, status: newStatus as any });
-      }
-    } catch (err) {
-      console.error("Error updating status:", err);
-      alert("Failed to update inquiry status.");
+      setInquiries(inquiries.map((inq) => (inq.id === id ? { ...inq, status: newStatus } : inq)));
+      if (selectedInquiry?.id === id) setSelectedInquiry({ ...selectedInquiry, status: newStatus });
+      toast("Status updated");
+    } catch {
+      toast("Failed to update status", "error");
     }
   };
 
-  const filtered = inquiries.filter((inq) => {
-    const matchesStatus = statusFilter === "all" || inq.status === statusFilter;
-    const matchesType = typeFilter === "all" || inq.inquiry_type === typeFilter;
-    
-    const searchLower = search.toLowerCase();
-    const matchesSearch =
-      search === "" ||
-      inq.full_name?.toLowerCase().includes(searchLower) ||
-      inq.email?.toLowerCase().includes(searchLower) ||
-      inq.subject?.toLowerCase().includes(searchLower) ||
-      inq.message?.toLowerCase().includes(searchLower);
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase();
+    return inquiries.filter((inq) => {
+      const matchesStatus = statusFilter === "all" || inq.status === statusFilter;
+      const matchesType = typeFilter === "all" || inq.inquiry_type === typeFilter;
+      const matchesSearch = !search || [inq.full_name, inq.email, inq.subject, inq.message].some((f) => f?.toLowerCase().includes(q));
+      return matchesStatus && matchesType && matchesSearch;
+    });
+  }, [inquiries, statusFilter, typeFilter, search]);
 
-    return matchesStatus && matchesType && matchesSearch;
-  });
-
-  const getStatusBadgeColor = (status: string) => {
-    switch (status) {
-      case "resolved":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "in_progress":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      default:
-        return "bg-blue-100 text-blue-800 border-blue-200";
-    }
-  };
+  const statusTabs = [
+    { id: "all", label: "All", count: inquiries.length },
+    { id: "new", label: "New", count: inquiries.filter((i) => i.status === "new").length },
+    { id: "in_progress", label: "In Progress", count: inquiries.filter((i) => i.status === "in_progress").length },
+    { id: "resolved", label: "Resolved", count: inquiries.filter((i) => i.status === "resolved").length },
+  ];
 
   return (
-    <div className="flex flex-col gap-10">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pb-6 border-b border-border">
-        <div>
-          <span className="font-black text-[12px] uppercase tracking-widest text-primary">CRM</span>
-          <h1 className="font-black text-[2.5rem] md:text-[3.2rem] leading-none tracking-[-0.05em] mt-3 mb-0">
-            Customer Inquiries
-          </h1>
-          <p className="text-foreground/50 font-bold text-sm mt-2 mb-0">
-            Monitor contact submissions, orders, and general inquiries.
-          </p>
-        </div>
+    <div className="flex flex-col gap-8">
+      <AdminPageHeader label="CRM" title="Customer Inquiries" description="Monitor contact submissions, orders, and general inquiries." />
 
-        {/* Filters */}
-        <div className="flex flex-wrap gap-4 items-center w-full md:w-auto">
-          {/* Search */}
-          <div className="relative flex-1 md:w-60 min-w-48">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/40" size={16} />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search CRM..."
-              className="h-11 w-full pl-10 pr-4 rounded-full border border-border text-xs font-bold bg-muted/30 focus:outline-none focus:border-primary focus:bg-background transition-all"
-            />
-          </div>
-
-          {/* Status filter dropdown */}
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="h-11 px-6 rounded-full border border-border text-xs font-black uppercase tracking-wider bg-muted/40 cursor-pointer focus:outline-none"
-          >
-            <option value="all">All Statuses</option>
-            <option value="new">New</option>
-            <option value="in_progress">In Progress</option>
-            <option value="resolved">Resolved</option>
-          </select>
-
-          {/* Type filter dropdown */}
-          <select
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-            className="h-11 px-6 rounded-full border border-border text-xs font-black uppercase tracking-wider bg-muted/40 cursor-pointer focus:outline-none"
-          >
+      <div className="flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between flex-wrap">
+        <AdminFilterTabs tabs={statusTabs} active={statusFilter} onChange={setStatusFilter} />
+        <div className="flex flex-wrap gap-3">
+          <AdminSearchBar value={search} onChange={setSearch} placeholder="Search CRM..." />
+          <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="h-11 px-4 rounded-full border border-border bg-muted/50 text-xs font-black uppercase tracking-wider cursor-pointer focus:outline-none focus:border-primary">
             <option value="all">All Types</option>
             <option value="furniture">Furniture</option>
             <option value="custom_order">Custom Order</option>
@@ -154,69 +101,46 @@ export default function AdminInquiries() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-24">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
-        </div>
+        <AdminLoading />
       ) : filtered.length === 0 ? (
-        <div className="bg-muted p-16 rounded-3xl border border-border/40 text-center">
-          <p className="text-foreground/60 text-lg font-bold m-0">No inquiries match the current search filters.</p>
-        </div>
+        <AdminEmptyState icon={Inbox} title="No inquiries" description="No inquiries match your current filters." />
       ) : (
-        <div className="card-layered overflow-hidden shadow-xs border border-border/40">
+        <div className="card-elevated overflow-hidden border border-border/40">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-border bg-muted/50">
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Sender</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Subject & Message</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Inquiry Type</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Submitted</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45">Status</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-wider text-foreground/45 text-right">View / Action</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/45">Sender</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/45">Subject</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/45">Type</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/45">Date</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/45">Status</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/45 text-right">View</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/40">
                 {filtered.map((inq) => (
                   <tr key={inq.id} className="hover:bg-muted/10 transition-colors">
-                    <td className="p-5">
-                      <div className="flex flex-col">
-                        <span className="font-bold text-base text-foreground leading-snug">{inq.full_name}</span>
-                        <span className="text-xs text-foreground/50 font-medium">{inq.email || "No Email"}</span>
-                        {inq.phone && <span className="text-[11px] text-foreground/40 font-mono mt-0.5">{inq.phone}</span>}
-                      </div>
+                    <td className="p-4">
+                      <span className="font-bold text-sm block">{inq.full_name}</span>
+                      <span className="text-xs text-foreground/50">{inq.email}</span>
                     </td>
-                    <td className="p-5 max-w-xs">
-                      <div className="flex flex-col">
-                        <span className="font-bold text-sm text-foreground line-clamp-1">{inq.subject || "No Subject"}</span>
-                        <span className="text-xs text-foreground/60 mt-1 line-clamp-2">{inq.message}</span>
-                      </div>
+                    <td className="p-4 max-w-xs">
+                      <span className="font-bold text-sm line-clamp-1">{inq.subject || "No Subject"}</span>
+                      <span className="text-xs text-foreground/55 line-clamp-1">{inq.message}</span>
                     </td>
-                    <td className="p-5 text-xs font-bold text-foreground/60 uppercase tracking-widest">
-                      {inq.inquiry_type}
-                    </td>
-                    <td className="p-5 text-sm font-bold text-foreground/75">
-                      {new Date(inq.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="p-5">
-                      <select
-                        value={inq.status}
-                        onChange={(e) => handleStatusChange(inq.id, e.target.value)}
-                        className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full border cursor-pointer focus:outline-none ${getStatusBadgeColor(
-                          inq.status
-                        )}`}
-                      >
+                    <td className="p-4 text-[10px] font-black uppercase tracking-wider text-foreground/55">{inq.inquiry_type}</td>
+                    <td className="p-4 text-xs font-bold text-foreground/70">{new Date(inq.created_at).toLocaleDateString()}</td>
+                    <td className="p-4">
+                      <select value={inq.status} onChange={(e) => handleStatusChange(inq.id, e.target.value as Inquiry["status"])} className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full border cursor-pointer focus:outline-none ${statusColors[inq.status]}`}>
                         <option value="new">New</option>
                         <option value="in_progress">In Progress</option>
                         <option value="resolved">Resolved</option>
                       </select>
                     </td>
-                    <td className="p-5 text-right">
-                      <button
-                        onClick={() => setSelectedInquiry(inq)}
-                        className="h-9 w-9 rounded-full border border-border flex items-center justify-center text-primary/75 hover:bg-primary hover:text-background transition-colors cursor-pointer"
-                        title="View Details"
-                      >
-                        <Eye size={14} />
+                    <td className="p-4 text-right">
+                      <button onClick={() => setSelectedInquiry(inq)} className="h-8 w-8 rounded-full border border-border flex items-center justify-center text-primary hover:bg-primary hover:text-background transition-colors cursor-pointer" aria-label="View">
+                        <Eye size={13} />
                       </button>
                     </td>
                   </tr>
@@ -227,93 +151,32 @@ export default function AdminInquiries() {
         </div>
       )}
 
-      {/* Details View Modal */}
-      {selectedInquiry && (
-        <div
-          onClick={() => setSelectedInquiry(null)}
-          className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-fade-in"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-lg bg-background rounded-3xl border border-border shadow-2xl overflow-hidden flex flex-col relative"
-          >
-            {/* Header */}
-            <div className="flex justify-between items-center p-6 border-b border-border">
-              <div>
-                <span className="font-black text-xs uppercase tracking-widest text-primary">Inquiry Details</span>
-                <h3 className="font-black text-xl tracking-tight text-foreground mt-2 mb-0 uppercase">
-                  {selectedInquiry.subject || "Customer Message"}
-                </h3>
-              </div>
-              <button
-                onClick={() => setSelectedInquiry(null)}
-                className="h-10 w-10 flex items-center justify-center rounded-full bg-muted hover:bg-foreground/10 text-foreground transition-transform active:scale-90"
-              >
-                <X size={18} />
-              </button>
+      <AdminModal open={!!selectedInquiry} onClose={() => setSelectedInquiry(null)} title="Inquiry Details" size="lg">
+        {selectedInquiry && (
+          <div className="flex flex-col gap-5">
+            <div className="grid grid-cols-2 gap-4 bg-muted/40 p-4 rounded-xl border border-border/40 text-sm">
+              <div><span className="text-[9px] font-black uppercase text-foreground/40 block">From</span><span className="font-bold">{selectedInquiry.full_name}</span></div>
+              <div><span className="text-[9px] font-black uppercase text-foreground/40 block">Email</span><span className="font-bold">{selectedInquiry.email || "—"}</span></div>
+              <div><span className="text-[9px] font-black uppercase text-foreground/40 block">Phone</span><span className="font-mono">{selectedInquiry.phone || "—"}</span></div>
+              <div><span className="text-[9px] font-black uppercase text-foreground/40 block">Submitted</span><span className="font-bold">{new Date(selectedInquiry.created_at).toLocaleString()}</span></div>
             </div>
-
-            {/* Details Panel */}
-            <div className="p-6 md:p-8 flex flex-col gap-6 overflow-y-auto max-h-[60vh]">
-              {/* Sender Details */}
-              <div className="grid grid-cols-2 gap-4 bg-muted/40 p-4 rounded-xl border border-border/40">
-                <div className="flex flex-col">
-                  <span className="text-[9px] font-black uppercase text-foreground/40 tracking-wider">From</span>
-                  <span className="font-bold text-sm text-foreground">{selectedInquiry.full_name}</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[9px] font-black uppercase text-foreground/40 tracking-wider">Email</span>
-                  <span className="font-bold text-sm text-foreground">{selectedInquiry.email || "—"}</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[9px] font-black uppercase text-foreground/40 tracking-wider">Phone</span>
-                  <span className="font-mono text-sm text-foreground">{selectedInquiry.phone || "—"}</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[9px] font-black uppercase text-foreground/40 tracking-wider">Submitted</span>
-                  <span className="font-bold text-sm text-foreground">
-                    {new Date(selectedInquiry.created_at).toLocaleString()}
-                  </span>
-                </div>
+            <div>
+              <span className="text-[9px] font-black uppercase text-foreground/40 tracking-wider">Message</span>
+              <div className="p-4 mt-2 bg-muted/20 border border-border/30 rounded-xl">
+                <p className="text-sm leading-relaxed m-0 whitespace-pre-wrap">{selectedInquiry.message}</p>
               </div>
-
-              {/* Message */}
-              <div className="flex flex-col gap-2">
-                <span className="text-[9px] font-black uppercase text-foreground/40 tracking-wider">Message Content</span>
-                <div className="p-5 bg-muted/20 border border-border/30 rounded-2xl">
-                  <p className="text-sm text-foreground/80 leading-relaxed m-0 whitespace-pre-wrap">
-                    {selectedInquiry.message}
-                  </p>
-                </div>
-              </div>
-
-              {/* Status Update Options */}
-              <div className="flex items-center justify-between border-t border-border/40 pt-6 mt-2">
-                <div className="flex flex-col">
-                  <span className="text-[9px] font-black uppercase text-foreground/40 tracking-wider">Type</span>
-                  <span className="text-xs font-black text-primary uppercase tracking-widest mt-1">
-                    {selectedInquiry.inquiry_type}
-                  </span>
-                </div>
-                <div className="flex flex-col items-end">
-                  <span className="text-[9px] font-black uppercase text-foreground/40 tracking-wider mb-1">Update Status</span>
-                  <select
-                    value={selectedInquiry.status}
-                    onChange={(e) => handleStatusChange(selectedInquiry.id, e.target.value)}
-                    className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border cursor-pointer focus:outline-none ${getStatusBadgeColor(
-                      selectedInquiry.status
-                    )}`}
-                  >
-                    <option value="new">New</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="resolved">Resolved</option>
-                  </select>
-                </div>
-              </div>
+            </div>
+            <div className="flex justify-between items-center pt-2 border-t border-border/40">
+              <span className="text-xs font-black text-primary uppercase">{selectedInquiry.inquiry_type}</span>
+              <select value={selectedInquiry.status} onChange={(e) => handleStatusChange(selectedInquiry.id, e.target.value as Inquiry["status"])} className={`text-[10px] font-black uppercase px-3 py-1.5 rounded-full border cursor-pointer ${statusColors[selectedInquiry.status]}`}>
+                <option value="new">New</option>
+                <option value="in_progress">In Progress</option>
+                <option value="resolved">Resolved</option>
+              </select>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </AdminModal>
     </div>
   );
 }
