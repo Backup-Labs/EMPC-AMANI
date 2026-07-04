@@ -88,7 +88,7 @@ export default function ContactContent() {
 
   return (
     <div className="bg-background min-h-screen overflow-x-hidden text-foreground">
-      <section className="relative h-[55vh] min-h-[420px] overflow-hidden">
+      <section className="relative h-[55vh] min-h-105 overflow-hidden">
         <Image src="/images/hero.png" alt="Contact" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-linear-to-b from-black/60 via-transparent to-black/50" />
         <div className="absolute inset-x-0 bottom-0 pb-12 lg:pb-16 px-6 md:px-12 lg:px-16 container mx-auto">

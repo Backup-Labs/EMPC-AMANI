@@ -251,7 +251,7 @@ export function ProductDetailClient({
                 <RevealOnScroll key={item.id} delay={i * 0.08}>
                   <Link href={`/products/${productPath(item)}`} className="group block no-underline text-foreground">
                     <article className="card-elevated overflow-hidden">
-                      <div className="relative aspect-[4/3] overflow-hidden">
+                      <div className="relative aspect-4/3 overflow-hidden">
                         <Image src={item.image_url} alt={item.title} fill sizes="33vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
                       </div>
                       <div className="p-4 flex justify-between items-center">

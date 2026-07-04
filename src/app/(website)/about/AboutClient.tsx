@@ -51,10 +51,10 @@ export function AboutClient({ content }: { content: SiteContent }) {
               </div>
             </motion.div>
             <motion.div {...fadeIn(0.1)} className="grid grid-cols-2 gap-3 lg:gap-4">
-              <div className="relative rounded-2xl overflow-hidden aspect-[3/4] shadow-md">
+              <div className="relative rounded-2xl overflow-hidden aspect-3/4 shadow-md">
                 <Image src="/images/project1.png" alt="Detail" fill sizes="50vw" className="object-cover" />
               </div>
-              <div className="relative rounded-2xl overflow-hidden aspect-[3/4] mt-8 shadow-md">
+              <div className="relative rounded-2xl overflow-hidden aspect-3/4 mt-8 shadow-md">
                 <Image src="/images/project2.png" alt="Space" fill sizes="50vw" className="object-cover" />
               </div>
             </motion.div>

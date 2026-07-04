@@ -122,7 +122,7 @@ export function NewsDetailClient({ post, related }: { post: CmsNewsPost; related
       <section className="px-6 md:px-12 lg:px-16 mb-10">
         <div className="max-w-5xl mx-auto">
           <RevealOnScroll>
-            <div className="relative rounded-2xl overflow-hidden aspect-[21/9] shadow-lg">
+            <div className="relative rounded-2xl overflow-hidden aspect-21/9 shadow-lg">
               <Image src={post.image} alt={post.title} fill sizes="100vw" priority className="object-cover" />
             </div>
           </RevealOnScroll>
@@ -163,7 +163,7 @@ export function NewsDetailClient({ post, related }: { post: CmsNewsPost; related
                 <RevealOnScroll key={item.slug} delay={i * 0.08}>
                   <Link href={item.externalUrl || `/news/${item.slug}`} className="group block no-underline text-foreground">
                     <article className="card-elevated overflow-hidden flex flex-col sm:flex-row">
-                      <div className="relative sm:w-48 aspect-[16/10] sm:aspect-auto shrink-0 overflow-hidden">
+                      <div className="relative sm:w-48 aspect-16/10 sm:aspect-auto shrink-0 overflow-hidden">
                         <Image src={item.image} alt={item.title} fill sizes="200px" className="object-cover transition-transform duration-700 group-hover:scale-105" />
                       </div>
                       <div className="p-5 flex flex-col gap-2 justify-center">

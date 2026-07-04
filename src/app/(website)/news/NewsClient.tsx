@@ -54,7 +54,7 @@ export function NewsClient({ posts }: { posts: CmsNewsPost[] }) {
                 <RevealOnScroll>
                   <PostLink post={featured} className="group block no-underline text-foreground py-8">
                     <article className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center">
-                      <div className="relative aspect-[16/10] rounded-2xl overflow-hidden shadow-lg">
+                      <div className="relative aspect-16/10 rounded-2xl overflow-hidden shadow-lg">
                         <Image src={featured.image} alt={featured.title} fill sizes="(max-width:1024px) 100vw, 50vw" priority className="object-cover transition-transform duration-700 group-hover:scale-105" />
                         <div className="absolute top-4 left-4 flex gap-2">
                           <Badge variant="glass">{t("common.featured")}</Badge>
@@ -85,7 +85,7 @@ export function NewsClient({ posts }: { posts: CmsNewsPost[] }) {
                   <RevealOnScroll key={post.slug} delay={i * 0.08}>
                     <PostLink post={post} className="group block no-underline text-foreground">
                       <article className="card-elevated overflow-hidden h-full flex flex-col">
-                        <div className="relative aspect-[16/10] overflow-hidden">
+                        <div className="relative aspect-16/10 overflow-hidden">
                           <Image src={post.image} alt={post.title} fill sizes="(max-width:768px) 100vw, 50vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
                           <div className="absolute top-3 left-3"><Badge variant="glass">{post.category}</Badge></div>
                         </div>

@@ -71,7 +71,7 @@ export function ProductsClient({ products }: { products: Product[] }) {
               <RevealOnScroll key={product.id} delay={i * 0.06}>
                 <Link href={`/products/${productPath(product)}`} className="group block no-underline text-foreground">
                   <article className="card-elevated overflow-hidden">
-                    <div className="relative aspect-[4/3] overflow-hidden">
+                    <div className="relative aspect-4/3 overflow-hidden">
                       <Image
                         src={product.image_url}
                         alt={product.title}

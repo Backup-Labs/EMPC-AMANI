@@ -310,7 +310,7 @@ export function HomeClient({
               <RevealOnScroll key={b.slug} delay={i * 0.08}>
                 <Link href={`/news/${b.slug}`} className="group block no-underline text-foreground">
                   <article className="card-elevated overflow-hidden">
-                    <div className="relative aspect-[16/10] overflow-hidden">
+                    <div className="relative aspect-16/10 overflow-hidden">
                       <Image src={b.image} alt={b.title} fill sizes="33vw" className="object-cover group-hover:scale-105 transition-transform duration-700" />
                     </div>
                     <div className="p-4">
