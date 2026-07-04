@@ -1,16 +1,18 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Maximize2 } from "lucide-react";
+import { motion } from "framer-motion";
 import { PageHero } from "@/components/ui/PageHero";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Badge } from "@/components/ui/Badge";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { CTASection } from "@/components/ui/CTASection";
+import { GalleryLightbox, type GalleryItem } from "@/components/ui/GalleryLightbox";
+import { useTranslation } from "@/lib/i18n/LanguageProvider";
 
-const featuredProjects = [
+const featuredProjects: (GalleryItem & { span: string })[] = [
   { title: "Siam Teak Table", tags: ["Hardwood", "Dining"], image: "/images/hero.png", span: "md:col-span-2 md:row-span-2" },
   { title: "Nordic Lounge Chair", tags: ["Oak", "Minimalist"], image: "/images/project1.png", span: "md:col-span-1 md:row-span-1" },
   { title: "Industrial Bookshelf", tags: ["Steel", "Pine"], image: "/images/project2.png", span: "md:col-span-1 md:row-span-2" },
@@ -24,53 +26,81 @@ const featuredProjects = [
 ];
 
 export default function Gallery() {
+  const { t } = useTranslation();
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
   return (
     <div className="bg-background min-h-screen overflow-x-hidden text-foreground">
       <PageHero
         image="/images/hero.png"
         alt="Gallery"
-        title="Gallery."
-        subtitle="A curated collection of bespoke furniture and masterfully crafted woodwork."
+        title={t("gallery.heroTitle")}
+        subtitle={t("gallery.heroDesc")}
       />
 
       <section className="px-6 md:px-12 lg:px-16 py-8 lg:py-12">
         <div className="max-w-7xl mx-auto">
           <SectionHeader
-            label="Catalogue"
-            heading={<>Crafted for Eternity.<br />Designed for Life.</>}
-            desc="Explore our finest pieces, where each grain tells a story of patience and precision."
+            label={t("gallery.catalogueLabel")}
+            heading={<>{t("gallery.catalogueHeading1")}<br />{t("gallery.catalogueHeading2")}</>}
+            desc={t("gallery.catalogueDesc")}
           />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5 pt-8 auto-rows-[260px]">
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 lg:gap-4 pt-8 auto-rows-[200px] md:auto-rows-[220px]">
             {featuredProjects.map((p, i) => (
-              <RevealOnScroll key={i} delay={i * 0.04} className={p.span}>
-                <Link href="/products" className="block h-full no-underline text-foreground">
-                  <article className={`relative rounded-xl overflow-hidden card-elevated group h-full cursor-pointer`}>
-                    <Image src={p.image} alt={p.title} fill sizes="33vw" className="object-cover group-hover:scale-105 transition-transform duration-700" />
-                    <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-300 z-10" />
-                    <div className="absolute bottom-5 left-5 right-5 z-20">
-                      <div className="flex gap-1.5 mb-2">
-                        {p.tags.map((t) => (
-                          <Badge key={t} variant="glass">{t}</Badge>
-                        ))}
-                      </div>
-                      <div className="flex justify-between items-end">
-                        <p className="font-black text-lg text-white leading-tight m-0">{p.title}</p>
-                        <div className="h-8 w-8 rounded-full bg-white text-black flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <ArrowUpRight size={14} />
-                        </div>
+              <RevealOnScroll key={i} delay={i * 0.03} className={p.span}>
+                <motion.button
+                  type="button"
+                  onClick={() => setLightboxIndex(i)}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                  className="relative rounded-xl overflow-hidden card-elevated group h-full w-full cursor-pointer text-left"
+                  aria-label={`${p.title} — ${t("gallery.viewFullscreen")}`}
+                >
+                  <Image
+                    src={p.image}
+                    alt={p.title}
+                    fill
+                    sizes="(max-width:768px) 100vw, 25vw"
+                    loading={i < 4 ? "eager" : "lazy"}
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/20 to-transparent opacity-70 group-hover:opacity-100 transition-opacity duration-400 z-10" />
+
+                  <div className="absolute top-3 right-3 z-20 h-8 w-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300 scale-75 group-hover:scale-100">
+                    <Maximize2 size={14} />
+                  </div>
+
+                  <div className="absolute bottom-4 left-4 right-4 z-20 translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
+                    <div className="flex gap-1.5 mb-2 flex-wrap">
+                      {p.tags.map((tag) => (
+                        <Badge key={tag} variant="glass">{tag}</Badge>
+                      ))}
+                    </div>
+                    <div className="flex justify-between items-end gap-2">
+                      <p className="font-black text-base md:text-lg text-white leading-tight m-0">{p.title}</p>
+                      <div className="h-7 w-7 rounded-full bg-white text-foreground flex items-center justify-center shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <ArrowUpRight size={13} />
                       </div>
                     </div>
-                  </article>
-                </Link>
+                  </div>
+                </motion.button>
               </RevealOnScroll>
             ))}
           </div>
         </div>
       </section>
 
+      <GalleryLightbox
+        items={featuredProjects}
+        activeIndex={lightboxIndex}
+        onClose={() => setLightboxIndex(null)}
+        onNavigate={setLightboxIndex}
+      />
+
       <CTASection
-        title="Begin your design journey today."
-        buttonText="Contact Studio"
+        title={t("common.beginJourney")}
+        buttonText={t("common.contactStudio")}
         buttonHref="/contact"
       />
     </div>

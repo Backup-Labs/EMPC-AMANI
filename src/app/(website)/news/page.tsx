@@ -12,10 +12,12 @@ import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { CTASection } from "@/components/ui/CTASection";
 import { newsPosts } from "@/lib/data/news";
 import { EASE } from "@/lib/motion";
+import { useTranslation } from "@/lib/i18n/LanguageProvider";
 
 const categories = ["All", ...Array.from(new Set(newsPosts.map((p) => p.category)))];
 
 export default function NewsPage() {
+  const { t } = useTranslation();
   const [activeCategory, setActiveCategory] = useState("All");
   const [isLoading] = useState(false);
 
@@ -30,16 +32,16 @@ export default function NewsPage() {
       <PageHero
         image="/images/hero.png"
         alt="News"
-        title={<>Latest<br />Insights.</>}
-        subtitle="Discover the latest stories from our workshop, where tradition meets modern innovation."
+        title={<>{t("news.heroTitle1")}<br />{t("news.heroTitle2")}</>}
+        subtitle={t("news.heroDesc")}
       />
 
       <section className="px-6 md:px-12 lg:px-16">
         <div className="max-w-7xl mx-auto">
           <SectionHeader
-            label="Stories"
-            heading={<>The Workshop<br />Chronicles.</>}
-            desc="Insights into our process, our heritage, and the future of artisanal craftsmanship."
+            label={t("news.storiesLabel")}
+            heading={<>{t("news.storiesHeading1")}<br />{t("news.storiesHeading2")}</>}
+            desc={t("news.storiesDesc")}
           />
 
           {/* Category filter */}
@@ -54,7 +56,7 @@ export default function NewsPage() {
                     : "bg-muted text-foreground/60 hover:text-foreground"
                 }`}
               >
-                {cat}
+                {cat === "All" ? t("common.all") : cat}
               </button>
             ))}
           </div>
@@ -86,7 +88,7 @@ export default function NewsPage() {
                           className="object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                         <div className="absolute top-4 left-4">
-                          <Badge variant="glass">Featured</Badge>
+                          <Badge variant="glass">{t("common.featured")}</Badge>
                         </div>
                       </div>
                       <div className="flex flex-col gap-4">
@@ -181,13 +183,13 @@ export default function NewsPage() {
       </section>
 
       <CTASection
-        title={<>Stay in the loop.</>}
-        description="Get workshop updates, design inspiration, and exclusive offers delivered to your inbox."
+        title={t("common.stayInLoop")}
+        description={t("common.stayInLoopDesc")}
       >
         <div className="flex w-full max-w-md gap-3">
           <input
             type="email"
-            placeholder="Email address"
+            placeholder={t("common.emailPlaceholder")}
             className="h-12 flex-1 px-5 rounded-full border border-border text-sm font-medium bg-background/50 focus:outline-none focus:border-primary transition-colors"
           />
           <button className="h-12 w-12 bg-primary text-background rounded-full flex items-center justify-center hover:opacity-90 transition-all shadow-md active:scale-95">

@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/Button";
 import { newsPosts } from "@/lib/data/news";
 import { products, formatPrice } from "@/lib/data/products";
 import { EASE } from "@/lib/motion";
+import { useTranslation } from "@/lib/i18n/LanguageProvider";
 
 const exclusiveProjects = [
   { title: "Siam Teak Table", category: "Dining", year: "2024", image: "/images/hero.png" },
@@ -40,6 +41,7 @@ const latestNews = newsPosts.slice(0, 3);
 const featuredProducts = products.slice(0, 3);
 
 export default function Home() {
+  const { t } = useTranslation();
   const [carouselIdx, setCarouselIdx] = useState(0);
   const prevSlide = () => setCarouselIdx((i) => (i - 1 + exclusiveProjects.length) % exclusiveProjects.length);
   const nextSlide = () => setCarouselIdx((i) => (i + 1) % exclusiveProjects.length);
@@ -65,7 +67,7 @@ export default function Home() {
               >
                 Masterful<br />
                 <span className="text-white bg-clip-text bg-linear-to-r from-accent-cyan via-accent-coral to-accent-pink">
-                  Carpentry.
+                  {t("home.heroTitle2")}
                 </span>
               </motion.h1>
               <motion.p
@@ -74,8 +76,7 @@ export default function Home() {
                 transition={{ duration: 0.8, delay: 0.15, ease: EASE }}
                 className="text-white/80 text-base md:text-lg leading-relaxed mt-5 max-w-lg"
               >
-                Precision in wood, excellence in craft. We create bespoke furniture
-                while empowering the next generation of master artisans.
+                {t("home.heroDesc")}
               </motion.p>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -83,9 +84,9 @@ export default function Home() {
                 transition={{ duration: 0.8, delay: 0.25, ease: EASE }}
                 className="flex flex-wrap gap-3 mt-6"
               >
-                <Button href="/products" size="lg">Explore Products</Button>
+                <Button href="/products" size="lg">{t("common.exploreProducts")}</Button>
                 <Button href="/contact" variant="outline" size="lg" className="border-white/30 text-white hover:bg-white hover:text-foreground">
-                  Get a Quote
+                  {t("common.getQuote")}
                 </Button>
               </motion.div>
             </div>
@@ -111,12 +112,12 @@ export default function Home() {
       <section className="px-6 md:px-12 lg:px-16">
         <div className="max-w-7xl mx-auto">
           <SectionHeader
-            label="Workshop"
-            heading={<>Raw Material.<br />Masterful Detail.</>}
-            desc="Our carpentry workshop is where traditional techniques meet modern precision to create furniture that lasts generations."
+            label={t("home.workshopLabel")}
+            heading={<>{t("home.workshopHeading1")}<br />{t("home.workshopHeading2")}</>}
+            desc={t("home.workshopDesc")}
             rightEl={
               <Link href="/about" className="inline-flex items-center gap-2 group font-bold text-sm text-primary">
-                Learn our story <ArrowUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                {t("common.learnOurStory")} <ArrowUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </Link>
             }
           />
@@ -134,9 +135,9 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6">
             {[
-              { val: 2500, suffix: "+", label: "Bespoke Pieces", desc: "Hand-crafted furniture delivered to homes and offices since 2012." },
-              { val: 85, label: "Master Artisans", desc: "Trained through our workshop and now leading the industry." },
-              { val: "RTB", label: "Certified Excellence", desc: "Official partner in vocational training and professional certification." },
+              { val: 2500, suffix: "+", label: t("home.stat1Label"), desc: t("home.stat1Desc") },
+              { val: 85, label: t("home.stat2Label"), desc: t("home.stat2Desc") },
+              { val: "RTB", label: t("home.stat3Label"), desc: t("home.stat3Desc") },
             ].map((s, i) => (
               <RevealOnScroll key={i} delay={i * 0.08}>
                 <div className="card-elevated p-6 flex flex-col">
@@ -156,12 +157,12 @@ export default function Home() {
       <section className="px-6 md:px-12 lg:px-16 py-8 lg:py-12 bg-muted/50">
         <div className="max-w-7xl mx-auto">
           <SectionHeader
-            label="Products"
-            heading={<>Crafted for<br />Every Space.</>}
-            desc="Browse our collection of hand-built furniture — each piece a testament to woodworking mastery."
+            label={t("home.productsLabel")}
+            heading={<>{t("home.productsHeading1")}<br />{t("home.productsHeading2")}</>}
+            desc={t("home.productsDesc")}
             rightEl={
               <Link href="/products" className="inline-flex items-center gap-2 group font-bold text-sm text-primary">
-                View all products <ArrowUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                {t("common.viewAllProducts")} <ArrowUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </Link>
             }
           />
@@ -198,9 +199,9 @@ export default function Home() {
       <section className="px-6 md:px-12 lg:px-16 bg-muted relative">
         <div className="max-w-7xl mx-auto relative z-10">
           <SectionHeader
-            label="Exclusive"
-            heading={<>Boldly Rooted.<br />Flawlessly Executed.</>}
-            desc="A curated selection of our most ambitious architectural interventions and luxury residential projects."
+            label={t("home.exclusiveLabel")}
+            heading={<>{t("home.exclusiveHeading1")}<br />{t("home.exclusiveHeading2")}</>}
+            desc={t("home.exclusiveDesc")}
           />
 
           <div className="py-8">
@@ -227,7 +228,7 @@ export default function Home() {
                 <div className="absolute bottom-8 left-8">
                   <p className="font-black text-[1.6rem] md:text-[2.2rem] text-white m-0 tracking-[-0.04em]">{slide.title}</p>
                   <Link href="/gallery" className="mt-4 inline-flex h-10 items-center px-6 rounded-full glass text-xs font-bold text-white hover:bg-white hover:text-black transition-all">
-                    Exploration <ArrowUpRight size={14} className="ml-1.5" />
+                    {t("common.exploration")} <ArrowUpRight size={14} className="ml-1.5" />
                   </Link>
                 </div>
               </motion.div>
@@ -240,9 +241,9 @@ export default function Home() {
       <section className="px-6 md:px-12 lg:px-16 py-8 lg:py-12">
         <div className="max-w-7xl mx-auto">
           <SectionHeader
-            label="Gallery"
-            heading={<>Inspiring Spaces.<br />Resonant Experience.</>}
-            desc="Our diverse range of work spans from boutique retail to high-end hospitality."
+            label={t("home.galleryLabel")}
+            heading={<>{t("home.galleryHeading1")}<br />{t("home.galleryHeading2")}</>}
+            desc={t("home.galleryDesc")}
           />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 py-8">
             {featuredProjects.map((p, i) => (
@@ -276,8 +277,8 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col gap-6">
             <div>
-              <span className="font-bold text-xs uppercase tracking-widest text-foreground/40">Collaborations</span>
-              <h2 className="font-black text-2xl md:text-3xl text-foreground tracking-tight mt-2">Our Trusted Partners.</h2>
+              <span className="font-bold text-xs uppercase tracking-widest text-foreground/40">{t("home.partnersLabel")}</span>
+              <h2 className="font-black text-2xl md:text-3xl text-foreground tracking-tight mt-2">{t("home.partnersHeading")}</h2>
             </div>
             <LogoMarquee logos={partners} />
           </div>
@@ -291,9 +292,9 @@ export default function Home() {
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <span className="w-2 h-2 rounded-full bg-primary block" />
-                <span className="font-bold text-xs uppercase tracking-widest text-foreground/60">News</span>
+                <span className="font-bold text-xs uppercase tracking-widest text-foreground/60">{t("home.newsLabel")}</span>
               </div>
-              <h2 className="font-black text-[2rem] md:text-[2.8rem] text-foreground leading-[0.92] tracking-[-0.04em] m-0">Latest Stories.</h2>
+              <h2 className="font-black text-[2rem] md:text-[2.8rem] text-foreground leading-[0.92] tracking-[-0.04em] m-0">{t("home.newsHeading")}</h2>
             </div>
             <Link href="/news" className="h-11 w-11 rounded-full glass flex items-center justify-center hover:bg-primary hover:text-background transition-all text-primary">
               <ArrowUpRight size={20} />
@@ -323,9 +324,9 @@ export default function Home() {
       <section className="px-6 md:px-12 lg:px-16 py-8 lg:py-12">
         <div className="max-w-7xl mx-auto">
           <SectionHeader
-            label="Reviews"
-            heading={<>Shared Experiences.<br />Verified Trust.</>}
-            desc="What our clients and carpentry training graduates have to say about EMPC."
+            label={t("home.reviewsLabel")}
+            heading={<>{t("home.reviewsHeading1")}<br />{t("home.reviewsHeading2")}</>}
+            desc={t("home.reviewsDesc")}
           />
           <Testimonials />
         </div>

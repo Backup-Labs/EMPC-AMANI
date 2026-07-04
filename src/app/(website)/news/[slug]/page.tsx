@@ -10,9 +10,11 @@ import { Badge } from "@/components/ui/Badge";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { getNewsPost, getRelatedPosts, newsPosts } from "@/lib/data/news";
 import { EASE } from "@/lib/motion";
+import { useTranslation } from "@/lib/i18n/LanguageProvider";
 import type { NewsContentBlock } from "@/types";
 
 function TableOfContents({ headings }: { headings: { id: string; text: string }[] }) {
+  const { t } = useTranslation();
   const [activeId, setActiveId] = useState("");
 
   useEffect(() => {
@@ -37,7 +39,7 @@ function TableOfContents({ headings }: { headings: { id: string; text: string }[
 
   return (
     <nav className="toc-sticky hidden xl:block">
-      <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/40 mb-4">On this page</p>
+      <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/40 mb-4">{t("common.onThisPage")}</p>
       <ul className="flex flex-col gap-2">
         {headings.map(({ id, text }) => (
           <li key={id}>
@@ -98,6 +100,7 @@ function ContentBlock({ block, index }: { block: NewsContentBlock; index: number
 export default function NewsDetailPage() {
   const params = useParams();
   const slug = params?.slug as string;
+  const { t } = useTranslation();
   const post = getNewsPost(slug) || newsPosts[0];
   const related = getRelatedPosts(slug);
 
@@ -141,7 +144,7 @@ export default function NewsDetailPage() {
               className="inline-flex items-center gap-2 font-bold text-[11px] text-foreground/40 uppercase tracking-widest mb-8 hover:text-foreground transition-colors group"
             >
               <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-              Back to News
+              {t("common.backToNews")}
             </Link>
 
             <div className="flex flex-wrap justify-center gap-3 items-center mb-6">
@@ -164,7 +167,7 @@ export default function NewsDetailPage() {
               </div>
               <div className="text-left">
                 <p className="font-bold text-sm m-0">{post.author}</p>
-                <p className="text-[10px] text-foreground/40 m-0 uppercase tracking-widest">Author</p>
+                <p className="text-[10px] text-foreground/40 m-0 uppercase tracking-widest">{t("common.author")}</p>
               </div>
             </div>
           </motion.div>
@@ -208,7 +211,7 @@ export default function NewsDetailPage() {
 
               {/* Share */}
               <div className="mt-10 pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <p className="font-bold text-sm text-foreground/60 m-0">Share this article</p>
+                <p className="font-bold text-sm text-foreground/60 m-0">{t("common.shareArticle")}</p>
                 <div className="flex gap-2">
                   {[
                     { label: "X", key: "twitter" },
@@ -237,7 +240,7 @@ export default function NewsDetailPage() {
       {related.length > 0 && (
         <section className="px-6 md:px-12 lg:px-16 py-12 bg-muted/50">
           <div className="max-w-7xl mx-auto">
-            <h2 className="font-black text-2xl tracking-tight mb-8">Related Articles</h2>
+            <h2 className="font-black text-2xl tracking-tight mb-8">{t("common.relatedArticles")}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {related.map((item, i) => (
                 <RevealOnScroll key={item.slug} delay={i * 0.08}>
@@ -274,7 +277,7 @@ export default function NewsDetailPage() {
           className="inline-flex items-center gap-2 font-bold text-sm text-foreground uppercase tracking-widest hover:text-primary transition-colors group"
         >
           <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-          All Articles
+          {t("common.allArticles")}
           <ArrowUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
         </Link>
       </div>

@@ -3,15 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-
-const navLinks = [
-  { name: "About", href: "/about" },
-  { name: "Products", href: "/products" },
-  { name: "Gallery", href: "/gallery" },
-  { name: "Services", href: "/services" },
-  { name: "News", href: "/news" },
-  { name: "Contact", href: "/contact" },
-];
+import { useTranslation } from "@/lib/i18n/LanguageProvider";
 
 const IconInstagram = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -36,49 +28,54 @@ const IconLinkedIn = () => (
 );
 
 export function Footer() {
+  const { t } = useTranslation();
+
+  const navLinks = [
+    { name: t("nav.about"), href: "/about" },
+    { name: t("nav.products"), href: "/products" },
+    { name: t("nav.gallery"), href: "/gallery" },
+    { name: t("nav.services"), href: "/services" },
+    { name: t("nav.news"), href: "/news" },
+    { name: t("nav.contact"), href: "/contact" },
+  ];
+
   return (
-    <footer className="bg-background relative overflow-hidden pt-32 pb-16 transition-colors duration-300">
-      {/* Monochromatic Mirror Glow Layer */}
-      <div className="absolute top-0 right-0 w-1/3 h-full bg-[radial-gradient(circle_at_100%_0%,rgba(0,0,0,0.02)_0%,transparent_70%)] pointer-events-none opacity-50 dark:opacity-20" />
-      
+    <footer className="bg-background relative overflow-hidden pt-24 pb-12 transition-colors duration-300">
+      <div className="absolute top-0 right-0 w-1/3 h-full bg-[radial-gradient(circle_at_100%_0%,rgba(0,0,0,0.02)_0%,transparent_70%)] pointer-events-none opacity-50" />
+
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 relative z-10">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-16 md:gap-0 pb-20 border-b border-border">
-          <div className="flex flex-col gap-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-12 pb-16 border-b border-border">
+          <div className="flex flex-col gap-6">
             <Link href="/" className="flex items-center gap-4 no-underline group">
               <div className="relative h-12 w-12 overflow-hidden rounded-full bg-white flex items-center justify-center p-1 border border-black/5 shadow-sm transition-transform group-hover:scale-105">
-                <Image
-                  src="/logo.jpg"
-                  alt="EMPC-AMANI Logo"
-                  fill
-                  sizes="48px"
-                  className="object-contain p-1"
-                />
+                <Image src="/logo.jpg" alt="EMPC-AMANI Logo" fill sizes="48px" className="object-contain p-1" />
               </div>
-              <span className="font-black text-3xl text-foreground tracking-tighter">
-                EMPC-AMANI
-              </span>
+              <span className="font-black text-3xl text-foreground tracking-tighter">EMPC-AMANI</span>
             </Link>
             <div className="flex flex-col gap-2">
-              <p className="text-foreground/60 text-lg font-bold italic">Artisanal Workshop & Master Carpentry</p>
-              <Link href="mailto:info@empc-amani.com" className="text-foreground text-lg font-bold hover:underline">info@empc-amani.com</Link>
+              <p className="text-foreground/60 text-base font-bold italic">{t("footer.tagline")}</p>
+              <Link href="mailto:info@empc-amani.com" className="text-foreground text-base font-bold hover:underline">
+                info@empc-amani.com
+              </Link>
             </div>
           </div>
 
-          <div className="flex flex-col gap-12 md:items-end">
-            <nav className="flex flex-wrap gap-x-12 gap-y-4 justify-start md:justify-end">
+          <div className="flex flex-col gap-8 md:items-end">
+            <nav className="flex flex-wrap gap-x-10 gap-y-3 justify-start md:justify-end">
               {navLinks.map((l) => (
-                <Link key={l.name} href={l.href} className="text-base font-black text-foreground/40 no-underline hover:text-foreground transition-colors uppercase tracking-widest">{l.name}</Link>
+                <Link key={l.href} href={l.href} className="text-sm font-black text-foreground/40 no-underline hover:text-foreground transition-colors uppercase tracking-widest">
+                  {l.name}
+                </Link>
               ))}
             </nav>
-
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               {[
                 { Icon: IconInstagram, label: "Instagram" },
                 { Icon: IconFacebook, label: "Facebook" },
                 { Icon: IconX, label: "X" },
                 { Icon: IconLinkedIn, label: "LinkedIn" },
               ].map(({ Icon, label }) => (
-                <Link key={label} href="#" className="h-12 w-12 rounded-full flex items-center justify-center text-foreground border border-border hover:bg-foreground hover:text-background transition-all transform hover:-translate-y-1 shadow-sm">
+                <Link key={label} href="#" className="h-11 w-11 rounded-full flex items-center justify-center text-foreground border border-border hover:bg-foreground hover:text-background transition-all hover:-translate-y-0.5 shadow-sm">
                   <Icon />
                 </Link>
               ))}
@@ -86,23 +83,25 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Big Brand Statement */}
-        <div className="py-20 lg:py-32 overflow-hidden text-center">
-          <h2 className="font-black text-[12vw] lg:text-[10rem] leading-[0.75] tracking-[-0.06em] text-foreground m-0 select-none opacity-[0.03] dark:opacity-[0.05]">
+        <div className="py-16 overflow-hidden text-center">
+          <h2 className="font-black text-[12vw] lg:text-[10rem] leading-[0.75] tracking-[-0.06em] text-foreground m-0 select-none opacity-[0.03]">
             EMPC-AMANI
           </h2>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-8">
-          <div className="flex gap-10">
-            <Link href="/terms" className="text-[11px] font-black text-foreground/20 uppercase tracking-[0.2em] no-underline hover:text-foreground">Terms</Link>
-            <Link href="/privacy" className="text-[11px] font-black text-foreground/20 uppercase tracking-[0.2em] no-underline hover:text-foreground">Privacy</Link>
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
+          <div className="flex gap-8">
+            <Link href="/terms" className="text-[11px] font-black text-foreground/30 uppercase tracking-widest no-underline hover:text-foreground">
+              {t("footer.terms")}
+            </Link>
+            <Link href="/privacy" className="text-[11px] font-black text-foreground/30 uppercase tracking-widest no-underline hover:text-foreground">
+              {t("footer.privacy")}
+            </Link>
           </div>
-          <div className="flex gap-6 items-center">
-            <p className="text-[11px] font-black text-foreground/20 uppercase tracking-[0.2em]">©2026 EMPC-AMANI</p>
+          <div className="flex gap-4 items-center">
+            <p className="text-[11px] font-black text-foreground/30 uppercase tracking-widest">{t("footer.copyright")}</p>
             <div className="h-1 w-1 rounded-full bg-foreground/20" />
-            <p className="text-[11px] font-black text-foreground/20 uppercase tracking-[0.2em]">Master Workshop</p>
+            <p className="text-[11px] font-black text-foreground/30 uppercase tracking-widest">{t("footer.workshop")}</p>
           </div>
         </div>
       </div>

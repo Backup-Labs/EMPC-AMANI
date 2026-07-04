@@ -65,6 +65,20 @@
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.5);
   }
+
+  /* High-contrast nav glass for light backgrounds */
+  .glass-nav {
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(10, 12, 130, 0.12);
+    box-shadow: 0 4px 24px rgba(10, 12, 130, 0.1);
+  }
+}
+
+/* Nav text shadow for readability on hero images */
+.nav-text-shadow {
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.55), 0 0 12px rgba(0, 0, 0, 0.35);
 }
 
 /* ── CUSTOM VISUAL POLISH UTILITIES ────────────────────────────────────────── */
