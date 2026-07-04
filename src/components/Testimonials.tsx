@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Star, X, ArrowUpRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { NotRobotCheckbox } from "@/components/ui/NotRobotCheckbox";
 
 interface Testimonial {
   id: string;
@@ -24,6 +25,7 @@ export function Testimonials() {
   const [role, setRole] = useState("Customer");
   const [rating, setRating] = useState(5);
   const [message, setMessage] = useState("");
+  const [notRobot, setNotRobot] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -58,7 +60,7 @@ export function Testimonials() {
       const res = await fetch("/api/testimonials", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, role, rating, message }),
+        body: JSON.stringify({ name, role, rating, message, not_robot: notRobot }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Failed to submit");
@@ -68,6 +70,7 @@ export function Testimonials() {
       setRole("Customer");
       setRating(5);
       setMessage("");
+      setNotRobot(false);
       setTimeout(() => {
         setSuccess(false);
         setModalOpen(false);
@@ -150,7 +153,10 @@ export function Testimonials() {
       {/* Modal Form */}
       {modalOpen && (
         <div
-          onClick={() => setModalOpen(false)}
+          onClick={() => {
+            setModalOpen(false);
+            setNotRobot(false);
+          }}
           className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-fade-in"
         >
           <div
@@ -161,7 +167,10 @@ export function Testimonials() {
             <div className="flex justify-between items-center p-6 border-b border-border">
               <span className="font-black text-xl uppercase tracking-wider text-foreground">Write a Review</span>
               <button
-                onClick={() => setModalOpen(false)}
+                onClick={() => {
+                  setModalOpen(false);
+                  setNotRobot(false);
+                }}
                 className="h-10 w-10 flex items-center justify-center rounded-full bg-muted hover:bg-foreground/10 text-foreground transition-transform active:scale-90"
               >
                 <X size={18} />
@@ -231,9 +240,16 @@ export function Testimonials() {
                   />
                 </div>
 
+                <NotRobotCheckbox
+                  id="testimonial-not-robot"
+                  checked={notRobot}
+                  onChange={setNotRobot}
+                  disabled={submitting}
+                />
+
                 <button
                   type="submit"
-                  disabled={submitting}
+                  disabled={submitting || !notRobot}
                   className="mt-4 h-14 bg-primary text-background font-black rounded-full flex items-center justify-center hover:opacity-90 active:scale-95 transition-all shadow-lg disabled:opacity-50 cursor-pointer"
                 >
                   {submitting ? "Submitting..." : "Submit Review"}

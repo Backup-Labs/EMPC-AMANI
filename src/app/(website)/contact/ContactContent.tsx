@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus, ArrowUpRight } from "lucide-react";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { NotRobotCheckbox } from "@/components/ui/NotRobotCheckbox";
 import { useTranslation } from "@/lib/i18n/LanguageProvider";
 
 export default function ContactContent() {
@@ -29,6 +30,7 @@ export default function ContactContent() {
   const [subject, setSubject] = useState("");
   const [inquiryType, setInquiryType] = useState("furniture");
   const [message, setMessage] = useState("");
+  const [notRobot, setNotRobot] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -66,6 +68,7 @@ export default function ContactContent() {
           subject: subject || null,
           message,
           inquiry_type: inquiryType,
+          not_robot: notRobot,
         }),
       });
       const json = await res.json();
@@ -77,6 +80,7 @@ export default function ContactContent() {
       setSubject("");
       setMessage("");
       setInquiryType("furniture");
+      setNotRobot(false);
       setTimeout(() => setSubmitted(false), 5000);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to send inquiry.";
@@ -170,8 +174,14 @@ export default function ContactContent() {
                 <textarea required rows={4} value={message} onChange={(e) => setMessage(e.target.value)} placeholder={t("contact.yourVision")} disabled={submitting}
                   className="bg-transparent border-b border-border focus:border-primary outline-none font-bold text-base transition-colors resize-none disabled:opacity-50 text-foreground" />
               </div>
+              <NotRobotCheckbox
+                id="contact-not-robot"
+                checked={notRobot}
+                onChange={setNotRobot}
+                disabled={submitting}
+              />
               <div className="flex flex-col gap-2">
-                <button type="submit" disabled={submitting || submitted}
+                <button type="submit" disabled={submitting || submitted || !notRobot}
                   className="inline-flex h-14 items-center px-10 rounded-full bg-primary text-background font-bold hover:opacity-90 transition-all shadow-md group self-start disabled:opacity-60 cursor-pointer">
                   {submitting ? t("common.sending") : submitted ? t("common.messageSent") : t("common.sendInquiry")}
                   <ArrowUpRight size={18} className="ml-2 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />

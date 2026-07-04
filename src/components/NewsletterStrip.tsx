@@ -2,9 +2,11 @@
 
 import React, { useState } from "react";
 import { ArrowRight } from "lucide-react";
+import { NotRobotCheckbox } from "@/components/ui/NotRobotCheckbox";
 
 export function NewsletterStrip() {
   const [email, setEmail] = useState("");
+  const [notRobot, setNotRobot] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
 
@@ -19,7 +21,7 @@ export function NewsletterStrip() {
       const res = await fetch("/api/newsletter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, not_robot: notRobot }),
       });
       const json = await res.json();
 
@@ -30,7 +32,10 @@ export function NewsletterStrip() {
       if (json.message === "Already subscribed" || json.success) {
         setStatus("success");
         setMessage(json.message === "Already subscribed" ? "You're already subscribed!" : "Thank you for subscribing!");
-        if (json.message !== "Already subscribed") setEmail("");
+        if (json.message !== "Already subscribed") {
+          setEmail("");
+          setNotRobot(false);
+        }
       } else {
         throw new Error(json.error || "Subscription failed");
       }
@@ -63,13 +68,20 @@ export function NewsletterStrip() {
             />
             <button
               type="submit"
-              disabled={status === "loading"}
+              disabled={status === "loading" || !notRobot}
               className="h-14 w-14 bg-primary text-background rounded-full flex items-center justify-center hover:opacity-90 transition-all shadow-md active:scale-95 disabled:opacity-50 shrink-0"
               aria-label="Subscribe"
             >
               <ArrowRight size={20} />
             </button>
           </div>
+          <NotRobotCheckbox
+            id="newsletter-not-robot"
+            checked={notRobot}
+            onChange={setNotRobot}
+            disabled={status === "loading"}
+            className="px-1"
+          />
           {message && (
             <p
               className={`text-xs font-bold px-4 mt-1 ${
