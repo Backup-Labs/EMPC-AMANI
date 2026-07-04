@@ -6,7 +6,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { Counter, LogoMarquee } from "@/components/AnimatedComponents";
-import { Testimonials } from "@/components/Testimonials";
+import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { Badge } from "@/components/ui/Badge";
@@ -50,7 +50,7 @@ export function HomeClient({
     <div className="bg-background min-h-screen overflow-x-hidden relative text-foreground">
 
       {/* Hero */}
-      <section className="relative h-screen min-h-[600px] overflow-hidden">
+      <section className="relative h-screen min-h-150 overflow-hidden">
         <Image src={heroImage} alt="EMPC-AMANI Interior" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-linear-to-b from-black/60 via-transparent to-black/40" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,0,0,0.05)_0%,transparent_60%)]" />
@@ -127,7 +127,7 @@ export function HomeClient({
       <section className="px-6 md:px-12 lg:px-16 py-8 lg:py-12">
         <div className="max-w-7xl mx-auto">
           <RevealOnScroll>
-            <div className="relative rounded-2xl overflow-hidden aspect-[21/9] mb-8 lg:mb-10 shadow-lg">
+            <div className="relative rounded-2xl overflow-hidden aspect-21/9 mb-8 lg:mb-10 shadow-lg">
               <Image src="/images/project2.png" alt="Studio" fill sizes="100vw" className="object-cover" />
             </div>
           </RevealOnScroll>
@@ -172,7 +172,7 @@ export function HomeClient({
               <RevealOnScroll key={product.id} delay={i * 0.08}>
                 <Link href={`/products/${productPath(product)}`} className="group block no-underline text-foreground">
                   <article className="card-elevated overflow-hidden">
-                    <div className="relative aspect-[4/3] overflow-hidden">
+                    <div className="relative aspect-4/3 overflow-hidden">
                       <Image src={product.image_url} alt={product.title} fill sizes="33vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
                       <div className="absolute top-3 left-3"><Badge variant="glass">{product.category}</Badge></div>
                     </div>
@@ -222,7 +222,7 @@ export function HomeClient({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.98 }}
                 transition={{ duration: 0.5, ease: EASE }}
-                className="relative rounded-2xl overflow-hidden aspect-[21/9] shadow-lg"
+                className="relative rounded-2xl overflow-hidden aspect-21/9 shadow-lg"
               >
                 <Image src={slide.image} alt={slide.title} fill sizes="100vw" className="object-cover" />
                 <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/10 to-transparent" />
@@ -333,7 +333,7 @@ export function HomeClient({
             heading={<>{t("home.reviewsHeading1")}<br />{t("home.reviewsHeading2")}</>}
             desc={t("home.reviewsDesc")}
           />
-          <Testimonials />
+          <TestimonialsCarousel />
         </div>
       </section>
     </div>

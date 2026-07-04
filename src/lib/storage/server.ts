@@ -1,7 +1,8 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 
-const BUCKETS = ["products", "gallery", "news", "media", "avatars"] as const;
+// const BUCKETS = ["products", "gallery", "news", "media", "avatars"] as const;
+const BUCKETS = "empc" as const;
 export type StorageBucket = (typeof BUCKETS)[number];
 
 export function isValidBucket(bucket: string): bucket is StorageBucket {

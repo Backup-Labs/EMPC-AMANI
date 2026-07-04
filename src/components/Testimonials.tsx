@@ -55,17 +55,13 @@ export function Testimonials() {
 
     setSubmitting(true);
     try {
-      const { error } = await supabase.from("testimonials").insert([
-        {
-          name,
-          role,
-          rating,
-          message,
-          approved: false, // Default is false anyway, but let's be explicit
-        },
-      ]);
-
-      if (error) throw error;
+      const res = await fetch("/api/testimonials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, role, rating, message }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Failed to submit");
 
       setSuccess(true);
       setName("");

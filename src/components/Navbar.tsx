@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -10,6 +10,14 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useTranslation } from "@/lib/i18n/LanguageProvider";
 
 const HERO_ROUTES = ["/", "/about", "/services", "/gallery", "/news", "/contact", "/testimonials"];
+const SCROLL_COMPACT_THRESHOLD = 12;
+const SCROLL_HIDE_THRESHOLD = 100;
+const SCROLL_DELTA = 6;
+
+/** Compact pill + glass — same as product detail / light-background pages */
+const COMPACT_NAV_BAR =
+  "glass-nav rounded-full px-5 py-2.5 md:px-7 shadow-lg shadow-primary/5";
+const EXPANDED_NAV_BAR = "bg-transparent py-6 md:py-8";
 
 function isLightBgRoute(pathname: string): boolean {
   if (pathname.startsWith("/products")) return true;
@@ -23,15 +31,18 @@ function hasHeroImage(pathname: string): boolean {
 }
 
 export function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const [hidden, setHidden] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const lastScrollY = useRef(0);
   const pathname = usePathname();
   const { t } = useTranslation();
 
   const lightBg = isLightBgRoute(pathname);
   const heroPage = hasHeroImage(pathname);
-  const solidNav = scrolled || lightBg;
-  const lightText = heroPage && !solidNav;
+  /** Product pages always use compact nav; hero pages switch on scroll */
+  const compactNav = lightBg || scrollY > SCROLL_COMPACT_THRESHOLD;
+  const lightText = heroPage && !compactNav;
 
   const navLinks = [
     { name: t("nav.about"), href: "/about" },
@@ -44,18 +55,48 @@ export function Navbar() {
   ];
 
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 60);
+    lastScrollY.current = window.scrollY;
+
+    let rafId = 0;
+    const handler = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const currentY = window.scrollY;
+        const delta = currentY - lastScrollY.current;
+
+        setScrollY(currentY);
+
+        if (!mobileOpen) {
+          if (currentY <= SCROLL_HIDE_THRESHOLD) {
+            setHidden(false);
+          } else if (delta > SCROLL_DELTA) {
+            setHidden(true);
+          } else if (delta < -SCROLL_DELTA) {
+            setHidden(false);
+          }
+        }
+
+        lastScrollY.current = currentY;
+      });
+    };
+
     window.addEventListener("scroll", handler, { passive: true });
     handler();
-    return () => window.removeEventListener("scroll", handler);
-  }, []);
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("scroll", handler);
+    };
+  }, [mobileOpen]);
 
   useEffect(() => {
     setMobileOpen(false);
+    setHidden(false);
+    lastScrollY.current = window.scrollY;
+    setScrollY(window.scrollY);
   }, [pathname]);
 
   const linkClass = (active: boolean) => {
-    if (solidNav) {
+    if (compactNav) {
       return active
         ? "text-foreground"
         : "text-foreground/65 hover:text-foreground";
@@ -67,23 +108,31 @@ export function Navbar() {
     <>
       <motion.header
         initial={{ y: -80, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, ease: "easeOut" as any }}
-        className="fixed top-0 left-0 right-0 z-50 px-4 md:px-0"
+        animate={{
+          y: hidden ? "-110%" : 0,
+          opacity: hidden ? 0 : 1,
+        }}
+        transition={{
+          type: "spring",
+          stiffness: 380,
+          damping: 32,
+          mass: 0.8,
+        }}
+        className={`fixed top-0 left-0 right-0 z-50 px-4 md:px-0 ${hidden ? "pointer-events-none" : ""}`}
       >
-        <div
-          className="transition-all duration-500 ease-in-out mx-auto px-6 md:px-12 lg:px-16"
-          style={{
-            marginTop: solidNav ? "12px" : "0",
-            maxWidth: solidNav ? "920px" : "1344px",
-            width: "100%",
+        <motion.div
+          animate={{
+            marginTop: compactNav ? 12 : 0,
+            maxWidth: compactNav ? 920 : 1344,
           }}
+          transition={{ type: "spring", stiffness: 320, damping: 28 }}
+          className="mx-auto px-6 md:px-12 lg:px-16 w-full"
         >
-          <div
-            className={`flex items-center justify-between transition-all duration-500 ease-in-out ${
-              solidNav
-                ? "glass-nav rounded-full px-5 py-2.5 md:px-7"
-                : "bg-transparent py-6 md:py-8"
+          <motion.div
+            layout
+            transition={{ type: "spring", stiffness: 320, damping: 28 }}
+            className={`flex items-center justify-between ${
+              compactNav ? COMPACT_NAV_BAR : EXPANDED_NAV_BAR
             }`}
           >
             <Link href="/" className="flex items-center gap-3 no-underline group shrink-0">
@@ -121,14 +170,17 @@ export function Navbar() {
                 className={`flex items-center justify-center transition-colors p-1 ${
                   lightText ? "text-white nav-text-shadow" : "text-foreground"
                 }`}
-                onClick={() => setMobileOpen(true)}
+                onClick={() => {
+                  setHidden(false);
+                  setMobileOpen(true);
+                }}
                 aria-label={t("nav.openMenu")}
               >
                 <Menu size={24} />
               </button>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </motion.header>
 
       <AnimatePresence>
@@ -138,7 +190,7 @@ export function Navbar() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed inset-0 z-[100] flex flex-col bg-background text-foreground"
+            className="fixed inset-0 z-100 flex flex-col bg-background text-foreground"
           >
             <div className="flex items-center justify-between p-6">
               <div className="flex items-center gap-3">

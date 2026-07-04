@@ -1,59 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
+import type { SiteContent, SiteSettings, FaqItem } from "./settings-types";
+import { DEFAULT_SERVICES, DEFAULT_MILESTONES, DEFAULT_ABOUT_VALUES } from "./defaults";
+
+export type { ServiceItem, MilestoneItem, AboutValue, SiteContent, SiteSettings, FaqItem } from "./settings-types";
+export { DEFAULT_SERVICES } from "./defaults";
 
 export const dynamic = "force-dynamic";
-
-export interface ServiceItem {
-  num: string;
-  title: string;
-  desc: string;
-  stat: number;
-  suffix: string;
-  statLabel: string;
-  image: string;
-}
-
-export interface MilestoneItem {
-  year: string;
-  title: string;
-  desc: string;
-  images: string[];
-}
-
-export interface AboutValue {
-  title: string;
-  desc: string;
-}
-
-export interface SiteContent {
-  hero_title: string;
-  hero_subtitle: string;
-  hero_image: string;
-  about_intro: string;
-  about_heading: string;
-  about_stat_artisans: number;
-  about_stat_heritage: number;
-  services_intro: string;
-  footer_tagline: string;
-  contact_intro: string;
-  faq_intro: string;
-  partners: { name: string; icon: string }[];
-  services: ServiceItem[];
-  milestones: MilestoneItem[];
-  about_values: AboutValue[];
-}
-
-const DEFAULT_MILESTONES: MilestoneItem[] = [
-  { year: "1990", title: "Workshop Founded", desc: "EMPC-AMANI begins with two benches and a passion for solid wood.", images: ["/images/hero.png", "/images/project1.png"] },
-  { year: "2010", title: "Industrial Expansion", desc: "Scale production for boutique hotels and luxury offices began.", images: ["/images/project2.png", "/images/hero.png"] },
-  { year: "2020", title: "Vocational Partnership", desc: "Launched our first student certification program with RTB.", images: ["/images/project1.png", "/images/project2.png"] },
-  { year: "2021", title: "Mastery Hub", desc: "Expanding our campus to become the premier carpentry training hub.", images: ["/images/hero.png", "/images/project1.png"] },
-];
-
-const DEFAULT_ABOUT_VALUES: AboutValue[] = [
-  { title: "Honest Materials", desc: "We only work with sustainably sourced timber, ensuring our impact on the earth is as beautiful as our work." },
-  { title: "Lifelong Mastery", desc: "Our workshop is a school of life. We believe in continuous learning and the preservation of heritage skills." },
-  { title: "Future Leaders", desc: "Through our partnership with RTB, we empower the youth with certified skills and real-world industrial experience." },
-];
 
 const DEFAULTS: SiteContent = {
   hero_title: "Craftsmanship Rooted in Heritage",
@@ -63,12 +15,12 @@ const DEFAULTS: SiteContent = {
   about_heading: "Rooted in Craft. Driven by Heritage.",
   about_stat_artisans: 250,
   about_stat_heritage: 14,
-  services_intro: "",
+  services_intro: "Master-grade carpentry and vocational training services tailored for excellence.",
   footer_tagline: "Master carpentry & vocational excellence.",
   contact_intro: "",
   faq_intro: "",
   partners: [],
-  services: [],
+  services: DEFAULT_SERVICES,
   milestones: DEFAULT_MILESTONES,
   about_values: DEFAULT_ABOUT_VALUES,
 };
@@ -85,13 +37,14 @@ export async function getSiteContent(): Promise<SiteContent> {
   const supabase = await createClient();
   const { data } = await supabase.from("settings").select("key, value").like("key", "content_%");
 
-  const content = { ...DEFAULTS, milestones: [...DEFAULT_MILESTONES], about_values: [...DEFAULT_ABOUT_VALUES] };
+  const content = { ...DEFAULTS, milestones: [...DEFAULT_MILESTONES], about_values: [...DEFAULT_ABOUT_VALUES], services: [...DEFAULT_SERVICES] };
   (data || []).forEach((row: { key: string; value: string }) => {
     const key = row.key.replace("content_", "");
     if (key === "partners") {
       content.partners = parseJsonField(row.value, []);
     } else if (key === "services") {
-      content.services = parseJsonField(row.value, []);
+      const parsed = parseJsonField<SiteContent["services"]>(row.value, []);
+      content.services = parsed.length ? parsed : [...DEFAULT_SERVICES];
     } else if (key === "milestones") {
       content.milestones = parseJsonField(row.value, DEFAULT_MILESTONES);
     } else if (key === "about_values") {
@@ -104,19 +57,8 @@ export async function getSiteContent(): Promise<SiteContent> {
       (content as Record<string, unknown>)[key] = row.value;
     }
   });
+  if (!content.services.length) content.services = [...DEFAULT_SERVICES];
   return content;
-}
-
-export interface SiteSettings {
-  company_name: string;
-  company_tagline: string;
-  contact_email: string;
-  contact_phone: string;
-  contact_address: string;
-  social_instagram: string;
-  social_facebook: string;
-  social_twitter: string;
-  social_linkedin: string;
 }
 
 const SETTINGS_DEFAULTS: SiteSettings = {
@@ -142,13 +84,6 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     }
   });
   return settings;
-}
-
-export interface FaqItem {
-  id: string;
-  question: string;
-  answer: string;
-  sort_order: number;
 }
 
 export async function getPublishedFaqs(): Promise<FaqItem[]> {

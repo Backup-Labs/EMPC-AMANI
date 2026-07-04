@@ -10,6 +10,8 @@ import { AdminFilterTabs } from "@/components/admin/ui/AdminFilterTabs";
 import { AdminLoading } from "@/components/admin/ui/AdminLoading";
 import { AdminEmptyState } from "@/components/admin/ui/AdminEmptyState";
 import { useToast } from "@/components/ui/Toast";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
+import { stripHtml } from "@/lib/sanitize";
 import type { Post } from "@/types/database";
 
 export default function AdminPosts() {
@@ -157,7 +159,7 @@ export default function AdminPosts() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !slug) return;
-    if (postType === "internal" && !content) return;
+    if (postType === "internal" && !stripHtml(content).trim()) return;
     if (postType === "external" && !externalUrl) return;
 
     setSubmitting(true);
@@ -396,7 +398,7 @@ export default function AdminPosts() {
           {postType === "internal" && (
             <div className="flex flex-col gap-1.5">
               <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Content</label>
-              <textarea required rows={8} value={content} onChange={(e) => setContent(e.target.value)} className="bg-transparent border border-border rounded-xl focus:border-foreground outline-none font-medium text-sm p-4 resize-none" />
+              <RichTextEditor value={content} onChange={setContent} placeholder="Write your article — use the toolbar for formatting..." />
             </div>
           )}
 

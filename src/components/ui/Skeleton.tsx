@@ -12,7 +12,7 @@ export function Skeleton({ className }: SkeletonProps) {
 export function CardSkeleton() {
   return (
     <div className="flex flex-col gap-4">
-      <Skeleton className="aspect-[4/3] w-full rounded-xl" />
+      <Skeleton className="aspect-4/3 w-full rounded-xl" />
       <Skeleton className="h-4 w-1/3" />
       <Skeleton className="h-6 w-2/3" />
       <Skeleton className="h-4 w-full" />

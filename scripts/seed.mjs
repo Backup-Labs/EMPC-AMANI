@@ -285,6 +285,15 @@ async function seed() {
     { key: "content_about_heading", value: "Rooted in Craft. Driven by Heritage." },
     { key: "content_about_stat_artisans", value: "250" },
     { key: "content_about_stat_heritage", value: "14" },
+    {
+      key: "content_services",
+      value: JSON.stringify([
+        { num: "01", title: "Bespoke Furniture", desc: "From concept sketches to the final coat of oil. We craft tables, chairs, and cabinets that become the heart of any room.", stat: 2500, suffix: "+", statLabel: "Crafted Pieces", image: "/images/hero.png" },
+        { num: "02", title: "Commercial Woodwork", desc: "Large-scale carpentry for boutique hotels, modern offices, and artisanal retail environments.", stat: 85, suffix: "+", statLabel: "Enterprises", image: "/images/project1.png" },
+        { num: "03", title: "Restoration & Care", desc: "Breathe new life into heritage timber. We restore, rework, and refine existing woodwork with expert care.", stat: 150, suffix: "+", statLabel: "Master Restorations", image: "/images/project2.png" },
+        { num: "04", title: "Internships & Training", desc: "Empowering the next generation with certified vocational training in partnership with RTB.", stat: 500, suffix: "+", statLabel: "Certified Artisans", image: "/images/project1.png" },
+      ]),
+    },
   ];
   const { error: sErr } = await supabase.from("settings").upsert(settings, { onConflict: "key" });
   if (sErr) console.warn("Settings:", sErr.message);

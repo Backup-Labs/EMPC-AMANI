@@ -42,4 +42,5 @@ export type NewsContentBlock =
   | { type: "p"; text: string }
   | { type: "h2"; text: string }
   | { type: "h3"; text: string }
-  | { type: "image"; src: string; alt?: string };
+  | { type: "image"; src: string; alt?: string }
+  | { type: "html"; html: string };

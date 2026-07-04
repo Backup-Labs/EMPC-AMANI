@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus, ArrowUpRight } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { useTranslation } from "@/lib/i18n/LanguageProvider";
 
@@ -57,18 +56,20 @@ export default function ContactContent() {
     setSubmitting(true);
     setErrorMsg("");
     try {
-      const { error } = await supabase.from("inquiries").insert([
-        {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           full_name: name,
-          email: email || null,
+          email: email || undefined,
           phone: phone || null,
           subject: subject || null,
           message,
           inquiry_type: inquiryType,
-          status: "new",
-        },
-      ]);
-      if (error) throw error;
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Failed to submit");
       setSubmitted(true);
       setName("");
       setEmail("");

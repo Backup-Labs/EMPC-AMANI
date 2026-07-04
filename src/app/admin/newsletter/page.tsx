@@ -45,13 +45,23 @@ export default function AdminNewsletter() {
     if (!subject.trim() || !content.trim()) return;
     if (!confirm(`Send to ${subCount} subscribers?`)) return;
     setSaving(true);
-    await supabase.from("newsletter_campaigns").insert([{
-      subject, content, status: "sent", sent_at: new Date().toISOString(), recipient_count: subCount,
-    }]);
-    setSaving(false);
-    setSubject(""); setContent("");
-    load();
-    alert(`Newsletter queued for ${subCount} subscribers.`);
+    try {
+      const res = await fetch("/api/newsletter/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subject, content }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Send failed");
+      alert(`Newsletter sent to ${json.sent} subscribers.`);
+      setSubject("");
+      setContent("");
+      load();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to send newsletter");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const filtered = campaigns.filter((c) => filter === "all" || c.status === filter);

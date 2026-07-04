@@ -8,8 +8,17 @@ export type CmsNewsPost = NewsPost & {
   externalSource?: string;
 };
 
+import { sanitizeHtml } from "@/lib/sanitize";
+
+function isHtmlContent(raw: string): boolean {
+  return /<(?:p|h[1-6]|ul|ol|li|blockquote|strong|em|div|br)\b/i.test(raw);
+}
+
 function parseContent(raw: string): NewsContentBlock[] {
   if (!raw?.trim()) return [{ type: "p", text: "" }];
+  if (isHtmlContent(raw)) {
+    return [{ type: "html", html: sanitizeHtml(raw) }];
+  }
   const blocks: NewsContentBlock[] = [];
   raw.split(/\n\n+/).forEach((block) => {
     const trimmed = block.trim();
@@ -25,7 +34,11 @@ function parseContent(raw: string): NewsContentBlock[] {
 }
 
 function estimateReadTime(content: NewsContentBlock[]): string {
-  const words = content.reduce((n, b) => n + ("text" in b ? b.text.split(/\s+/).length : 0), 0);
+  const words = content.reduce((n, b) => {
+    if (b.type === "html") return n + b.html.replace(/<[^>]+>/g, " ").split(/\s+/).length;
+    if ("text" in b) return n + b.text.split(/\s+/).length;
+    return n;
+  }, 0);
   return `${Math.max(1, Math.ceil(words / 200))} min read`;
 }
 

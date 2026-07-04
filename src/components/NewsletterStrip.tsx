@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { ArrowRight } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 
 export function NewsletterStrip() {
   const [email, setEmail] = useState("");
@@ -17,25 +16,28 @@ export function NewsletterStrip() {
     setMessage("");
 
     try {
-      const { error } = await supabase.from("subscribers").insert([{ email }]);
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const json = await res.json();
 
-      if (error) {
-        // PostgREST/Supabase unique violation error code is "23505"
-        if (error.code === "23505") {
-          setStatus("success");
-          setMessage("You're already subscribed!");
-        } else {
-          throw error;
-        }
-      } else {
-        setStatus("success");
-        setMessage("Thank you for subscribing!");
-        setEmail("");
+      if (!res.ok && res.status !== 200) {
+        throw new Error(json.error || "Subscription failed");
       }
-    } catch (err: any) {
+
+      if (json.message === "Already subscribed" || json.success) {
+        setStatus("success");
+        setMessage(json.message === "Already subscribed" ? "You're already subscribed!" : "Thank you for subscribing!");
+        if (json.message !== "Already subscribed") setEmail("");
+      } else {
+        throw new Error(json.error || "Subscription failed");
+      }
+    } catch (err: unknown) {
       console.error("Newsletter subscription error:", err);
       setStatus("error");
-      setMessage(err.message || "An error occurred. Please try again.");
+      setMessage(err instanceof Error ? err.message : "An error occurred. Please try again.");
     }
   };
 

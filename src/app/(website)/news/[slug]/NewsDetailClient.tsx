@@ -49,6 +49,14 @@ function TableOfContents({ headings }: { headings: { id: string; text: string }[
 }
 
 function ContentBlock({ block, index }: { block: NewsContentBlock; index: number }) {
+  if (block.type === "html") {
+    return (
+      <div
+        className="prose-article text-foreground/65 text-[1.0625rem] leading-[1.75] mb-5"
+        dangerouslySetInnerHTML={{ __html: block.html }}
+      />
+    );
+  }
   if (block.type === "h2") {
     const id = `heading-${index}`;
     return <h2 id={id} className="font-black text-[1.75rem] md:text-[2.2rem] tracking-[-0.04em] leading-tight mt-10 mb-4 text-foreground scroll-mt-32">{block.text}</h2>;
