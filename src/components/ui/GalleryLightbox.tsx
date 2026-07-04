@@ -7,9 +7,12 @@ import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "@/lib/i18n/LanguageProvider";
 
 export interface GalleryItem {
+  id?: string;
   title: string;
   tags: string[];
   image: string;
+  description?: string;
+  category?: string;
 }
 
 interface GalleryLightboxProps {

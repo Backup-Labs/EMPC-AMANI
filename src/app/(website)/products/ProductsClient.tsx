@@ -10,7 +10,7 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Badge } from "@/components/ui/Badge";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { CTASection } from "@/components/ui/CTASection";
-import { formatPrice } from "@/lib/data/products";
+import { formatPrice, productPath } from "@/lib/format";
 import { useTranslation } from "@/lib/i18n/LanguageProvider";
 import { EASE } from "@/lib/motion";
 import type { Product } from "@/types";
@@ -69,7 +69,7 @@ export function ProductsClient({ products }: { products: Product[] }) {
           >
             {filtered.map((product, i) => (
               <RevealOnScroll key={product.id} delay={i * 0.06}>
-                <Link href={`/products/${product.id}`} className="group block no-underline text-foreground">
+                <Link href={`/products/${productPath(product)}`} className="group block no-underline text-foreground">
                   <article className="card-elevated overflow-hidden">
                     <div className="relative aspect-[4/3] overflow-hidden">
                       <Image

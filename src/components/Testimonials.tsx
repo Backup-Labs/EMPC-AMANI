@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Star, X, ArrowUpRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 interface Testimonial {
   id: string;
@@ -105,8 +106,14 @@ export function Testimonials() {
     <div className="py-16 md:py-24">
       {/* Testimonials Grid */}
       {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="card-layered p-8 flex flex-col gap-6">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-20 w-full" />
+              <Skeleton className="h-4 w-32 mt-4" />
+            </div>
+          ))}
         </div>
       ) : testimonials.length === 0 ? (
         <div className="text-center py-12 bg-muted rounded-2xl border border-border/40">

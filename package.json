@@ -6,13 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed": "node scripts/seed.mjs",
+    "migrate": "node scripts/migrate.mjs"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.2",
-    "cloudinary": "^2.10.0",
     "clsx": "^2.1.1",
     "dotenv": "^17.4.2",
     "framer-motion": "^12.38.0",
@@ -30,6 +31,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.2",
+    "pg": "^8.16.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

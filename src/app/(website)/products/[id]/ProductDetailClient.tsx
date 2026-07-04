@@ -22,7 +22,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { useTranslation } from "@/lib/i18n/LanguageProvider";
-import { productReviews, formatPrice } from "@/lib/data/products";
+import { formatPrice, productPath } from "@/lib/format";
 import { trackProductView } from "@/lib/portal/recentlyViewed";
 import { EASE } from "@/lib/motion";
 import type { Product } from "@/types";
@@ -50,7 +50,7 @@ export function ProductDetailClient({
 }) {
   const { t } = useTranslation();
   const related = relatedProducts;
-  const reviews = productReviews[product.id] || [];
+  const reviews: { id: string; author: string; rating: number; date: string; comment: string }[] = [];
 
   useEffect(() => {
     trackProductView({
@@ -249,7 +249,7 @@ export function ProductDetailClient({
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {related.map((item, i) => (
                 <RevealOnScroll key={item.id} delay={i * 0.08}>
-                  <Link href={`/products/${item.id}`} className="group block no-underline text-foreground">
+                  <Link href={`/products/${productPath(item)}`} className="group block no-underline text-foreground">
                     <article className="card-elevated overflow-hidden">
                       <div className="relative aspect-[4/3] overflow-hidden">
                         <Image src={item.image_url} alt={item.title} fill sizes="33vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />

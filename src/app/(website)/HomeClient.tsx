@@ -11,55 +11,47 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { newsPosts } from "@/lib/data/news";
-import { products, formatPrice } from "@/lib/data/products";
+import { formatPrice, productPath } from "@/lib/format";
 import type { Product, NewsPost } from "@/types";
+import type { SiteContent, FaqItem } from "@/lib/cms/settings";
+import type { GalleryItem } from "@/components/ui/GalleryLightbox";
 import { EASE } from "@/lib/motion";
 import { useTranslation } from "@/lib/i18n/LanguageProvider";
 
-const exclusiveProjects = [
-  { title: "Siam Teak Table", category: "Dining", year: "2024", image: "/images/hero.png" },
-  { title: "Artisan Credenza", category: "Storage", year: "2025", image: "/images/project1.png" },
-  { title: "Nordic Lounge", category: "Seating", year: "2024", image: "/images/project2.png" },
-];
-
-const featuredProjects = [
-  { title: "Master Suite Set", tags: ["Oak", "Bespoke"], image: "/images/hero.png" },
-  { title: "Floating Bed Frame", tags: ["Maple", "Modern"], image: "/images/project1.png" },
-  { title: "Live Edge Desk", tags: ["Walnut", "Office"], image: "/images/project2.png" },
-];
-
-const partners = [
-  { name: "RTB", icon: "R" },
-  { name: "WoodMaster", icon: "W" },
-  { name: "EcoTimber", icon: "E" },
-  { name: "Vocation", icon: "V" },
-  { name: "Heritage", icon: "H" },
-  { name: "CraftHub", icon: "C" },
-];
-
-const defaultLatestNews = newsPosts.slice(0, 3);
-const defaultFeaturedProducts = products.slice(0, 3);
-
 export function HomeClient({
-  featuredProducts = defaultFeaturedProducts,
-  latestNewsPosts = defaultLatestNews,
+  featuredProducts,
+  latestNewsPosts,
+  galleryItems,
+  siteContent,
+  faqs: _faqs,
 }: {
-  featuredProducts?: Product[];
-  latestNewsPosts?: NewsPost[];
+  featuredProducts: Product[];
+  latestNewsPosts: NewsPost[];
+  galleryItems: (GalleryItem & { span?: string })[];
+  siteContent: SiteContent;
+  faqs: FaqItem[];
 }) {
   const { t } = useTranslation();
+  const carouselItems = galleryItems.length
+    ? galleryItems.map((g) => ({ title: g.title, image: g.image }))
+    : featuredProducts.map((p) => ({ title: p.title, image: p.image_url }));
+
   const [carouselIdx, setCarouselIdx] = useState(0);
-  const prevSlide = () => setCarouselIdx((i) => (i - 1 + exclusiveProjects.length) % exclusiveProjects.length);
-  const nextSlide = () => setCarouselIdx((i) => (i + 1) % exclusiveProjects.length);
-  const slide = exclusiveProjects[carouselIdx];
+  const carouselLen = Math.max(carouselItems.length, 1);
+  const prevSlide = () => setCarouselIdx((i) => (i - 1 + carouselLen) % carouselLen);
+  const nextSlide = () => setCarouselIdx((i) => (i + 1) % carouselLen);
+  const slide = carouselItems[carouselIdx] || { title: siteContent.hero_title, image: siteContent.hero_image || "/images/hero.png" };
+  const partners = siteContent.partners.length ? siteContent.partners : [
+    { name: "RTB", icon: "R" }, { name: "WoodMaster", icon: "W" }, { name: "EcoTimber", icon: "E" },
+  ];
+  const heroImage = siteContent.hero_image || "/images/hero.png";
 
   return (
     <div className="bg-background min-h-screen overflow-x-hidden relative text-foreground">
 
       {/* Hero */}
       <section className="relative h-screen min-h-[600px] overflow-hidden">
-        <Image src="/images/hero.png" alt="EMPC-AMANI Interior" fill priority sizes="100vw" className="object-cover" />
+        <Image src={heroImage} alt="EMPC-AMANI Interior" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-linear-to-b from-black/60 via-transparent to-black/40" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,0,0,0.05)_0%,transparent_60%)]" />
 
@@ -83,7 +75,7 @@ export function HomeClient({
                 transition={{ duration: 0.8, delay: 0.15, ease: EASE }}
                 className="text-white/80 text-base md:text-lg leading-relaxed mt-5 max-w-lg"
               >
-                {t("home.heroDesc")}
+                {siteContent.hero_subtitle || t("home.heroDesc")}
               </motion.p>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -174,9 +166,11 @@ export function HomeClient({
             }
           />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6 py-8">
-            {featuredProducts.map((product, i) => (
+            {featuredProducts.length === 0 ? (
+              <p className="text-sm text-foreground/50 col-span-full text-center py-8">No products published yet.</p>
+            ) : featuredProducts.map((product, i) => (
               <RevealOnScroll key={product.id} delay={i * 0.08}>
-                <Link href={`/products/${product.id}`} className="group block no-underline text-foreground">
+                <Link href={`/products/${productPath(product)}`} className="group block no-underline text-foreground">
                   <article className="card-elevated overflow-hidden">
                     <div className="relative aspect-[4/3] overflow-hidden">
                       <Image src={product.image_url} alt={product.title} fill sizes="33vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
@@ -253,15 +247,17 @@ export function HomeClient({
             desc={t("home.galleryDesc")}
           />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 py-8">
-            {featuredProjects.map((p, i) => (
+            {galleryItems.length === 0 ? (
+              <p className="text-sm text-foreground/50 col-span-full text-center py-8">No gallery items yet.</p>
+            ) : galleryItems.slice(0, 3).map((p, i) => (
               <RevealOnScroll key={i} delay={i * 0.08}>
                 <Link href="/gallery" className="group block no-underline text-foreground">
                   <article className="card-elevated p-4 flex flex-col gap-4">
                     <div className="relative rounded-xl overflow-hidden aspect-square">
                       <Image src={p.image} alt={p.title} fill sizes="33vw" className="object-cover group-hover:scale-105 transition-transform duration-700" />
                       <div className="absolute top-3 left-3 flex gap-1.5">
-                        {p.tags.map((t) => (
-                          <Badge key={t} variant="glass">{t}</Badge>
+                        {p.tags.map((tag) => (
+                          <Badge key={tag} variant="glass">{tag}</Badge>
                         ))}
                       </div>
                     </div>
@@ -308,7 +304,9 @@ export function HomeClient({
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6 py-8">
-            {latestNewsPosts.map((b, i) => (
+            {latestNewsPosts.length === 0 ? (
+              <p className="text-sm text-foreground/50 col-span-full text-center py-8">No news articles yet.</p>
+            ) : latestNewsPosts.map((b, i) => (
               <RevealOnScroll key={b.slug} delay={i * 0.08}>
                 <Link href={`/news/${b.slug}`} className="group block no-underline text-foreground">
                   <article className="card-elevated overflow-hidden">

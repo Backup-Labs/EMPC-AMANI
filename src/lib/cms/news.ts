@@ -1,6 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import type { NewsPost, NewsContentBlock } from "@/types";
-import { newsPosts as staticPosts } from "@/lib/data/news";
+
+export const dynamic = "force-dynamic";
+
+export type CmsNewsPost = NewsPost & {
+  externalUrl?: string;
+  externalSource?: string;
+};
 
 function parseContent(raw: string): NewsContentBlock[] {
   if (!raw?.trim()) return [{ type: "p", text: "" }];
@@ -8,16 +14,12 @@ function parseContent(raw: string): NewsContentBlock[] {
   raw.split(/\n\n+/).forEach((block) => {
     const trimmed = block.trim();
     if (!trimmed) return;
-    if (trimmed.startsWith("### ")) {
-      blocks.push({ type: "h3", text: trimmed.slice(4) });
-    } else if (trimmed.startsWith("## ")) {
-      blocks.push({ type: "h2", text: trimmed.slice(3) });
-    } else if (trimmed.startsWith("![")) {
+    if (trimmed.startsWith("### ")) blocks.push({ type: "h3", text: trimmed.slice(4) });
+    else if (trimmed.startsWith("## ")) blocks.push({ type: "h2", text: trimmed.slice(3) });
+    else if (trimmed.startsWith("![")) {
       const match = trimmed.match(/!\[([^\]]*)\]\(([^)]+)\)/);
       if (match) blocks.push({ type: "image", src: match[2], alt: match[1] });
-    } else {
-      blocks.push({ type: "p", text: trimmed });
-    }
+    } else blocks.push({ type: "p", text: trimmed });
   });
   return blocks.length ? blocks : [{ type: "p", text: raw }];
 }
@@ -26,11 +28,6 @@ function estimateReadTime(content: NewsContentBlock[]): string {
   const words = content.reduce((n, b) => n + ("text" in b ? b.text.split(/\s+/).length : 0), 0);
   return `${Math.max(1, Math.ceil(words / 200))} min read`;
 }
-
-export type CmsNewsPost = NewsPost & {
-  externalUrl?: string;
-  externalSource?: string;
-};
 
 function mapDbPost(row: Record<string, unknown>): CmsNewsPost {
   const content = parseContent(row.content as string);
@@ -43,7 +40,7 @@ function mapDbPost(row: Record<string, unknown>): CmsNewsPost {
     author: (row.author as string) || "EMPC Team",
     category: (row.category as string) || "News",
     tags: (row.tags as string[]) || [],
-    image: (row.cover_image as string) || "/images/hero.png",
+    image: (row.cover_image as string) || "",
     content,
     readTime: estimateReadTime(content),
     ...(row.post_type === "external"
@@ -53,34 +50,28 @@ function mapDbPost(row: Record<string, unknown>): CmsNewsPost {
 }
 
 export async function getPublishedPosts(): Promise<CmsNewsPost[]> {
-  try {
-    const supabase = await createClient();
-    const now = new Date().toISOString();
-    const { data, error } = await supabase
-      .from("posts")
-      .select("*")
-      .eq("published", true)
-      .order("created_at", { ascending: false });
+  const supabase = await createClient();
+  const now = new Date().toISOString();
+  const { data, error } = await supabase
+    .from("posts")
+    .select("*")
+    .eq("published", true)
+    .order("created_at", { ascending: false });
 
-    if (error || !data?.length) return staticPosts;
-
-    return data
-      .filter((p) => !p.scheduled_at || p.scheduled_at <= now)
-      .map(mapDbPost);
-  } catch {
-    return staticPosts;
+  if (error) {
+    console.error("getPublishedPosts:", error.message);
+    return [];
   }
+
+  return (data || [])
+    .filter((p) => !p.scheduled_at || p.scheduled_at <= now)
+    .map(mapDbPost);
 }
 
-export async function getPostBySlug(slug: string): Promise<CmsNewsPost | undefined> {
-  try {
-    const supabase = await createClient();
-    const { data } = await supabase.from("posts").select("*").eq("slug", slug).eq("published", true).maybeSingle();
-    if (data) return mapDbPost(data);
-  } catch {
-    // fall through
-  }
-  return staticPosts.find((p) => p.slug === slug);
+export async function getPostBySlug(slug: string): Promise<CmsNewsPost | null> {
+  const supabase = await createClient();
+  const { data } = await supabase.from("posts").select("*").eq("slug", slug).eq("published", true).maybeSingle();
+  return data ? mapDbPost(data) : null;
 }
 
 export async function getRelatedPosts(slug: string, limit = 2): Promise<CmsNewsPost[]> {

@@ -6,12 +6,17 @@ import { WhatsAppWidget } from "@/components/WhatsAppWidget";
 import { ChatbotWidget } from "@/components/ChatbotWidget";
 import { PageTransition } from "@/components/ui/PageTransition";
 import { Providers } from "@/components/Providers";
+import { getSiteSettings } from "@/lib/cms/settings";
 
-export default function WebsiteLayout({
+export const dynamic = "force-dynamic";
+
+export default async function WebsiteLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const settings = await getSiteSettings();
+
   return (
     <Providers>
       <Navbar />
@@ -19,7 +24,7 @@ export default function WebsiteLayout({
         <PageTransition>{children}</PageTransition>
       </main>
       <NewsletterStrip />
-      <Footer />
+      <Footer settings={settings} />
       <WhatsAppWidget />
       <ChatbotWidget />
     </Providers>

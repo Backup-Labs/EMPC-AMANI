@@ -10,7 +10,10 @@ import { AdminFilterTabs } from "@/components/admin/ui/AdminFilterTabs";
 import { AdminLoading } from "@/components/admin/ui/AdminLoading";
 import { AdminEmptyState } from "@/components/admin/ui/AdminEmptyState";
 import { useToast } from "@/components/ui/Toast";
+import { ProductImageManager, imagesToPayload, payloadToImages, type ProductImage } from "@/components/admin/ProductImageManager";
+import { AdminTableSkeleton } from "@/components/admin/ui/AdminSkeleton";
 import type { Product } from "@/types/database";
+import { slugify } from "@/lib/format";
 
 const PAGE_SIZE = 10;
 
@@ -29,7 +32,7 @@ export default function AdminProducts() {
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [price, setPrice] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [productImages, setProductImages] = useState<ProductImage[]>([]);
   const [description, setDescription] = useState("");
   const [tagsInput, setTagsInput] = useState("");
   const [published, setPublished] = useState(true);
@@ -95,7 +98,7 @@ export default function AdminProducts() {
     setTitle("");
     setCategory("");
     setPrice("");
-    setImageUrl("");
+    setProductImages([]);
     setDescription("");
     setTagsInput("");
     setPublished(true);
@@ -113,7 +116,7 @@ export default function AdminProducts() {
     setTitle(product.title);
     setCategory(product.category || "");
     setPrice(product.price ? product.price.toString() : "");
-    setImageUrl(product.image_url || "");
+    setProductImages(payloadToImages(product.image_url, (product as Product & { images?: string[] }).images));
     setDescription(product.description || "");
     setTagsInput(product.tags ? product.tags.join(", ") : "");
     setPublished(product.published !== false);
@@ -152,11 +155,14 @@ export default function AdminProducts() {
     setSubmitting(true);
 
     const parsedTags = tagsInput.split(",").map((t) => t.trim()).filter(Boolean);
+    const { image_url, images } = imagesToPayload(productImages);
     const payload = {
       title,
+      slug: slugify(title),
       category: category || null,
       price: price ? parseFloat(price) : null,
-      image_url: imageUrl || null,
+      image_url,
+      images,
       description: description || null,
       tags: parsedTags,
       published,
@@ -237,7 +243,7 @@ export default function AdminProducts() {
       </div>
 
       {loading ? (
-        <AdminLoading />
+        <AdminTableSkeleton rows={6} cols={5} />
       ) : filtered.length === 0 ? (
         <AdminEmptyState icon={Package} title="No products found" description="Adjust filters or add your first product." />
       ) : (
@@ -328,25 +334,25 @@ export default function AdminProducts() {
         </>
       )}
 
-      <AdminModal open={modalOpen} onClose={() => setModalOpen(false)} title={editingProduct ? "Edit Product" : "Create Product"} size="lg">
+      <AdminModal open={modalOpen} onClose={() => setModalOpen(false)} title={editingProduct ? "Edit Product" : "Create Product"} size="xl">
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Title</label>
             <input required type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Siam Teak Table" className="h-11 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-sm" />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Category</label>
               <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} placeholder="Dining" className="h-11 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-sm" />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Price (USD)</label>
-              <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="1200" className="h-11 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-sm" />
+              <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Price (RWF)</label>
+              <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="4850000" className="h-11 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-sm" />
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Image URL</label>
-            <input type="text" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="/images/product.jpg" className="h-11 bg-transparent border-b border-border focus:border-foreground outline-none font-bold text-sm" />
+            <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Product Images</label>
+            <ProductImageManager images={productImages} onChange={setProductImages} bucket="products" />
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Description</label>

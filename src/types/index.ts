@@ -1,5 +1,6 @@
 export interface Product {
   id: string;
+  slug?: string;
   title: string;
   category: string;
   price: number;
@@ -10,6 +11,7 @@ export interface Product {
   specifications?: { label: string; value: string }[];
   features?: string[];
   inStock?: boolean;
+  featured?: boolean;
   rating?: number;
   reviewCount?: number;
   created_at?: string;

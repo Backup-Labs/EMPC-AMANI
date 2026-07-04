@@ -25,9 +25,9 @@ export default function AdminLayout({
   return (
     <ToastProvider>
       <AdminGuard>
-        <div className="flex bg-background min-h-screen text-foreground transition-colors duration-300">
+        <div className="flex h-dvh overflow-hidden bg-background text-foreground transition-colors duration-300">
           <AdminSidebar />
-          <main className="flex-1 h-screen overflow-y-auto bg-background/80 p-6 md:p-10 lg:p-12">
+          <main className="flex-1 min-w-0 overflow-y-auto overscroll-contain p-4 md:p-6 lg:p-8 pt-16 lg:pt-8">
             {children}
           </main>
         </div>

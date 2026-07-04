@@ -167,6 +167,7 @@ export default function AdminPosts() {
       if (uploadFile) {
         const formData = new FormData();
         formData.append("file", uploadFile);
+        formData.append("bucket", "news");
         const res = await fetch("/api/upload", { method: "POST", body: formData });
         if (!res.ok) {
           const errorData = await res.json();

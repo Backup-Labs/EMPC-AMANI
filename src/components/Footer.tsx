@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTranslation } from "@/lib/i18n/LanguageProvider";
+import type { SiteSettings } from "@/lib/cms/settings";
 
 const IconInstagram = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -27,7 +28,7 @@ const IconLinkedIn = () => (
   </svg>
 );
 
-export function Footer() {
+export function Footer({ settings }: { settings: SiteSettings }) {
   const { t } = useTranslation();
 
   const navLinks = [
@@ -39,6 +40,13 @@ export function Footer() {
     { name: t("nav.contact"), href: "/contact" },
   ];
 
+  const socialLinks = [
+    { Icon: IconInstagram, label: "Instagram", href: settings.social_instagram },
+    { Icon: IconFacebook, label: "Facebook", href: settings.social_facebook },
+    { Icon: IconX, label: "X", href: settings.social_twitter },
+    { Icon: IconLinkedIn, label: "LinkedIn", href: settings.social_linkedin },
+  ].filter((s) => s.href);
+
   return (
     <footer className="bg-background relative overflow-hidden pt-24 pb-12 transition-colors duration-300">
       <div className="absolute top-0 right-0 w-1/3 h-full bg-[radial-gradient(circle_at_100%_0%,rgba(0,0,0,0.02)_0%,transparent_70%)] pointer-events-none opacity-50" />
@@ -48,15 +56,25 @@ export function Footer() {
           <div className="flex flex-col gap-6">
             <Link href="/" className="flex items-center gap-4 no-underline group">
               <div className="relative h-12 w-12 overflow-hidden rounded-full bg-white flex items-center justify-center p-1 border border-black/5 shadow-sm transition-transform group-hover:scale-105">
-                <Image src="/logo.jpg" alt="EMPC-AMANI Logo" fill sizes="48px" className="object-contain p-1" />
+                <Image src="/logo.jpg" alt={`${settings.company_name} Logo`} fill sizes="48px" className="object-contain p-1" />
               </div>
-              <span className="font-black text-3xl text-foreground tracking-tighter">EMPC-AMANI</span>
+              <span className="font-black text-3xl text-foreground tracking-tighter">{settings.company_name}</span>
             </Link>
             <div className="flex flex-col gap-2">
-              <p className="text-foreground/60 text-base font-bold italic">{t("footer.tagline")}</p>
-              <Link href="mailto:info@empc-amani.com" className="text-foreground text-base font-bold hover:underline">
-                info@empc-amani.com
-              </Link>
+              <p className="text-foreground/60 text-base font-bold italic">{settings.company_tagline || t("footer.tagline")}</p>
+              {settings.contact_email && (
+                <Link href={`mailto:${settings.contact_email}`} className="text-foreground text-base font-bold hover:underline">
+                  {settings.contact_email}
+                </Link>
+              )}
+              {settings.contact_phone && (
+                <Link href={`tel:${settings.contact_phone.replace(/\s/g, "")}`} className="text-foreground/70 text-sm font-bold hover:underline">
+                  {settings.contact_phone}
+                </Link>
+              )}
+              {settings.contact_address && (
+                <p className="text-foreground/50 text-sm font-medium m-0">{settings.contact_address}</p>
+              )}
             </div>
           </div>
 
@@ -68,24 +86,28 @@ export function Footer() {
                 </Link>
               ))}
             </nav>
-            <div className="flex gap-3">
-              {[
-                { Icon: IconInstagram, label: "Instagram" },
-                { Icon: IconFacebook, label: "Facebook" },
-                { Icon: IconX, label: "X" },
-                { Icon: IconLinkedIn, label: "LinkedIn" },
-              ].map(({ Icon, label }) => (
-                <Link key={label} href="#" className="h-11 w-11 rounded-full flex items-center justify-center text-foreground border border-border hover:bg-foreground hover:text-background transition-all hover:-translate-y-0.5 shadow-sm">
-                  <Icon />
-                </Link>
-              ))}
-            </div>
+            {socialLinks.length > 0 && (
+              <div className="flex gap-3">
+                {socialLinks.map(({ Icon, label, href }) => (
+                  <Link
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    className="h-11 w-11 rounded-full flex items-center justify-center text-foreground border border-border hover:bg-foreground hover:text-background transition-all hover:-translate-y-0.5 shadow-sm"
+                  >
+                    <Icon />
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
         <div className="py-16 overflow-hidden text-center">
           <h2 className="font-black text-[12vw] lg:text-[10rem] leading-[0.75] tracking-[-0.06em] text-foreground m-0 select-none opacity-[0.03]">
-            EMPC-AMANI
+            {settings.company_name}
           </h2>
         </div>
 

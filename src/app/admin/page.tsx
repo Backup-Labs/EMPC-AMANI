@@ -18,7 +18,7 @@ import {
 import { supabase } from "@/lib/supabase";
 import { AdminPageHeader } from "@/components/admin/ui/AdminPageHeader";
 import { AdminStatCard } from "@/components/admin/ui/AdminStatCard";
-import { AdminLoading } from "@/components/admin/ui/AdminLoading";
+import { AdminDashboardSkeleton } from "@/components/admin/ui/AdminSkeleton";
 import { motion } from "framer-motion";
 
 interface Metrics {
@@ -125,10 +125,10 @@ export default function AdminDashboard() {
   const formatRevenue = (n: number) =>
     new Intl.NumberFormat("en-RW", { style: "currency", currency: "RWF", maximumFractionDigits: 0 }).format(n);
 
-  if (loading) return <AdminLoading label="Loading dashboard..." />;
+  if (loading) return <AdminDashboardSkeleton />;
 
   return (
-    <div className="flex flex-col gap-8 max-w-7xl">
+    <div className="flex flex-col gap-5 max-w-7xl pt-12 lg:pt-0">
       <AdminPageHeader
         label="Overview"
         title="Executive Dashboard"
@@ -136,7 +136,7 @@ export default function AdminDashboard() {
       />
 
       {/* KPI Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
         <AdminStatCard label="New Inquiries" value={metrics.inquiries} description="Awaiting response" icon={Inbox} href="/admin/inquiries" color="blue" />
         <AdminStatCard label="Total Orders" value={metrics.orders} description="All time" icon={Package} href="/admin/orders" color="primary" />
         <AdminStatCard label="Revenue" value={formatRevenue(metrics.revenue)} description="Order total" icon={DollarSign} href="/admin/orders" color="green" />
@@ -209,7 +209,7 @@ export default function AdminDashboard() {
             <div className="flex flex-col gap-3">
               {[
                 { label: "Database", status: "Connected", ok: true },
-                { label: "Media Storage", status: "Cloudinary", ok: true },
+                { label: "Media Storage", status: "Supabase", ok: true },
                 { label: "AI Chatbot", status: "Active", ok: true },
               ].map((s) => (
                 <div key={s.label} className="flex justify-between items-center">

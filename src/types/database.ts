@@ -77,6 +77,7 @@ export interface SiteSetting {
 
 export interface Product {
   id: string;
+  slug?: string;
   title: string;
   category: string;
   price: number;
@@ -86,6 +87,9 @@ export interface Product {
   in_stock?: boolean;
   published?: boolean;
   featured?: boolean;
+  images?: string[];
+  specifications?: { label: string; value: string }[];
+  features?: string[];
   created_at: string;
 }
 

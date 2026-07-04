@@ -9,7 +9,7 @@ import { supabase } from "@/lib/supabase";
 import { AdminModal } from "@/components/admin/ui/AdminModal";
 import { useToast } from "@/components/ui/Toast";
 import { getRecentlyViewed, type RecentProduct } from "@/lib/portal/recentlyViewed";
-import { formatPrice } from "@/lib/data/products";
+import { formatPrice } from "@/lib/format";
 import type { Order, CustomerProfile } from "@/types/database";
 
 export default function PortalDashboard() {

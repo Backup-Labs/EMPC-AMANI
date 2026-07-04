@@ -17,9 +17,9 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
   return (
     <ToastProvider>
       <PortalGuard>
-        <div className="flex bg-background min-h-screen text-foreground">
+        <div className="flex h-dvh overflow-hidden bg-background text-foreground">
           <PortalSidebar />
-          <main className="flex-1 overflow-y-auto p-6 md:p-10 lg:p-12">{children}</main>
+          <main className="flex-1 min-w-0 overflow-y-auto overscroll-contain p-4 md:p-6 lg:p-8 pt-16 lg:pt-8">{children}</main>
         </div>
       </PortalGuard>
     </ToastProvider>

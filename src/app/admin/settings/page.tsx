@@ -49,7 +49,7 @@ export default function AdminSettings() {
 
   const categories = [...new Set(SETTING_KEYS.map((s) => s.category))];
 
-  if (loading) return <AdminLoading />;
+  if (loading) return <AdminLoading variant="form" />;
 
   return (
     <div className="flex flex-col gap-8 max-w-3xl">

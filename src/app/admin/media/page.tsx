@@ -48,6 +48,7 @@ export default function AdminMedia() {
     setUploading(true);
     const form = new FormData();
     form.append("file", file);
+    form.append("bucket", "media");
     const res = await fetch("/api/upload", { method: "POST", body: form });
     const json = await res.json();
     if (json.url) {

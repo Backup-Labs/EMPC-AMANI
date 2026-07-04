@@ -97,6 +97,7 @@ export default function AdminGallery() {
     try {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("bucket", "gallery");
       const res = await fetch("/api/upload", { method: "POST", body: formData });
       if (!res.ok) {
         const errorData = await res.json();
@@ -137,7 +138,7 @@ export default function AdminGallery() {
       </div>
 
       {loading ? (
-        <AdminLoading />
+        <AdminLoading variant="grid" />
       ) : filtered.length === 0 ? (
         <AdminEmptyState icon={ImageIcon} title="No photos yet" description="Upload your first showcase image." />
       ) : (

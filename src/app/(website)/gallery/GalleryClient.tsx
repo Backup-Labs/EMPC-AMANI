@@ -23,8 +23,10 @@ export function GalleryClient({ items }: { items: (GalleryItem & { span?: string
         <div className="max-w-7xl mx-auto">
           <SectionHeader label={t("gallery.catalogueLabel")} heading={<>{t("gallery.catalogueHeading1")}<br />{t("gallery.catalogueHeading2")}</>} desc={t("gallery.catalogueDesc")} />
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3 lg:gap-4 pt-8 auto-rows-[200px] md:auto-rows-[220px]">
-            {items.map((p, i) => (
-              <RevealOnScroll key={i} delay={i * 0.03} className={p.span}>
+            {items.length === 0 ? (
+              <p className="text-sm text-foreground/50 col-span-full text-center py-12">No gallery items published yet.</p>
+            ) : items.map((p, i) => (
+              <RevealOnScroll key={p.id || i} delay={i * 0.03} className={p.span}>
                 <motion.button type="button" onClick={() => setLightboxIndex(i)} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }} className="relative rounded-xl overflow-hidden card-elevated group h-full w-full cursor-pointer text-left" aria-label={`${p.title} — ${t("gallery.viewFullscreen")}`}>
                   <Image src={p.image} alt={p.title} fill sizes="(max-width:768px) 100vw, 25vw" loading={i < 4 ? "eager" : "lazy"} className="object-cover transition-transform duration-700 group-hover:scale-110" />
                   <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/20 to-transparent opacity-70 group-hover:opacity-100 transition-opacity duration-400 z-10" />

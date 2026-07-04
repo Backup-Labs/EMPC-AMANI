@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Plus, Check, Trash2, Edit2 } from "lucide-react";
+import { Plus, Check, Trash2, Edit2, Upload, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { uploadFile } from "@/lib/upload";
 import { AdminPageHeader } from "@/components/admin/ui/AdminPageHeader";
 import { AdminFilterTabs } from "@/components/admin/ui/AdminFilterTabs";
 import { AdminModal } from "@/components/admin/ui/AdminModal";
@@ -22,6 +23,8 @@ export default function AdminTestimonials() {
   const [message, setMessage] = useState("");
   const [rating, setRating] = useState(5);
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => { fetchTestimonials(); }, []);
@@ -35,28 +38,38 @@ export default function AdminTestimonials() {
 
   const openCreate = () => {
     setEditing(null);
-    setName(""); setRole("Customer"); setMessage(""); setRating(5); setAvatarUrl("");
+    setName(""); setRole("Customer"); setMessage(""); setRating(5); setAvatarUrl(""); setAvatarFile(null);
     setModalOpen(true);
   };
 
   const openEdit = (t: Testimonial) => {
     setEditing(t);
-    setName(t.name); setRole(t.role); setMessage(t.message); setRating(t.rating); setAvatarUrl(t.avatar_url || "");
+    setName(t.name); setRole(t.role); setMessage(t.message); setRating(t.rating); setAvatarUrl(t.avatar_url || ""); setAvatarFile(null);
     setModalOpen(true);
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    const payload = { name, role, message, rating, avatar_url: avatarUrl || null, approved: editing?.approved ?? false };
-    if (editing) {
-      await supabase.from("testimonials").update(payload).eq("id", editing.id);
-    } else {
-      await supabase.from("testimonials").insert([payload]);
+    try {
+      let finalAvatarUrl = avatarUrl || null;
+      if (avatarFile) {
+        finalAvatarUrl = await uploadFile(avatarFile, "media", setUploadProgress);
+      }
+      const payload = { name, role, message, rating, avatar_url: finalAvatarUrl, approved: editing?.approved ?? false };
+      if (editing) {
+        await supabase.from("testimonials").update(payload).eq("id", editing.id);
+      } else {
+        await supabase.from("testimonials").insert([payload]);
+      }
+      setModalOpen(false);
+      fetchTestimonials();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to save testimonial");
+    } finally {
+      setSubmitting(false);
+      setUploadProgress(0);
     }
-    setSubmitting(false);
-    setModalOpen(false);
-    fetchTestimonials();
   };
 
   const handleApprove = async (id: string, approved: boolean) => {
@@ -157,7 +170,54 @@ export default function AdminTestimonials() {
         <form onSubmit={handleSave} className="flex flex-col gap-4">
           <input required placeholder="Customer name" value={name} onChange={(e) => setName(e.target.value)} className="h-11 px-4 rounded-xl border border-border bg-muted/50 text-sm font-medium focus:outline-none focus:border-primary" />
           <input placeholder="Role / Position (optional)" value={role} onChange={(e) => setRole(e.target.value)} className="h-11 px-4 rounded-xl border border-border bg-muted/50 text-sm font-medium focus:outline-none focus:border-primary" />
-          <input placeholder="Profile photo URL (optional)" value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} className="h-11 px-4 rounded-xl border border-border bg-muted/50 text-sm font-medium focus:outline-none focus:border-primary" />
+
+          <div className="flex flex-col gap-2">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-foreground/45">Profile Photo</label>
+            {(avatarUrl || avatarFile) && (
+              <div className="relative h-16 w-16 rounded-full overflow-hidden border border-border bg-muted">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={avatarFile ? URL.createObjectURL(avatarFile) : avatarUrl}
+                  alt="Preview"
+                  className="h-full w-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => { setAvatarUrl(""); setAvatarFile(null); }}
+                  className="absolute top-0 right-0 h-5 w-5 bg-black/60 text-white flex items-center justify-center rounded-full cursor-pointer"
+                  aria-label="Remove photo"
+                >
+                  <X size={10} />
+                </button>
+              </div>
+            )}
+            <div className="flex flex-col sm:flex-row gap-2">
+              <label className="inline-flex h-10 items-center gap-2 px-4 rounded-full border border-border bg-muted/50 text-xs font-bold cursor-pointer hover:bg-muted transition-colors">
+                <Upload size={14} /> Upload Photo
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) { setAvatarFile(file); setAvatarUrl(""); }
+                  }}
+                />
+              </label>
+              <input
+                placeholder="Or paste image URL..."
+                value={avatarUrl}
+                onChange={(e) => { setAvatarUrl(e.target.value); setAvatarFile(null); }}
+                className="h-10 flex-1 px-4 rounded-xl border border-border bg-muted/50 text-sm font-medium focus:outline-none focus:border-primary"
+              />
+            </div>
+            {uploadProgress > 0 && uploadProgress < 100 && (
+              <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                <div className="h-full bg-primary transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
+              </div>
+            )}
+          </div>
+
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/45 mb-2">Rating</p>
             <StarRating value={rating} onChange={setRating} size={20} />
