@@ -169,7 +169,7 @@ export function AdminSidebar() {
 
       <aside className={cn(
         "bg-muted border-r border-border h-full flex flex-col shrink-0 transition-all duration-300 z-50",
-        collapsed ? "w-[72px]" : "w-64",
+        collapsed ? "w-18" : "w-64",
         "hidden lg:flex"
       )}>
         {navContent}

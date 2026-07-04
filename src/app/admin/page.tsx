@@ -240,7 +240,7 @@ export default function AdminDashboard() {
                 initial={{ height: 0 }}
                 animate={{ height: `${Math.max(8, (bar.val / bar.max) * 100)}%` }}
                 transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="w-full bg-primary/80 rounded-t-lg min-h-[8px]"
+                className="w-full bg-primary/80 rounded-t-lg min-h-2"
               />
               <span className="text-[9px] font-bold text-foreground/40 uppercase tracking-wider text-center">{bar.label}</span>
               <span className="text-xs font-black text-foreground">{bar.val}</span>

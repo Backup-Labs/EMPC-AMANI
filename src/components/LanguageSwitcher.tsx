@@ -45,7 +45,7 @@ export function LanguageSwitcher({ variant = "dark", className }: LanguageSwitch
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 min-w-[140px] glass-nav rounded-xl overflow-hidden shadow-lg z-50 py-1">
+        <div className="absolute right-0 top-full mt-2 min-w-35 glass-nav rounded-xl overflow-hidden shadow-lg z-50 py-1">
           {LOCALES.map((l) => (
             <button
               key={l.code}
