@@ -1,5 +1,6 @@
-import nodemailer from "nodemailer";
-import type { Transporter } from "nodemailer";
+type Transporter = {
+  sendMail: (opts: Record<string, unknown>) => Promise<unknown>;
+};
 
 let transporter: Transporter | null = null;
 
@@ -30,14 +31,15 @@ export function isSmtpConfigured(): boolean {
   return getSmtpConfig() !== null;
 }
 
-function getTransporter(): Transporter {
+async function getTransporter(): Promise<Transporter> {
   if (transporter) return transporter;
   const config = getSmtpConfig();
   if (!config) {
     throw new Error("SMTP is not configured. Set SMTP_HOST, SMTP_USER, SMTP_PASSWORD, and SMTP_FROM in .env.local");
   }
+  const nodemailer = await import("nodemailer");
   const { from: _from, ...transportOpts } = config;
-  transporter = nodemailer.createTransport(transportOpts);
+  transporter = nodemailer.createTransport(transportOpts) as Transporter;
   return transporter;
 }
 
@@ -56,7 +58,7 @@ export async function sendEmail(options: SendEmailOptions): Promise<void> {
     return;
   }
 
-  const transport = getTransporter();
+  const transport = await getTransporter();
   await transport.sendMail({
     from: config.from,
     to: options.to,

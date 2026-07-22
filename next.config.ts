@@ -11,6 +11,9 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1:3000", "127.0.0.1:3001", "localhost:3000", "localhost:3001"],
+  experimental: {
+    optimizePackageImports: ["lucide-react", "framer-motion"],
+  },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },

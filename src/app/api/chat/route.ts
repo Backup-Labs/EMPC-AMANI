@@ -1,8 +1,5 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 const DEFAULT_SYSTEM_PROMPT = `You are the helpful assistant for EMPC, a furniture and carpentry 
 training company. You help website visitors with:
@@ -23,7 +20,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No messages provided" }, { status: 400 });
     }
 
-    // Try to fetch custom system prompt from Supabase settings
     let systemPrompt = DEFAULT_SYSTEM_PROMPT;
     try {
       const { data, error } = await supabase
@@ -31,7 +27,7 @@ export async function POST(req: NextRequest) {
         .select("value")
         .eq("key", "chatbot_system_prompt")
         .single();
-      
+
       if (data && data.value && !error) {
         systemPrompt = data.value;
       }
@@ -39,14 +35,15 @@ export async function POST(req: NextRequest) {
       console.warn("Could not load system prompt from settings, falling back to default.", dbErr);
     }
 
+    const { GoogleGenerativeAI } = await import("@google/generative-ai");
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-    
-    // Find the index of the first user message. The history must start with a user message.
-    const firstUserIndex = messages.findIndex((m: any) => m.role === "user");
+
+    const firstUserIndex = messages.findIndex((m: { role: string }) => m.role === "user");
     const historyMessages = firstUserIndex !== -1 ? messages.slice(firstUserIndex, -1) : [];
 
     const chat = model.startChat({
-      history: historyMessages.map((m: any) => ({
+      history: historyMessages.map((m: { role: string; content: string }) => ({
         role: m.role === "user" ? "user" : "model",
         parts: [{ text: m.content }],
       })),
@@ -61,8 +58,9 @@ export async function POST(req: NextRequest) {
     const reply = result.response.text();
 
     return NextResponse.json({ reply });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("AI Chatbot Route Error:", err);
-    return NextResponse.json({ error: err.message || "Internal server error" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Internal server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

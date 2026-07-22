@@ -10,9 +10,21 @@ import { AdminFilterTabs } from "@/components/admin/ui/AdminFilterTabs";
 import { AdminLoading } from "@/components/admin/ui/AdminLoading";
 import { AdminEmptyState } from "@/components/admin/ui/AdminEmptyState";
 import { useToast } from "@/components/ui/Toast";
-import { RichTextEditor } from "@/components/admin/RichTextEditor";
+import dynamic from "next/dynamic";
 import { stripHtml } from "@/lib/sanitize";
 import type { Post } from "@/types/database";
+
+const RichTextEditor = dynamic(
+  () => import("@/components/admin/RichTextEditor").then((m) => m.RichTextEditor),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-48 rounded-xl border border-border bg-muted/40 animate-pulse flex items-center justify-center text-xs font-bold text-foreground/40">
+        Loading editor…
+      </div>
+    ),
+  }
+);
 
 export default function AdminPosts() {
   const { toast } = useToast();
