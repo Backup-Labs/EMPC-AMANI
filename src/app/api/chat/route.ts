@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 
 const DEFAULT_SYSTEM_PROMPT = `You are the helpful assistant for EMPC, a furniture and carpentry 
 training company. You help website visitors with:
@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
 
     let systemPrompt = DEFAULT_SYSTEM_PROMPT;
     try {
+      const supabase = await createClient();
       const { data, error } = await supabase
         .from("settings")
         .select("value")

@@ -4,79 +4,132 @@ import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
 
-// Resolve directories to load .env.local
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const envPath = path.resolve(__dirname, "../.env.local");
 
 if (fs.existsSync(envPath)) {
   dotenv.config({ path: envPath });
 } else {
-  console.error("Error: .env.local file not found. Please create it first before running this script.");
+  console.error("Error: .env.local file not found.");
   process.exit(1);
 }
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error("Error: Supabase environment variables are missing in .env.local.");
+if (!supabaseUrl || (!serviceKey && !anonKey)) {
+  console.error("Missing NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local");
   process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const admin = createClient(supabaseUrl, serviceKey || anonKey, {
+  auth: { autoRefreshToken: false, persistSession: false },
+});
 
-const adminEmail = "amaniishimwe36@gmail.com";
-const adminPassword = "Tequiero@2024";
+const adminEmail = process.env.ADMIN_EMAIL || process.argv[2] || "amaniishimwe36@gmail.com";
+const adminPassword = process.env.ADMIN_PASSWORD || process.argv[3] || "";
+const adminName = process.env.ADMIN_NAME || "Amani Ishimwe";
 
-async function registerAdmin() {
-  console.log(`Attempting to sign up auth user: ${adminEmail}...`);
-  
-  try {
-    const { data, error } = await supabase.auth.signUp({
+async function ensureAdminProfile(userId, email) {
+  const { error } = await admin.from("admin_profiles").upsert(
+    {
+      id: userId,
+      full_name: adminName,
+      role: "admin",
+      email,
+    },
+    { onConflict: "id" }
+  );
+
+  if (error) {
+    console.error("Failed to upsert admin_profiles:", error.message);
+    console.log("\nRun this SQL in Supabase SQL Editor:\n");
+    console.log(`INSERT INTO admin_profiles (id, full_name, role, email)`);
+    console.log(`VALUES ('${userId}', '${adminName}', 'admin', '${email}')`);
+    console.log(`ON CONFLICT (id) DO UPDATE SET role = 'admin', email = EXCLUDED.email;`);
+    process.exit(1);
+  }
+
+  console.log(`✓ admin_profiles row ready for ${email} (${userId}) with role=admin`);
+}
+
+async function main() {
+  console.log(`Setting up admin: ${adminEmail}`);
+
+  // Prefer finding existing user via admin API
+  if (serviceKey) {
+    const { data: list, error: listErr } = await admin.auth.admin.listUsers({ perPage: 200 });
+    if (listErr) {
+      console.warn("listUsers failed:", listErr.message);
+    } else {
+      const existing = list.users.find((u) => u.email?.toLowerCase() === adminEmail.toLowerCase());
+      if (existing) {
+        await ensureAdminProfile(existing.id, existing.email || adminEmail);
+        console.log("\nDone. Log in at /admin/login with this email.");
+        return;
+      }
+    }
+
+    if (!adminPassword) {
+      console.error("User not found. Pass a password to create them:");
+      console.error('  npm run setup-admin -- "email@example.com" "YourPassword"');
+      process.exit(1);
+    }
+
+    const { data: created, error: createErr } = await admin.auth.admin.createUser({
+      email: adminEmail,
+      password: adminPassword,
+      email_confirm: true,
+    });
+
+    if (createErr) {
+      console.error("createUser failed:", createErr.message);
+      process.exit(1);
+    }
+
+    await ensureAdminProfile(created.user.id, adminEmail);
+    console.log("\nDone. Log in at /admin/login with this email.");
+    return;
+  }
+
+  // Fallback without service role: sign in / sign up then print SQL
+  if (!adminPassword) {
+    console.error("Set ADMIN_PASSWORD or pass password as argv when service role is missing.");
+    process.exit(1);
+  }
+
+  const pub = createClient(supabaseUrl, anonKey);
+  let userId = null;
+
+  const { data: signedIn, error: signInErr } = await pub.auth.signInWithPassword({
+    email: adminEmail,
+    password: adminPassword,
+  });
+
+  if (!signInErr && signedIn.user) {
+    userId = signedIn.user.id;
+  } else {
+    const { data: signedUp, error: signUpErr } = await pub.auth.signUp({
       email: adminEmail,
       password: adminPassword,
     });
-
-    if (error) {
-      if (error.message.includes("already registered")) {
-        console.log(`\nUser is already registered in Supabase Auth.`);
-        // Try to sign in to fetch user id
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-          email: adminEmail,
-          password: adminPassword,
-        });
-
-        if (signInError) {
-          console.error("Sign-in verification failed. If password differs, change it in your Supabase Auth dashboard.");
-          process.exit(1);
-        }
-
-        const userId = signInData.user.id;
-        printSqlInstructions(userId);
-        return;
-      }
-      throw error;
+    if (signUpErr) {
+      console.error(signUpErr.message);
+      process.exit(1);
     }
-
-    if (data.user) {
-      console.log(`\nSuccess: User successfully created in Supabase Auth!`);
-      printSqlInstructions(data.user.id);
-    }
-  } catch (err) {
-    console.error("Sign up failed:", err.message);
-    console.log("\nAlternative option: Create the user directly in your Supabase Dashboard under Authentication -> Users, get their User ID, and run the SQL below.");
+    userId = signedUp.user?.id;
   }
+
+  if (!userId) {
+    console.error("Could not resolve user id.");
+    process.exit(1);
+  }
+
+  await ensureAdminProfile(userId, adminEmail);
 }
 
-function printSqlInstructions(userId) {
-  console.log("\n==================================================");
-  console.log("SQL TO RUN IN YOUR SUPABASE SQL EDITOR");
-  console.log("==================================================");
-  console.log(`Run this query in Supabase to make this user an Admin:\n`);
-  console.log(`INSERT INTO admin_profiles (id, full_name, role)`);
-  console.log(`VALUES ('${userId}', 'Amani Ishimwe', 'admin')`);
-  console.log(`ON CONFLICT (id) DO UPDATE SET role = 'admin';\n`);
-  console.log("==================================================");
-}
-
-registerAdmin();
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

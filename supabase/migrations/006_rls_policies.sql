@@ -166,3 +166,48 @@ DROP POLICY IF EXISTS "Users insert own profile" ON customer_profiles;
 CREATE POLICY "Users insert own profile"
 ON customer_profiles FOR INSERT TO authenticated
 WITH CHECK (auth.uid() = id);
+
+-- Admin profiles (required for /admin login)
+-- SECURITY DEFINER avoids recursive RLS checks on admin_profiles
+CREATE OR REPLACE FUNCTION public.is_staff()
+RETURNS boolean
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+STABLE
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM admin_profiles
+    WHERE id = auth.uid() AND role IN ('admin', 'editor')
+  );
+$$;
+
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS boolean
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+STABLE
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM admin_profiles
+    WHERE id = auth.uid() AND role = 'admin'
+  );
+$$;
+
+DROP POLICY IF EXISTS "Admins read own profile" ON admin_profiles;
+CREATE POLICY "Admins read own profile"
+ON admin_profiles FOR SELECT TO authenticated
+USING (auth.uid() = id OR public.is_staff());
+
+DROP POLICY IF EXISTS "Admins manage all profiles" ON admin_profiles;
+CREATE POLICY "Admins manage all profiles"
+ON admin_profiles FOR ALL TO authenticated
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
+
+-- Allow a user to read their own row even before is_staff works (login path)
+DROP POLICY IF EXISTS "Users read own admin row" ON admin_profiles;
+CREATE POLICY "Users read own admin row"
+ON admin_profiles FOR SELECT TO authenticated
+USING (auth.uid() = id);

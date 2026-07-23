@@ -9,6 +9,7 @@
     "lint": "eslint",
     "seed": "node scripts/seed.mjs",
     "migrate": "node scripts/migrate.mjs",
+    "setup-admin": "node scripts/setup-admin.mjs",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
