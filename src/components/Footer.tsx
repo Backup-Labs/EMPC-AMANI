@@ -30,6 +30,7 @@ const IconLinkedIn = () => (
 
 export function Footer({ settings }: { settings: SiteSettings }) {
   const { t } = useTranslation();
+  const companyName = settings.company_name || "EMPC-AMANI";
 
   const navLinks = [
     { name: t("nav.about"), href: "/about" },
@@ -48,27 +49,29 @@ export function Footer({ settings }: { settings: SiteSettings }) {
   ].filter((s) => s.href);
 
   return (
-    <footer className="bg-background relative overflow-hidden pt-24 pb-12 transition-colors duration-300">
-      <div className="absolute top-0 right-0 w-1/3 h-full bg-[radial-gradient(circle_at_100%_0%,rgba(0,0,0,0.02)_0%,transparent_70%)] pointer-events-none opacity-50" />
+    <footer className="relative shrink-0 bg-background border-t border-border pt-16 md:pt-20 pb-28 md:pb-24">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(10,12,130,0.04),transparent_55%)]" />
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 relative z-10">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-12 pb-16 border-b border-border">
-          <div className="flex flex-col gap-6">
-            <Link href="/" className="flex items-center gap-4 no-underline group">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.2fr_1fr] gap-12 lg:gap-16 pb-12 md:pb-14 border-b border-border">
+          <div className="flex flex-col gap-5">
+            <Link href="/" className="flex items-center gap-4 no-underline group w-fit">
               <div className="relative h-12 w-12 overflow-hidden rounded-full bg-white flex items-center justify-center p-1 border border-black/5 shadow-sm transition-transform group-hover:scale-105">
-                <Image src="/logo.jpg" alt={`${settings.company_name} Logo`} fill sizes="48px" className="object-contain p-1" />
+                <Image src="/logo.jpg" alt={`${companyName} Logo`} fill sizes="48px" className="object-contain p-1" />
               </div>
-              <span className="font-black text-3xl text-foreground tracking-tighter">{settings.company_name}</span>
+              <span className="font-black text-2xl md:text-3xl text-foreground tracking-tighter">{companyName}</span>
             </Link>
-            <div className="flex flex-col gap-2">
-              <p className="text-foreground/60 text-base font-bold italic">{settings.company_tagline || t("footer.tagline")}</p>
+            <p className="text-foreground/60 text-base font-medium max-w-md m-0 leading-relaxed">
+              {settings.company_tagline || t("footer.tagline")}
+            </p>
+            <div className="flex flex-col gap-1.5 mt-1">
               {settings.contact_email && (
-                <Link href={`mailto:${settings.contact_email}`} className="text-foreground text-base font-bold hover:underline">
+                <Link href={`mailto:${settings.contact_email}`} className="text-foreground text-sm font-bold hover:underline w-fit">
                   {settings.contact_email}
                 </Link>
               )}
               {settings.contact_phone && (
-                <Link href={`tel:${settings.contact_phone.replace(/\s/g, "")}`} className="text-foreground/70 text-sm font-bold hover:underline">
+                <Link href={`tel:${settings.contact_phone.replace(/\s/g, "")}`} className="text-foreground/70 text-sm font-bold hover:underline w-fit">
                   {settings.contact_phone}
                 </Link>
               )}
@@ -79,14 +82,18 @@ export function Footer({ settings }: { settings: SiteSettings }) {
           </div>
 
           <div className="flex flex-col gap-8 md:items-end">
-            <nav className="flex flex-wrap gap-x-10 gap-y-3 justify-start md:justify-end">
+            <nav className="flex flex-wrap gap-x-8 gap-y-3 justify-start md:justify-end">
               {navLinks.map((l) => (
-                <Link key={l.href} href={l.href} className="text-sm font-black text-foreground/40 no-underline hover:text-foreground transition-colors uppercase tracking-widest">
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className="text-xs font-black text-foreground/45 no-underline hover:text-foreground transition-colors uppercase tracking-widest"
+                >
                   {l.name}
                 </Link>
               ))}
             </nav>
-            {socialLinks.length > 0 && (
+            {socialLinks.length > 0 ? (
               <div className="flex gap-3">
                 {socialLinks.map(({ Icon, label, href }) => (
                   <Link
@@ -101,29 +108,34 @@ export function Footer({ settings }: { settings: SiteSettings }) {
                   </Link>
                 ))}
               </div>
+            ) : (
+              <p className="text-[11px] font-bold text-foreground/30 uppercase tracking-widest m-0">
+                {t("footer.workshop")}
+              </p>
             )}
           </div>
         </div>
 
-        <div className="py-16 overflow-hidden text-center">
-          <h2 className="font-black text-[12vw] lg:text-[10rem] leading-[0.75] tracking-[-0.06em] text-foreground m-0 select-none opacity-[0.03]">
-            {settings.company_name}
-          </h2>
+        {/* Brand wordmark — clipped safely so it never hides the legal row */}
+        <div className="relative py-10 md:py-12" aria-hidden>
+          <p className="font-black text-[clamp(3.5rem,14vw,9rem)] leading-none tracking-[-0.06em] text-foreground/5 m-0 text-center select-none whitespace-nowrap overflow-hidden">
+            {companyName}
+          </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-2 pb-2">
           <div className="flex gap-8">
-            <Link href="/terms" className="text-[11px] font-black text-foreground/30 uppercase tracking-widest no-underline hover:text-foreground">
+            <Link href="/terms" className="text-[11px] font-black text-foreground/35 uppercase tracking-widest no-underline hover:text-foreground">
               {t("footer.terms")}
             </Link>
-            <Link href="/privacy" className="text-[11px] font-black text-foreground/30 uppercase tracking-widest no-underline hover:text-foreground">
+            <Link href="/privacy" className="text-[11px] font-black text-foreground/35 uppercase tracking-widest no-underline hover:text-foreground">
               {t("footer.privacy")}
             </Link>
           </div>
-          <div className="flex gap-4 items-center">
-            <p className="text-[11px] font-black text-foreground/30 uppercase tracking-widest">{t("footer.copyright")}</p>
-            <div className="h-1 w-1 rounded-full bg-foreground/20" />
-            <p className="text-[11px] font-black text-foreground/30 uppercase tracking-widest">{t("footer.workshop")}</p>
+          <div className="flex flex-wrap gap-3 items-center justify-center">
+            <p className="text-[11px] font-black text-foreground/35 uppercase tracking-widest m-0">{t("footer.copyright")}</p>
+            <span className="h-1 w-1 rounded-full bg-foreground/20" />
+            <p className="text-[11px] font-black text-foreground/35 uppercase tracking-widest m-0">{t("footer.workshop")}</p>
           </div>
         </div>
       </div>

@@ -19,12 +19,14 @@ export default async function WebsiteLayout({
 
   return (
     <Providers>
-      <Navbar />
-      <main className="flex-1">
-        <PageTransition>{children}</PageTransition>
-      </main>
-      <NewsletterStrip />
-      <Footer settings={settings} />
+      <div className="flex min-h-dvh flex-col">
+        <Navbar />
+        <main className="flex-1 w-full">
+          <PageTransition>{children}</PageTransition>
+        </main>
+        <NewsletterStrip />
+        <Footer settings={settings} />
+      </div>
       <WhatsAppWidget />
       <ChatbotWidget />
     </Providers>
