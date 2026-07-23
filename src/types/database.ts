@@ -9,7 +9,7 @@ export interface AdminProfile {
   full_name: string;
   role: UserRole;
   email?: string;
-  created_at?: string;
+  created_at?: string; 
 }
 
 export interface CustomerProfile {
