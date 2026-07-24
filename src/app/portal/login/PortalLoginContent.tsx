@@ -39,7 +39,8 @@ export default function PortalLoginContent() {
   const handleGoogleSignIn = async () => {
     setLoading(true);
     setErrorMsg("");
-    const redirectTo = `${window.location.origin}/portal/dashboard`;
+    // Must match an entry in Supabase Auth → Redirect URLs
+    const redirectTo = `${window.location.origin}/auth/callback?next=/portal/dashboard`;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo },
