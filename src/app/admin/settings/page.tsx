@@ -9,9 +9,9 @@ import { AdminLoading } from "@/components/admin/ui/AdminLoading";
 const SETTING_KEYS = [
   { key: "company_name", label: "Company Name", category: "general", default: "EMPC-AMANI" },
   { key: "company_tagline", label: "Tagline", category: "general", default: "Artisanal Workshop & Master Carpentry" },
-  { key: "contact_email", label: "Contact Email", category: "contact", default: "info@empc-amani.com" },
-  { key: "contact_phone", label: "Phone", category: "contact", default: "+250 788 000 000" },
-  { key: "contact_address", label: "Address", category: "contact", default: "Kigali, Rwanda" },
+  { key: "contact_email", label: "Contact Email", category: "contact", default: "maniraguhapierrecelestin33@gmail.com" },
+  { key: "contact_phone", label: "Phone", category: "contact", default: "+250788516492" },
+  { key: "contact_address", label: "Address", category: "contact", default: "Musanze, Rwanda" },
   { key: "social_instagram", label: "Instagram URL", category: "social", default: "" },
   { key: "social_facebook", label: "Facebook URL", category: "social", default: "" },
   { key: "social_twitter", label: "X (Twitter) URL", category: "social", default: "" },

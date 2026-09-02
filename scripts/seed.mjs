@@ -273,9 +273,9 @@ async function seed() {
   } else console.warn("FAQs:", fResult.error);
 
   const settings = [
-    { key: "contact_email", value: "info@empc-amani.com" },
-    { key: "contact_phone", value: "+250 788 123 456" },
-    { key: "contact_address", value: "KG 7 Ave, Kigali, Rwanda" },
+    { key: "contact_email", value: "maniraguhapierrecelestin33@gmail.com" },
+    { key: "contact_phone", value: "+250788516492" },
+    { key: "contact_address", value: "Musanze, Rwanda" },
     { key: "company_name", value: "EMPC-AMANI" },
     { key: "company_tagline", value: "Artisanal Workshop & Master Carpentry" },
     { key: "social_instagram", value: "https://instagram.com/empc-amani" },

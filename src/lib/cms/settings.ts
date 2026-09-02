@@ -64,9 +64,9 @@ export async function getSiteContent(): Promise<SiteContent> {
 const SETTINGS_DEFAULTS: SiteSettings = {
   company_name: "EMPC-AMANI",
   company_tagline: "Artisanal Workshop & Master Carpentry",
-  contact_email: "info@empc-amani.com",
-  contact_phone: "+250 788 123 456",
-  contact_address: "Kigali, Rwanda",
+  contact_email: "maniraguhapierrecelestin33@gmail.com",
+  contact_phone: "+250788516492",
+  contact_address: "Musanze, Rwanda",
   social_instagram: "",
   social_facebook: "",
   social_twitter: "",

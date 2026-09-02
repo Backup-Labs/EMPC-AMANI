@@ -121,9 +121,9 @@ export default function ContactContent() {
             </div>
             <div className="flex flex-col gap-6">
               {[
-                { label: t("contact.studio"), value: "Amani Lane London EC1R" },
-                { label: t("contact.email"), value: "info@empc-amani.com" },
-                { label: t("contact.phone"), value: "+1-555-44-456" },
+                { label: t("contact.location"), value: "Musanze, Rwanda" },
+                { label: t("contact.email"), value: "maniraguhapierrecelestin33@gmail.com" },
+                { label: t("contact.phone"), value: "+250788516492" },
               ].map((item, i) => (
                 <div key={i} className="flex flex-col border-b border-border pb-5">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-foreground/40 mb-1">{item.label}</span>

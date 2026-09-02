@@ -145,9 +145,9 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 INSERT INTO settings (key, value, category) VALUES
   ('company_name', 'EMPC-AMANI', 'general'),
   ('company_tagline', 'Artisanal Workshop & Master Carpentry', 'general'),
-  ('contact_email', 'info@empc-amani.com', 'contact'),
-  ('contact_phone', '+250 788 123 456', 'contact'),
-  ('contact_address', 'KG 7 Ave, Kigali, Rwanda', 'contact'),
+  ('contact_email', 'maniraguhapierrecelestin33@gmail.com', 'contact'),
+  ('contact_phone', '+250788516492', 'contact'),
+  ('contact_address', 'Musanze, Rwanda', 'contact'),
   ('social_instagram', 'https://instagram.com/empc-amani', 'social'),
   ('social_facebook', 'https://facebook.com/empc-amani', 'social'),
   ('social_twitter', 'https://x.com/empc_amani', 'social'),
