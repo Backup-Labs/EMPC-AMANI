@@ -5,6 +5,11 @@ import { ThemeProvider } from "@/components/ui/ThemeProvider";
 export const metadata: Metadata = {
   title: "EMPC-AMANI | Master Carpentry & Furniture",
   description: "Bespoke carpentry and furniture craftsmanship. Empowering future artisans through vocational excellence.",
+  icons: {
+    icon: "/logo.jpg",
+    shortcut: "/logo.jpg",
+    apple: "/logo.jpg",
+  },
 };
 
 export default function RootLayout({
